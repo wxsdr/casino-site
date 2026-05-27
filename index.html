@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Kurahivka RP - Казино</title>
+</head>
+<body>
+
+    <h1>Добро пожаловать в Казино Kurahivka RP</h1>
+    <hr>
+
+    <div id="auth-section">
+        <h3>Шаг 1: Войдите в аккаунт</h3>
+        <input type="text" id="username-input" placeholder="Введите ваш ник в игре">
+        <button onclick="login()">Войти</button>
+    </div>
+
+    <div id="game-section" style="display: none;">
+        <h3>Привет, <span id="player-name">Игрок</span>!</h3>
+        <p>Ваш баланс фишек: <strong id="chips-balance">Загрузка...</strong></p>
+        
+        <hr>
+        <h3>Шаг 2: Сделайте ставку</h3>
+        <input type="number" id="bet-amount" placeholder="Количество фишек" min="1">
+        <br><br>
+        <button onclick="spinWheel()">Испытать удачу (Крутить)</button>
+        
+        <h2 id="result-message" style="color: blue;"></h2>
+    </div>
+
+    <script>
+        // Простейшая логика «входа» без пароля для теста
+        function login() {
+            const username = document.getElementById('username-input').value.trim();
+            if (username === "") {
+                alert("Пожалуйста, введите ник!");
+                return;
+            }
+            
+            // Прячем ввод ника, показываем казино
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('game-section').style.display = 'block';
+            document.getElementById('player-name').innerText = username;
+            
+            // Пока Firebase не подключен, ставим тестовый баланс
+            document.getElementById('chips-balance').innerText = "0 (Перейдем к Firebase - обновится)";
+        }
+
+        // Заглушка для крутилки казино
+        function spinWheel() {
+            const bet = parseInt(document.getElementById('bet-amount').value);
+            if (!bet || bet < 1) {
+                alert("Введите правильную ставку!");
+                return;
+            }
+            
+            document.getElementById('result-message').innerText = "Ставка принята! (Тут будет магия Firebase...)";
+        }
+    </script>
+
+</body>
+</html>

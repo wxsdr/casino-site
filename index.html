@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Kurahivka RP - Казино</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -17,7 +19,7 @@
 
     <div id="game-section" style="display: none;">
         <h3>Привет, <span id="player-name">Игрок</span>!</h3>
-        <p>Ваш баланс фишек: <strong id="chips-balance">Загрузка...</strong></p>
+        <p>Ваш баланс фишек: <strong id="chips-balance">0</strong> 🪙</p>
         
         <hr>
         <h3>Шаг 2: Сделайте ставку</h3>
@@ -29,32 +31,91 @@
     </div>
 
     <script>
-        // Простейшая логика «входа» без пароля для теста
+        // Твоя личная конфигурация Firebase со скриншота
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
+            authDomain: "kurahivka-casino.firebaseapp.com",
+            databaseURL: "https://kurahivka-casino-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "kurahivka-casino",
+            storageBucket: "kurahivka-casino.firebasestorage.app",
+            messagingSenderId: "104831084459",
+            appId: "1:104831084459:web:ef044794d93791ee30ace"
+        };
+
+        // Инициализируем Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        let userNickname = "";
+        let currentChips = 0;
+
+        // Функция входа
         function login() {
             const username = document.getElementById('username-input').value.trim();
             if (username === "") {
                 alert("Пожалуйста, введите ник!");
                 return;
             }
+
+            userNickname = username;
             
-            // Прячем ввод ника, показываем казино
+            // Скрываем авторизацию, показываем казино
             document.getElementById('auth-section').style.display = 'none';
             document.getElementById('game-section').style.display = 'block';
-            document.getElementById('player-name').innerText = username;
+            document.getElementById('player-name').innerText = userNickname;
+
+            // Подключаем живое отслеживание баланса из Firebase
+            // Ищем игрока по его имени (в базе бэкенд будет создавать пути по UUID, но для простоты добавим и по нику)
+            const userRef = database.ref('users_by_name/' + userNickname.toLowerCase());
             
-            // Пока Firebase не подключен, ставим тестовый баланс
-            document.getElementById('chips-balance').innerText = "0 (Перейдем к Firebase - обновится)";
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.chips !== undefined) {
+                    currentChips = data.chips;
+                } else {
+                    currentChips = 0;
+                }
+                document.getElementById('chips-balance').innerText = currentChips;
+            });
         }
 
-        // Заглушка для крутилки казино
+        // Логика рулетки (настоящий рандом)
         function spinWheel() {
             const bet = parseInt(document.getElementById('bet-amount').value);
             if (!bet || bet < 1) {
                 alert("Введите правильную ставку!");
                 return;
             }
-            
-            document.getElementById('result-message').innerText = "Ставка принята! (Тут будет магия Firebase...)";
+            if (bet > currentChips) {
+                alert("Недостаточно фишек на балансе!");
+                return;
+            }
+
+            document.getElementById('result-message').innerText = "Крутим рулетку... 🎰";
+
+            // Генерируем шанс (например, 40% на победу с удвоением ставки)
+            setTimeout(() => {
+                const win = Math.random() < 0.40; 
+                let newChips = currentChips;
+
+                if (win) {
+                    const winAmount = bet * 2;
+                    newChips = currentChips + bet; // Чистый выигрыш равен ставке при x2
+                    document.getElementById('result-message').innerHTML = `§aВы выиграли ${winAmount} фишек! 🎉`;
+                    document.getElementById('result-message').style.color = "green";
+                } else {
+                    newChips = currentChips - bet;
+                    document.getElementById('result-message').innerText = "Вы проиграли ставку. Повезет в следующий раз! 😔";
+                    document.getElementById('result-message').style.color = "red";
+                }
+
+                // Записываем новый баланс обратно в Firebase
+                database.ref('users_by_name/' + userNickname.toLowerCase()).update({
+                    username: userNickname,
+                    chips: newChips
+                });
+
+            }, 1500); // Имитация кручения 1.5 секунды
         }
     </script>
 

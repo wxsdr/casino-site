@@ -7,15 +7,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        :root {
-            --neon: #00ff9d;
-            --neon-red: #ff003c;
-            --bg: #0a0a0c;
-            --glass: rgba(20, 20, 25, 0.8);
-        }
+        :root { --neon: #00ff9d; --neon-red: #ff003c; --bg: #0a0a0c; --glass: rgba(20, 20, 25, 0.8); }
         body { margin: 0; background: radial-gradient(circle at center, #1a1a24 0%, var(--bg) 100%); color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
-        
-        /* Авторизація */
         #auth-section { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
         .auth-box { background: var(--glass); padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); box-shadow: 0 0 30px rgba(0, 255, 157, 0.1); text-align: center; width: 350px; }
         .auth-box h1 { margin-top: 0; color: var(--neon); text-shadow: 0 0 10px var(--neon); }
@@ -24,13 +17,10 @@
         button { width: 100%; padding: 15px; background: var(--neon); color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
         button:hover { box-shadow: 0 0 20px var(--neon); transform: translateY(-2px); }
         button:disabled { background: #555; color: #888; cursor: not-allowed; }
-
-        /* Лобі Казино */
         #lobby-section { display: none; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background: rgba(0,0,0,0.5); border-bottom: 1px solid #333; }
         .balance-badge { background: rgba(0, 255, 157, 0.1); border: 1px solid var(--neon); padding: 10px 20px; border-radius: 30px; font-weight: bold; color: var(--neon); }
         .content { padding: 40px 50px; max-width: 1400px; margin: 0 auto;}
-        
         .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; margin-top: 30px; }
         .game-card { background: var(--glass); padding: 30px 20px; border-radius: 15px; border: 1px solid #333; text-align: center; cursor: pointer; transition: 0.4s; }
         .game-card:hover { transform: translateY(-10px); border-color: var(--neon); box-shadow: 0 10px 30px rgba(0,255,157,0.2); }
@@ -39,6 +29,13 @@
     </style>
 </head>
 <body>
+
+    <div id="out-of-casino-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,10,12,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(15px);">
+        <h1 style="color: var(--neon-red); font-size: 50px; margin: 0; text-shadow: 0 0 20px var(--neon-red);">🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
+        <p style="color: #aaa; font-size: 24px; margin-top: 15px;">Ви покинули територію казино (або вийшли з гри).</p>
+        <p style="color: white; font-size: 18px;">Поверніться до будівлі казино в Minecraft, щоб грати на сайті.</p>
+        <button onclick="logout()" style="width: auto; padding: 15px 40px; margin-top: 30px; background: #333; color: white;">Вийти з акаунта</button>
+    </div>
 
     <div id="auth-section">
         <div class="auth-box">
@@ -63,20 +60,11 @@
         <div class="content">
             <h1 style="border-left: 4px solid var(--neon); padding-left: 15px;">Рулетка (Мультиплеєр)</h1>
             <p style="color: #aaa;">Оберіть стіл. Гра почнеться, коли всі гравці зроблять ставки.</p>
-            
             <div class="game-grid">
-                <div class="game-card" onclick="window.location.href='games/roulette.html?table=1'">
-                    <h3>Стіл #1</h3><p>VIP Рулетка</p>
-                </div>
-                <div class="game-card" onclick="window.location.href='games/roulette.html?table=2'">
-                    <h3>Стіл #2</h3><p>VIP Рулетка</p>
-                </div>
-                <div class="game-card" onclick="window.location.href='games/roulette.html?table=3'">
-                    <h3>Стіл #3</h3><p>VIP Рулетка</p>
-                </div>
-                <div class="game-card" onclick="window.location.href='games/roulette.html?table=4'">
-                    <h3>Стіл #4</h3><p>VIP Рулетка</p>
-                </div>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=1'"><h3>Стіл #1</h3><p>VIP Рулетка</p></div>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=2'"><h3>Стіл #2</h3><p>VIP Рулетка</p></div>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=3'"><h3>Стіл #3</h3><p>VIP Рулетка</p></div>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=4'"><h3>Стіл #4</h3><p>VIP Рулетка</p></div>
             </div>
         </div>
     </div>
@@ -86,10 +74,7 @@
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
             databaseURL: "https://kurahivka-casino-default-rtdb.europe-west1.firebasedatabase.app/",
-            projectId: "kurahivka-casino",
-            storageBucket: "kurahivka-casino.firebasestorage.app",
-            messagingSenderId: "104831084459",
-            appId: "1:104831084459:web:ef044794d93791ee30ace"
+            projectId: "kurahivka-casino"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -103,28 +88,18 @@
             const username = document.getElementById('username-input').value.trim();
             const pin = document.getElementById('pin-input').value.trim();
             const btn = document.getElementById('login-btn');
-
             if (!username || !pin) return alert("Введіть нік і код!");
-
-            btn.innerText = "З'єднання...";
-            btn.disabled = true;
+            btn.innerText = "З'єднання..."; btn.disabled = true;
 
             try {
                 const res = await fetch(`https://casino-backend-039e.onrender.com/api/login?user=${username}&pin=${pin}`);
                 const data = await res.json();
-
                 if (data.success) {
                     localStorage.setItem('casino_user', username.toLowerCase());
                     openLobby(username);
-                } else {
-                    alert("Помилка: " + data.message);
-                }
-            } catch (err) {
-                alert("Сервер недоступний. Спробуйте ще раз.");
-            } finally {
-                btn.innerText = "УВІЙТИ";
-                btn.disabled = false;
-            }
+                } else alert("Помилка: " + data.message);
+            } catch (err) { alert("Сервер недоступний."); } 
+            finally { btn.innerText = "УВІЙТИ"; btn.disabled = false; }
         }
 
         function openLobby(username) {
@@ -134,14 +109,19 @@
 
             database.ref('users_by_name/' + username.toLowerCase()).on('value', (snapshot) => {
                 const data = snapshot.val();
+                
+                // --- ЛОГІКА БЛОКУВАННЯ САЙТУ ---
+                if (data && data.in_casino === false) {
+                    document.getElementById('out-of-casino-overlay').style.display = 'flex';
+                } else {
+                    document.getElementById('out-of-casino-overlay').style.display = 'none';
+                }
+
                 document.getElementById('chips-balance').innerText = data ? (data.chips || 0) : 0;
             });
         }
 
-        function logout() {
-            localStorage.removeItem('casino_user');
-            location.reload();
-        }
+        function logout() { localStorage.removeItem('casino_user'); location.reload(); }
     </script>
 </body>
 </html>

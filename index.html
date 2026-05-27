@@ -1,40 +1,89 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Kurahivka RP - Казино</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurahivka RP Casino | Elite</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --neon: #00ff9d;
+            --neon-red: #ff003c;
+            --bg: #0a0a0c;
+            --glass: rgba(20, 20, 25, 0.7);
+        }
+        body { margin: 0; background: radial-gradient(circle at center, #1a1a24 0%, var(--bg) 100%); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; min-height: 100vh; }
+        
+        /* Авторизація */
+        #auth-section { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        .auth-box { background: var(--glass); padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); box-shadow: 0 0 30px rgba(0, 255, 157, 0.1); text-align: center; width: 350px; }
+        .auth-box h1 { margin-top: 0; color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+        input { width: 90%; padding: 15px; margin: 10px 0; background: rgba(0,0,0,0.5); border: 1px solid #333; color: white; border-radius: 8px; outline: none; font-size: 16px; transition: 0.3s; }
+        input:focus { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,157,0.3); }
+        button { width: 100%; padding: 15px; background: var(--neon); color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        button:hover { box-shadow: 0 0 20px var(--neon); transform: translateY(-2px); }
+        button:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* Лобі Казино */
+        #lobby-section { display: none; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background: rgba(0,0,0,0.5); border-bottom: 1px solid #333; }
+        .balance-badge { background: rgba(0, 255, 157, 0.1); border: 1px solid var(--neon); padding: 10px 20px; border-radius: 30px; font-weight: bold; color: var(--neon); text-shadow: 0 0 5px var(--neon); }
+        .content { padding: 40px 50px; }
+        
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; margin-top: 30px; }
+        .game-card { background: var(--glass); height: 200px; border-radius: 15px; border: 1px solid #333; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; }
+        .game-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); transform: skewX(-20deg); transition: 0.5s; }
+        .game-card:hover::before { left: 150%; }
+        .game-card:hover { transform: translateY(-10px); border-color: var(--neon); box-shadow: 0 10px 30px rgba(0,255,157,0.2); }
+        .game-card h3 { font-size: 24px; margin: 0 0 10px 0; }
+        .game-card p { color: #888; margin: 0; font-size: 14px; }
+    </style>
 </head>
 <body>
 
-    <h1>Добро пожаловать в Казино Kurahivka RP</h1>
-    <hr>
-
     <div id="auth-section">
-        <h3>Шаг 1: Войдите в аккаунт</h3>
-        <input type="text" id="username-input" placeholder="Введите ваш ник в игре">
-        <br><br>
-        <input type="text" id="pin-input" placeholder="Код из игры (/casinopass)">
-        <br><br>
-        <button onclick="login()">Войти</button>
+        <div class="auth-box">
+            <h1>KURAHIVKA RP</h1>
+            <p style="color: #aaa; margin-bottom: 25px;">Вхід у закритий клуб</p>
+            <input type="text" id="username-input" placeholder="Нікнейм у грі">
+            <input type="password" id="pin-input" placeholder="Код із гри (/casinopass)">
+            <button id="login-btn" onclick="login()">УВІЙТИ</button>
+        </div>
     </div>
 
-    <div id="game-section" style="display: none;">
-        <h3>Привет, <span id="player-name">Игрок</span>!</h3>
-        <p>Ваш баланс фишек: <strong id="chips-balance">0</strong> 🪙</p>
-        
-        <hr>
-        <h3>Шаг 2: Сделайте ставку</h3>
-        <input type="number" id="bet-amount" placeholder="Количество фишек" min="1">
-        <br><br>
-        <button onclick="spinWheel()">Испытать удачу (Крутить)</button>
-        
-        <h2 id="result-message" style="color: blue;"></h2>
+    <div id="lobby-section">
+        <div class="header">
+            <h2>🎰 Лобі Казино</h2>
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <span id="player-name">Гравець</span>
+                <div class="balance-badge"><span id="chips-balance">0</span> 🪙</div>
+                <button onclick="logout()" style="width: auto; padding: 10px 20px; margin: 0; background: var(--neon-red); box-shadow: none;">Вихід</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <h1 style="border-left: 4px solid var(--neon); padding-left: 15px;">Настільні ігри</h1>
+            <div class="game-grid">
+                <div class="game-card" onclick="window.location.href='games/roulette.html'">
+                    <h3>Рулетка</h3>
+                    <p>Червоне, чорне, зелене</p>
+                </div>
+                
+                <div class="game-card" onclick="alert('У розробці!')">
+                    <h3>Блекджек</h3>
+                    <p>Класичні карти 21</p>
+                </div>
+                
+                <div class="game-card" onclick="alert('У розробці!')">
+                    <h3>Слоти</h3>
+                    <p>Ігрові автомати</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Твоя личная конфигурация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -44,98 +93,62 @@
             messagingSenderId: "104831084459",
             appId: "1:104831084459:web:ef044794d93791ee30ace"
         };
-
-        // Инициализируем Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        
-        let userNickname = "";
-        let currentChips = 0;
 
-        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА (С ПРОВЕРКОЙ PIN) ---
+        // Перевірка, чи ми вже увійшли (збереження сесії)
+        window.onload = () => {
+            const savedUser = localStorage.getItem('casino_user');
+            if (savedUser) {
+                openLobby(savedUser);
+            }
+        };
+
         async function login() {
             const username = document.getElementById('username-input').value.trim();
             const pin = document.getElementById('pin-input').value.trim();
+            const btn = document.getElementById('login-btn');
 
-            if (username === "" || pin === "") {
-                alert("Пожалуйста, введите ник и код из игры!");
-                return;
-            }
+            if (!username || !pin) return alert("Введіть нік і код!");
 
-            // Отправляем запрос на твой Render сервер для проверки PIN-кода
+            btn.innerText = "З'єднання...";
+            btn.disabled = true;
+
             try {
-                const response = await fetch(`https://casino-backend-039e.onrender.com/api/login?user=${username}&pin=${pin}`);
-                const data = await response.json();
+                // Твій бекенд на Render
+                const res = await fetch(`https://casino-backend-039e.onrender.com/api/login?user=${username}&pin=${pin}`);
+                const data = await res.json();
 
                 if (data.success) {
-                    // Код верный! Пускаем игрока
-                    userNickname = username;
-                    
-                    document.getElementById('auth-section').style.display = 'none';
-                    document.getElementById('game-section').style.display = 'block';
-                    document.getElementById('player-name').innerText = userNickname;
-
-                    // Подключаем живое отслеживание баланса из Firebase
-                    const userRef = database.ref('users_by_name/' + userNickname.toLowerCase());
-                    
-                    userRef.on('value', (snapshot) => {
-                        const dbData = snapshot.val();
-                        if (dbData && dbData.chips !== undefined) {
-                            currentChips = dbData.chips;
-                        } else {
-                            currentChips = 0;
-                        }
-                        document.getElementById('chips-balance').innerText = currentChips;
-                    });
+                    localStorage.setItem('casino_user', username.toLowerCase());
+                    openLobby(username);
                 } else {
-                    // Код неверный или игрока нет в базе
-                    alert("Ошибка: " + data.message);
+                    alert("Помилка: " + data.message);
                 }
-            } catch (error) {
-                alert("Ошибка соединения с сервером авторизации! Подождите пару секунд и попробуйте снова.");
-                console.error(error);
+            } catch (err) {
+                alert("Сервер недоступний. Спробуйте ще раз.");
+            } finally {
+                btn.innerText = "УВІЙТИ";
+                btn.disabled = false;
             }
         }
 
-        // Логика рулетки (настоящий рандом)
-        function spinWheel() {
-            const bet = parseInt(document.getElementById('bet-amount').value);
-            if (!bet || bet < 1) {
-                alert("Введите правильную ставку!");
-                return;
-            }
-            if (bet > currentChips) {
-                alert("Недостаточно фишек на балансе!");
-                return;
-            }
+        function openLobby(username) {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('lobby-section').style.display = 'block';
+            document.getElementById('player-name').innerText = username.toUpperCase();
 
-            document.getElementById('result-message').innerText = "Крутим рулетку... 🎰";
+            // Живий баланс
+            database.ref('users_by_name/' + username.toLowerCase()).on('value', (snapshot) => {
+                const data = snapshot.val();
+                document.getElementById('chips-balance').innerText = data ? (data.chips || 0) : 0;
+            });
+        }
 
-            // Генерируем шанс (например, 40% на победу с удвоением ставки)
-            setTimeout(() => {
-                const win = Math.random() < 0.40; 
-                let newChips = currentChips;
-
-                if (win) {
-                    const winAmount = bet * 2;
-                    newChips = currentChips + bet; // Чистый выигрыш равен ставке при x2
-                    document.getElementById('result-message').innerHTML = `Вы выиграли ${winAmount} фишек! 🎉`;
-                    document.getElementById('result-message').style.color = "green";
-                } else {
-                    newChips = currentChips - bet;
-                    document.getElementById('result-message').innerText = "Вы проиграли ставку. Повезет в следующий раз! 😔";
-                    document.getElementById('result-message').style.color = "red";
-                }
-
-                // Записываем новый баланс обратно в Firebase
-                database.ref('users_by_name/' + userNickname.toLowerCase()).update({
-                    username: userNickname,
-                    chips: newChips
-                });
-
-            }, 1500); // Имитация кручения 1.5 секунды
+        function logout() {
+            localStorage.removeItem('casino_user');
+            location.reload();
         }
     </script>
-
 </body>
 </html>

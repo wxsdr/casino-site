@@ -12,8 +12,11 @@
     <hr>
 
     <div id="auth-section">
-        <h3>Шаг 1: Войдите в аккаунт сука</h3>
+        <h3>Шаг 1: Войдите в аккаунт</h3>
         <input type="text" id="username-input" placeholder="Введите ваш ник в игре">
+        <br><br>
+        <input type="text" id="pin-input" placeholder="Код из игры (/casinopass)">
+        <br><br>
         <button onclick="login()">Войти</button>
     </div>
 
@@ -31,7 +34,7 @@
     </div>
 
     <script>
-        // Твоя личная конфигурация Firebase со скриншота
+        // Твоя личная конфигурация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -49,34 +52,49 @@
         let userNickname = "";
         let currentChips = 0;
 
-        // Функция входа
-        function login() {
+        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА (С ПРОВЕРКОЙ PIN) ---
+        async function login() {
             const username = document.getElementById('username-input').value.trim();
-            if (username === "") {
-                alert("Пожалуйста, введите ник!");
+            const pin = document.getElementById('pin-input').value.trim();
+
+            if (username === "" || pin === "") {
+                alert("Пожалуйста, введите ник и код из игры!");
                 return;
             }
 
-            userNickname = username;
-            
-            // Скрываем авторизацию, показываем казино
-            document.getElementById('auth-section').style.display = 'none';
-            document.getElementById('game-section').style.display = 'block';
-            document.getElementById('player-name').innerText = userNickname;
+            // Отправляем запрос на твой Render сервер для проверки PIN-кода
+            try {
+                const response = await fetch(`https://casino-backend-039e.onrender.com/api/login?user=${username}&pin=${pin}`);
+                const data = await response.json();
 
-            // Подключаем живое отслеживание баланса из Firebase
-            // Ищем игрока по его имени (в базе бэкенд будет создавать пути по UUID, но для простоты добавим и по нику)
-            const userRef = database.ref('users_by_name/' + userNickname.toLowerCase());
-            
-            userRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data && data.chips !== undefined) {
-                    currentChips = data.chips;
+                if (data.success) {
+                    // Код верный! Пускаем игрока
+                    userNickname = username;
+                    
+                    document.getElementById('auth-section').style.display = 'none';
+                    document.getElementById('game-section').style.display = 'block';
+                    document.getElementById('player-name').innerText = userNickname;
+
+                    // Подключаем живое отслеживание баланса из Firebase
+                    const userRef = database.ref('users_by_name/' + userNickname.toLowerCase());
+                    
+                    userRef.on('value', (snapshot) => {
+                        const dbData = snapshot.val();
+                        if (dbData && dbData.chips !== undefined) {
+                            currentChips = dbData.chips;
+                        } else {
+                            currentChips = 0;
+                        }
+                        document.getElementById('chips-balance').innerText = currentChips;
+                    });
                 } else {
-                    currentChips = 0;
+                    // Код неверный или игрока нет в базе
+                    alert("Ошибка: " + data.message);
                 }
-                document.getElementById('chips-balance').innerText = currentChips;
-            });
+            } catch (error) {
+                alert("Ошибка соединения с сервером авторизации! Подождите пару секунд и попробуйте снова.");
+                console.error(error);
+            }
         }
 
         // Логика рулетки (настоящий рандом)
@@ -101,7 +119,7 @@
                 if (win) {
                     const winAmount = bet * 2;
                     newChips = currentChips + bet; // Чистый выигрыш равен ставке при x2
-                    document.getElementById('result-message').innerHTML = `§aВы выиграли ${winAmount} фишек! 🎉`;
+                    document.getElementById('result-message').innerHTML = `Вы выиграли ${winAmount} фишек! 🎉`;
                     document.getElementById('result-message').style.color = "green";
                 } else {
                     newChips = currentChips - bet;

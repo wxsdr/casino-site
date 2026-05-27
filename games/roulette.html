@@ -13,19 +13,30 @@
         body { margin: 0; background: #0a0a0c; color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
         
         .nav-bar { padding: 15px 30px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-between; border-bottom: 2px solid var(--gold); align-items: center;}
-        .back-btn { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 8px 20px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .back-btn { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 8px 20px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-weight: bold;}
         .back-btn:hover { background: var(--gold); color: black; }
         
-        .main-layout { display: flex; max-width: 1200px; margin: 0 auto; padding: 20px; gap: 30px; }
-        .left-panel { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 20px;}
-        .right-panel { width: 300px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; border: 1px solid #333; height: fit-content;}
+        /* Виправлений лейаут: тепер нічого не кривить */
+        .main-layout { 
+            display: flex; 
+            flex-wrap: wrap; /* Дозволяє переносити блоки на малих екранах */
+            justify-content: center; /* Центрує все ідеально */
+            max-width: 1300px; 
+            margin: 0 auto; 
+            padding: 30px 20px; 
+            gap: 40px; 
+        }
+        
+        .left-panel { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 100%;}
+        .right-panel { width: 320px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; border: 1px solid #333; height: fit-content;}
 
-        /* ПЛОСКЕ ЧІТКЕ КОЛЕСО (2D) */
-        .wheel-wrapper { position: relative; width: 350px; height: 350px; padding: 20px; background: var(--wood); border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.8); border: 5px solid var(--gold); }
+        /* КОЛЕСО */
+        .wheel-wrapper { position: relative; width: 350px; height: 350px; padding: 20px; background: var(--wood); border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.8); border: 5px solid var(--gold); margin: 0 auto; }
         .wheel { width: 100%; height: 100%; border-radius: 50%; position: absolute; transition: transform 6s cubic-bezier(0.25, 0.1, 0.15, 1); }
         .wheel-bg { width: 100%; height: 100%; border-radius: 50%; position: absolute; transform: rotate(-4.864deg); }
         .numbers-overlay { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
-        .wheel-number { position: absolute; width: 30px; height: 50%; left: calc(50% - 15px); bottom: 50%; transform-origin: bottom center; text-align: center; color: white; font-weight: bold; font-size: 14px; padding-top: 5px;}
+        
+        .wheel-number { position: absolute; width: 40px; height: 50%; left: calc(50% - 20px); bottom: 50%; transform-origin: bottom center; text-align: center; color: white; font-weight: bold; font-size: 14px; padding-top: 6px; box-sizing: border-box;}
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: radial-gradient(circle, #ffd700, #b8860b); border-radius: 50%; z-index: 10; border: 3px solid #fff; }
         
         /* Кулька */
@@ -33,35 +44,36 @@
         .ball { position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 12px; height: 12px; background: white; border-radius: 50%; box-shadow: -2px 2px 5px rgba(0,0,0,0.8); }
 
         /* ІГРОВИЙ СТІЛ */
-        .table-wrapper { background: var(--wood); padding: 15px; border-radius: 15px; border: 3px solid var(--gold); }
-        .betting-board { display: grid; grid-template-columns: 80px repeat(12, 50px); grid-template-rows: repeat(3, 50px) 40px; background: var(--table-bg); gap: 2px; border: 2px solid white; padding: 2px; }
-        .cell { display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 1px solid rgba(255,255,255,0.5); cursor: pointer; position: relative; user-select: none; transition: 0.2s;}
+        .table-wrapper { background: var(--wood); padding: 15px; border-radius: 15px; border: 3px solid var(--gold); width: fit-content; overflow-x: auto;}
+        .betting-board { display: grid; grid-template-columns: 70px repeat(12, 45px); grid-template-rows: repeat(3, 45px) 40px; background: var(--table-bg); gap: 2px; border: 2px solid white; padding: 2px; width: fit-content;}
+        .cell { display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; border: 1px solid rgba(255,255,255,0.5); cursor: pointer; position: relative; user-select: none; transition: 0.2s;}
         .cell:hover { opacity: 0.8; box-shadow: inset 0 0 10px white; }
         .cell-zero { grid-row: 1 / 4; grid-column: 1; background: var(--green); }
         .row-1 { grid-row: 1; } .row-2 { grid-row: 2; } .row-3 { grid-row: 3; }
         .bottom-bets { grid-row: 4; grid-column: 2 / 14; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
         .cell-red-bet { background: var(--red); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold;}
         .cell-black-bet { background: var(--black); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold;}
-        .chip-on-table { position: absolute; width: 24px; height: 24px; background: radial-gradient(circle, #fff 30%, #2980b9 40%); border-radius: 50%; border: 2px solid white; font-size: 10px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; pointer-events: none; z-index: 10;}
+        
+        .chip-on-table { position: absolute; width: 22px; height: 22px; background: radial-gradient(circle, #fff 30%, #2980b9 40%); border-radius: 50%; border: 2px solid white; font-size: 10px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; pointer-events: none; z-index: 10;}
 
         /* КЕРУВАННЯ */
-        .controls { display: flex; flex-direction: column; gap: 20px; align-items: center; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; width: 100%;}
-        .chip-selector { display: flex; gap: 10px; }
-        .chip { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; color: black; border: 3px dashed white; transition: 0.3s; background: #ecf0f1;}
+        .controls { display: flex; flex-direction: column; gap: 20px; align-items: center; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; width: 100%; box-sizing: border-box;}
+        .chip-selector { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;}
+        .chip { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; color: black; border: 2px dashed white; transition: 0.3s; background: #ecf0f1;}
         .chip.active { transform: scale(1.1); box-shadow: 0 0 15px var(--gold); border: 3px solid var(--gold); }
         .c-50 { background: #3498db; color: white;} .c-100 { background: #2ecc71; } .c-500 { background: #9b59b6; color: white;} .c-1000 { background: #f1c40f; }
 
-        .btn-ready { padding: 15px 30px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; background: var(--gold); color: black; width: 100%;}
+        .btn-ready { padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; background: var(--gold); color: black; width: 100%;}
         .btn-ready:hover { transform: scale(1.02); }
         .btn-ready:disabled { background: #555; color: #888; cursor: not-allowed; }
 
         /* СПИСОК ГРАВЦІВ */
         .players-list { list-style: none; padding: 0; margin: 0; }
-        .players-list li { padding: 10px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 5px; display: flex; justify-content: space-between;}
-        .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: red; margin-right: 10px;}
+        .players-list li { padding: 10px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 5px; display: flex; align-items: center;}
+        .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: red; margin-right: 15px;}
         .status-dot.ready { background: #00ff9d; box-shadow: 0 0 10px #00ff9d;}
         
-        #status-text { font-size: 20px; font-weight: bold; color: var(--gold); min-height: 30px; margin-top: 10px; text-align: center;}
+        #status-text { font-size: 22px; font-weight: bold; color: var(--gold); min-height: 30px; margin-top: 10px; text-align: center; width: 100%;}
     </style>
 </head>
 <body>
@@ -71,7 +83,7 @@
     <audio id="sound-lose" src="../sounds/lose.mp3" preload="auto"></audio>
 
     <div class="nav-bar">
-        <button class="back-btn" onclick="leaveTable()">🔙 Втекти зі столу</button>
+        <button class="back-btn" onclick="leaveTable()">🔙 Вийти в Лобі</button>
         <h2 id="table-title" style="margin: 0; color: var(--gold);">Стіл #1</h2>
         <div style="font-size: 18px;">Баланс: <strong id="balance-display" style="color: var(--neon); font-size: 22px;">0</strong> 🪙</div>
     </div>
@@ -97,11 +109,11 @@
                 </div>
             </div>
 
-            <button onclick="clearBets()" style="background: transparent; color: #888; border: 1px solid #555; padding: 5px 15px; border-radius: 5px; cursor:pointer;">Очистити мої ставки</button>
+            <button onclick="clearBets()" style="background: transparent; color: #888; border: 1px solid #555; padding: 8px 20px; border-radius: 5px; cursor:pointer; margin-top: 10px;">🗑️ Очистити мої ставки</button>
         </div>
 
         <div class="right-panel">
-            <h3 style="margin-top:0; border-bottom: 1px solid #444; padding-bottom: 10px;">Гравці за столом:</h3>
+            <h3 style="margin-top:0; border-bottom: 1px solid #444; padding-bottom: 10px; text-align: center;">Гравці за столом</h3>
             <ul class="players-list" id="players-ul">
                 </ul>
 
@@ -114,7 +126,7 @@
                     <div class="chip c-1000" onclick="selectChip(1000, this)">1K</div>
                 </div>
                 
-                <div>Моя ставка: <strong id="current-bet-display" style="color: white; font-size: 20px;">0</strong></div>
+                <div style="text-align: center; margin: 10px 0;">Моя ставка: <br><strong id="current-bet-display" style="color: white; font-size: 24px;">0</strong></div>
 
                 <button class="btn-ready" id="ready-btn" onclick="toggleReady()">ПІДТВЕРДИТИ СТАВКУ</button>
             </div>
@@ -147,23 +159,21 @@
             document.getElementById('balance-display').innerText = currentBalance;
         });
 
-        // МУЛЬТИПЛЕЄР: Підключення до кімнати
+        // МУЛЬТИПЛЕЄР
         const tableRef = database.ref(`tables/table_${tableId}`);
         const myPlayerRef = tableRef.child('players/' + username);
         
-        myPlayerRef.set({ ready: false }); // При вході ми не готові
-        myPlayerRef.onDisconnect().remove(); // Якщо закрив вкладку - видаляємо зі столу
+        myPlayerRef.set({ ready: false }); 
+        myPlayerRef.onDisconnect().remove();
 
         let isReady = false;
         let isSpinningLocal = false;
         let tableState = 'betting';
 
-        // Слухаємо зміни на столі (Хтось зайшов, вийшов, натиснув готовий, або почався спін)
         tableRef.on('value', snap => {
             const data = snap.val() || { status: 'betting', players: {} };
             const players = data.players || {};
             
-            // 1. Оновлюємо список гравців справа
             const ul = document.getElementById('players-ul');
             ul.innerHTML = '';
             let allReady = true;
@@ -172,14 +182,12 @@
             for (const [name, info] of Object.entries(players)) {
                 playerCount++;
                 if (!info.ready) allReady = false;
-                
                 const dotClass = info.ready ? 'status-dot ready' : 'status-dot';
-                ul.innerHTML += `<li><div><span class="${dotClass}"></span>${name.toUpperCase()}</div></li>`;
+                ul.innerHTML += `<li><span class="${dotClass}"></span>${name.toUpperCase()}</li>`;
             }
 
-            // 2. Якщо всі готові (мінімум 1 гравець), і статус ще betting -> Запускаємо рулетку
+            // Якщо всі готові
             if (allReady && playerCount > 0 && data.status === 'betting') {
-                // Визначаємо "Хоста" (перший за алфавітом), щоб тільки один відправив результат
                 const sortedNames = Object.keys(players).sort();
                 if (username === sortedNames[0]) {
                     const resultIndex = Math.floor(Math.random() * 37);
@@ -187,7 +195,7 @@
                 }
             }
 
-            // 3. Якщо сервер сказав spinning, а ми ще betting -> АНІМАЦІЯ!
+            // Запуск анімації
             if (data.status === 'spinning' && tableState === 'betting') {
                 tableState = 'spinning';
                 playSpinAnimation(data.result);
@@ -207,7 +215,7 @@
 
             const btn = document.getElementById('ready-btn');
             if (isReady) {
-                btn.innerText = "✅ ГОТОВИЙ (ОЧІКУВАННЯ ІНШИХ)";
+                btn.innerText = "✅ ГОТОВИЙ";
                 btn.style.background = "var(--green)";
             } else {
                 btn.innerText = "ПІДТВЕРДИТИ СТАВКУ";
@@ -215,7 +223,7 @@
             }
         }
 
-        // === ГЕНЕРАЦІЯ 2D КОЛЕСА ===
+        // === ГЕНЕРАЦІЯ КОЛЕСА ===
         const wheelOrder = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
         const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
         const sliceAngle = 360 / 37;
@@ -264,7 +272,7 @@
         }
 
         function placeBet(target) {
-            if (isReady || isSpinningLocal) return; // Не можна ставити, якщо вже натиснув готовий
+            if (isReady || isSpinningLocal) return;
             if (totalBetAmount + selectedChipValue > currentBalance) return alert("Недостатньо фішок!");
 
             if (!activeBets[target]) activeBets[target] = 0;
@@ -290,21 +298,19 @@
             document.querySelectorAll('.chip-temp').forEach(c => c.remove());
         }
 
-        // === АНІМАЦІЯ (ЗАПУСКАЄТЬСЯ МУЛЬТИПЛЕЄРОМ) ===
+        // === АНІМАЦІЯ ===
         let currentWheelRotation = 0;
         let currentBallRotation = 0;
 
         async function playSpinAnimation(winningNumber) {
             isSpinningLocal = true;
-            document.getElementById('status-text').innerText = "Кулька крутиться... Ставки не приймаються!";
+            document.getElementById('status-text').innerText = "Кулька крутиться...";
             document.getElementById('status-text').style.color = "white";
             document.getElementById('ready-btn').disabled = true;
 
-            // Відтворюємо звук (якщо він є у папці sounds)
             const spinAudio = document.getElementById('sound-spin');
-            if(spinAudio) spinAudio.play().catch(e => console.log('Аудіо заблоковано браузером'));
+            if(spinAudio) spinAudio.play().catch(()=>{});
 
-            // Списуємо ставку з бази (Тільки коли рулетка реально поїхала)
             if (totalBetAmount > 0) {
                 await userRef.update({ chips: currentBalance - totalBetAmount });
             }
@@ -316,12 +322,11 @@
 
             document.getElementById('wheel').style.transform = `rotate(${currentWheelRotation}deg)`;
             const track = document.getElementById('ball-track');
-            track.style.transform = `rotate(${currentBallRotation}deg) scale(0.8)`; 
+            track.style.transform = `rotate(${currentBallRotation}deg) scale(0.85)`; 
 
-            // ЗАТРИМКА: Результати тільки після зупинки анімації (Через 6 секунд)
             setTimeout(() => {
                 track.style.transform = `rotate(${currentBallRotation}deg) scale(1)`; 
-                setTimeout(() => evaluateLocalBets(winningNumber), 500); // Ще 0.5с щоб кулька "впала"
+                setTimeout(() => evaluateLocalBets(winningNumber), 500);
             }, 5500);
         }
 
@@ -336,17 +341,16 @@
 
             const statusText = document.getElementById('status-text');
             if (winAmount > 0) {
-                statusText.innerHTML = `Випало: <span style="color:var(--${winningColor})">${winningNumber}</span>. Виграш: +${winAmount} 🪙!`;
+                statusText.innerHTML = `Випало: <span style="color:var(--${winningColor})">${winningNumber}</span>. Виграш: +${winAmount} 🪙`;
                 statusText.style.color = "var(--neon)";
                 document.getElementById('sound-win').play().catch(()=>{});
                 await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + winAmount }); });
             } else {
-                statusText.innerHTML = `Випало: <span style="color:var(--${winningColor})">${winningNumber}</span>. Ви програли.`;
+                statusText.innerHTML = `Випало: <span style="color:var(--${winningColor})">${winningNumber}</span>. Програш.`;
                 statusText.style.color = "var(--red)";
                 document.getElementById('sound-lose').play().catch(()=>{});
             }
 
-            // Очищаємо стіл і скидаємо статус кімнати
             setTimeout(() => {
                 activeBets = {}; totalBetAmount = 0; document.getElementById('current-bet-display').innerText = 0;
                 document.querySelectorAll('.chip-temp').forEach(c => c.remove());
@@ -361,7 +365,6 @@
                 
                 myPlayerRef.update({ ready: false });
 
-                // Хост повертає статус столу в 'betting'
                 tableRef.once('value', s => {
                     const p = s.val().players || {};
                     const sorted = Object.keys(p).sort();

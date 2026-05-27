@@ -11,32 +11,30 @@
             --neon: #00ff9d;
             --neon-red: #ff003c;
             --bg: #0a0a0c;
-            --glass: rgba(20, 20, 25, 0.7);
+            --glass: rgba(20, 20, 25, 0.8);
         }
-        body { margin: 0; background: radial-gradient(circle at center, #1a1a24 0%, var(--bg) 100%); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; min-height: 100vh; }
+        body { margin: 0; background: radial-gradient(circle at center, #1a1a24 0%, var(--bg) 100%); color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
         
         /* Авторизація */
         #auth-section { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
         .auth-box { background: var(--glass); padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); box-shadow: 0 0 30px rgba(0, 255, 157, 0.1); text-align: center; width: 350px; }
         .auth-box h1 { margin-top: 0; color: var(--neon); text-shadow: 0 0 10px var(--neon); }
-        input { width: 90%; padding: 15px; margin: 10px 0; background: rgba(0,0,0,0.5); border: 1px solid #333; color: white; border-radius: 8px; outline: none; font-size: 16px; transition: 0.3s; }
+        input { width: 90%; padding: 15px; margin: 10px 0; background: rgba(0,0,0,0.5); border: 1px solid #333; color: white; border-radius: 8px; outline: none; font-size: 16px; transition: 0.3s; box-sizing: border-box;}
         input:focus { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,157,0.3); }
         button { width: 100%; padding: 15px; background: var(--neon); color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
         button:hover { box-shadow: 0 0 20px var(--neon); transform: translateY(-2px); }
-        button:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
+        button:disabled { background: #555; color: #888; cursor: not-allowed; }
 
         /* Лобі Казино */
         #lobby-section { display: none; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background: rgba(0,0,0,0.5); border-bottom: 1px solid #333; }
-        .balance-badge { background: rgba(0, 255, 157, 0.1); border: 1px solid var(--neon); padding: 10px 20px; border-radius: 30px; font-weight: bold; color: var(--neon); text-shadow: 0 0 5px var(--neon); }
-        .content { padding: 40px 50px; }
+        .balance-badge { background: rgba(0, 255, 157, 0.1); border: 1px solid var(--neon); padding: 10px 20px; border-radius: 30px; font-weight: bold; color: var(--neon); }
+        .content { padding: 40px 50px; max-width: 1400px; margin: 0 auto;}
         
         .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; margin-top: 30px; }
-        .game-card { background: var(--glass); height: 200px; border-radius: 15px; border: 1px solid #333; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; }
-        .game-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); transform: skewX(-20deg); transition: 0.5s; }
-        .game-card:hover::before { left: 150%; }
+        .game-card { background: var(--glass); padding: 30px 20px; border-radius: 15px; border: 1px solid #333; text-align: center; cursor: pointer; transition: 0.4s; }
         .game-card:hover { transform: translateY(-10px); border-color: var(--neon); box-shadow: 0 10px 30px rgba(0,255,157,0.2); }
-        .game-card h3 { font-size: 24px; margin: 0 0 10px 0; }
+        .game-card h3 { font-size: 24px; margin: 0 0 10px 0; color: var(--neon); }
         .game-card p { color: #888; margin: 0; font-size: 14px; }
     </style>
 </head>
@@ -54,21 +52,11 @@
 
     <div id="lobby-section">
         <div class="header">
-            <h2>🎰 Лобі Казино</h2>
+            <h2 style="margin: 0;">🎰 Лобі Казино</h2>
             <div style="display: flex; gap: 20px; align-items: center;">
                 <span id="player-name">Гравець</span>
                 <div class="balance-badge"><span id="chips-balance">0</span> 🪙</div>
-                <button onclick="logout()" style="width: auto; padding: 10px 20px; margin: 0; background: var(--neon-red); box-shadow: none;">Вихід</button>
-            </div>
-        </div>
-
-        <<div id="lobby-section">
-        <div class="header">
-            <h2>🎰 Лобі Казино</h2>
-            <div style="display: flex; gap: 20px; align-items: center;">
-                <span id="player-name">Гравець</span>
-                <div class="balance-badge"><span id="chips-balance">0</span> 🪙</div>
-                <button onclick="logout()" style="width: auto; padding: 10px 20px; margin: 0; background: #ff003c; box-shadow: none; color: white;">Вихід</button>
+                <button onclick="logout()" style="width: auto; padding: 10px 20px; margin: 0; background: var(--neon-red); box-shadow: none; color: white;">Вихід</button>
             </div>
         </div>
 
@@ -78,20 +66,16 @@
             
             <div class="game-grid">
                 <div class="game-card" onclick="window.location.href='games/roulette.html?table=1'">
-                    <h3 style="color: var(--neon)">Стіл #1</h3>
-                    <p>VIP Рулетка</p>
+                    <h3>Стіл #1</h3><p>VIP Рулетка</p>
                 </div>
                 <div class="game-card" onclick="window.location.href='games/roulette.html?table=2'">
-                    <h3 style="color: var(--neon)">Стіл #2</h3>
-                    <p>VIP Рулетка</p>
+                    <h3>Стіл #2</h3><p>VIP Рулетка</p>
                 </div>
                 <div class="game-card" onclick="window.location.href='games/roulette.html?table=3'">
-                    <h3 style="color: var(--neon)">Стіл #3</h3>
-                    <p>VIP Рулетка</p>
+                    <h3>Стіл #3</h3><p>VIP Рулетка</p>
                 </div>
                 <div class="game-card" onclick="window.location.href='games/roulette.html?table=4'">
-                    <h3 style="color: var(--neon)">Стіл #4</h3>
-                    <p>VIP Рулетка</p>
+                    <h3>Стіл #4</h3><p>VIP Рулетка</p>
                 </div>
             </div>
         </div>
@@ -110,12 +94,9 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Перевірка, чи ми вже увійшли (збереження сесії)
         window.onload = () => {
             const savedUser = localStorage.getItem('casino_user');
-            if (savedUser) {
-                openLobby(savedUser);
-            }
+            if (savedUser) openLobby(savedUser);
         };
 
         async function login() {
@@ -129,7 +110,6 @@
             btn.disabled = true;
 
             try {
-                // Твій бекенд на Render
                 const res = await fetch(`https://casino-backend-039e.onrender.com/api/login?user=${username}&pin=${pin}`);
                 const data = await res.json();
 
@@ -152,7 +132,6 @@
             document.getElementById('lobby-section').style.display = 'block';
             document.getElementById('player-name').innerText = username.toUpperCase();
 
-            // Живий баланс
             database.ref('users_by_name/' + username.toLowerCase()).on('value', (snapshot) => {
                 const data = snapshot.val();
                 document.getElementById('chips-balance').innerText = data ? (data.chips || 0) : 0;

@@ -62,22 +62,36 @@
             </div>
         </div>
 
+        <<div id="lobby-section">
+        <div class="header">
+            <h2>🎰 Лобі Казино</h2>
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <span id="player-name">Гравець</span>
+                <div class="balance-badge"><span id="chips-balance">0</span> 🪙</div>
+                <button onclick="logout()" style="width: auto; padding: 10px 20px; margin: 0; background: #ff003c; box-shadow: none; color: white;">Вихід</button>
+            </div>
+        </div>
+
         <div class="content">
-            <h1 style="border-left: 4px solid var(--neon); padding-left: 15px;">Настільні ігри</h1>
+            <h1 style="border-left: 4px solid var(--neon); padding-left: 15px;">Рулетка (Мультиплеєр)</h1>
+            <p style="color: #aaa;">Оберіть стіл. Гра почнеться, коли всі гравці зроблять ставки.</p>
+            
             <div class="game-grid">
-                <div class="game-card" onclick="window.location.href='games/roulette.html'">
-                    <h3>Рулетка</h3>
-                    <p>Червоне, чорне, зелене</p>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=1'">
+                    <h3 style="color: var(--neon)">Стіл #1</h3>
+                    <p>VIP Рулетка</p>
                 </div>
-                
-                <div class="game-card" onclick="alert('У розробці!')">
-                    <h3>Блекджек</h3>
-                    <p>Класичні карти 21</p>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=2'">
+                    <h3 style="color: var(--neon)">Стіл #2</h3>
+                    <p>VIP Рулетка</p>
                 </div>
-                
-                <div class="game-card" onclick="alert('У розробці!')">
-                    <h3>Слоти</h3>
-                    <p>Ігрові автомати</p>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=3'">
+                    <h3 style="color: var(--neon)">Стіл #3</h3>
+                    <p>VIP Рулетка</p>
+                </div>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=4'">
+                    <h3 style="color: var(--neon)">Стіл #4</h3>
+                    <p>VIP Рулетка</p>
                 </div>
             </div>
         </div>

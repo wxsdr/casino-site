@@ -151,7 +151,18 @@
         let currentBalance = 0;
         const userRef = database.ref('users_by_name/' + username);
         userRef.on('value', snap => {
-            currentBalance = snap.val() ? (snap.val().chips || 0) : 0;
+            const data = snap.val();
+            
+            // --- ЛОГІКА БЛОКУВАННЯ НА СТОЛІ ---
+            if (data && data.in_casino === false) {
+                document.getElementById('out-of-casino-overlay').style.display = 'flex';
+                // Автоматично робимо гравця "Не готовим", якщо він вийшов з казино
+                if (isReady) toggleReady(); 
+            } else {
+                document.getElementById('out-of-casino-overlay').style.display = 'none';
+            }
+
+            currentBalance = data ? (data.chips || 0) : 0;
             document.getElementById('balance-display').innerText = currentBalance;
         });
 

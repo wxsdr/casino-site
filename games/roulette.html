@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Рулетка | Kurahivka RP</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        :root { --bg: #0a0a0c; --neon: #00ff9d; --red: #ff3333; --black: #222; --green: #00cc66; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; }
+        
+        .nav-bar { padding: 20px; background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; border-bottom: 1px solid #333; }
+        .back-btn { background: transparent; color: white; border: 1px solid #555; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .back-btn:hover { background: #333; }
+        
+        .game-area { padding: 50px; max-width: 800px; margin: 0 auto; }
+        
+        /* Кнопки ставок */
+        .bet-controls { display: flex; gap: 10px; justify-content: center; margin: 30px 0; }
+        .bet-btn { padding: 15px 40px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: white; transition: 0.2s; border: 2px solid transparent; }
+        .bet-btn:hover { transform: scale(1.05); }
+        .bet-btn.active { border-color: white; box-shadow: 0 0 15px white; }
+        
+        .btn-red { background: var(--red); }
+        .btn-black { background: var(--black); border: 1px solid #444; }
+        .btn-green { background: var(--green); }
+        
+        input[type="number"] { padding: 15px; font-size: 18px; background: #111; color: var(--neon); border: 1px solid #333; border-radius: 8px; text-align: center; width: 200px; margin-bottom: 20px; outline: none;}
+        
+        .spin-btn { background: var(--neon); color: black; font-size: 24px; font-weight: bold; padding: 15px 50px; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; width: 100%; max-width: 400px; }
+        .spin-btn:hover { box-shadow: 0 0 30px var(--neon); }
+        .spin-btn:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+        
+        #result-box { margin-top: 40px; font-size: 28px; font-weight: bold; height: 40px; }
+    </style>
+</head>
+<body>
+
+    <div class="nav-bar">
+        <button class="back-btn" onclick="window.location.href='../index.html'">🔙 В Лобі</button>
+        <div style="font-size: 20px;">Баланс: <strong id="balance-display" style="color: var(--neon);">0</strong> 🪙</div>
+    </div>
+
+    <div class="game-area">
+        <h1>Європейська Рулетка</h1>
+        <p style="color: #aaa;">Оберіть колір та введіть суму ставки</p>
+        
+        <input type="number" id="bet-amount" placeholder="Сума ставки (фішки)" min="1">
+        
+        <div class="bet-controls">
+            <button class="bet-btn btn-red" onclick="selectColor('red')">ЧЕРВОНЕ (x2)</button>
+            <button class="bet-btn btn-green" onclick="selectColor('green')">ЗЕЛЕНЕ (x14)</button>
+            <button class="bet-btn btn-black" onclick="selectColor('black')">ЧОРНЕ (x2)</button>
+        </div>
+
+        <button class="spin-btn" id="spin-btn" onclick="playRoulette()">КРУТИТИ</button>
+        
+        <div id="result-box"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
+            authDomain: "kurahivka-casino.firebaseapp.com",
+            databaseURL: "https://kurahivka-casino-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "kurahivka-casino"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Захист: якщо зайшов не через логін — викидаємо назад
+        const username = localStorage.getItem('casino_user');
+        if (!username) window.location.href = '../index.html';
+
+        let currentChips = 0;
+        let selectedColor = null;
+        let isSpinning = false;
+
+        // Синхронізація балансу
+        const userRef = database.ref('users_by_name/' + username);
+        userRef.on('value', (snapshot) => {
+            currentChips = snapshot.val() ? (snapshot.val().chips || 0) : 0;
+            document.getElementById('balance-display').innerText = currentChips;
+        });
+
+        function selectColor(color) {
+            if (isSpinning) return;
+            selectedColor = color;
+            document.querySelectorAll('.bet-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.btn-' + color).classList.add('active');
+        }
+
+        async function playRoulette() {
+            if (isSpinning) return;
+            
+            const betAmount = parseInt(document.getElementById('bet-amount').value);
+            const resultBox = document.getElementById('result-box');
+
+            if (!selectedColor) return alert('Оберіть колір!');
+            if (!betAmount || betAmount < 1) return alert('Введіть коректну ставку!');
+            if (betAmount > currentChips) return alert('Недостатньо фішок!');
+
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+            
+            // 1. Спочатку знімаємо фішки (щоб уникнути багів з подвійними кліками)
+            await userRef.update({ chips: currentChips - betAmount });
+
+            resultBox.style.color = 'white';
+            resultBox.innerText = 'Кулька крутиться... 🌀';
+
+            // 2. Логіка рулетки (Генерація числа від 0 до 36)
+            setTimeout(async () => {
+                const roll = Math.floor(Math.random() * 37);
+                let winningColor;
+
+                if (roll === 0) winningColor = 'green';
+                else if (roll % 2 === 0) winningColor = 'black'; // Спрощена логіка для парних/непарних
+                else winningColor = 'red';
+
+                // 3. Перевірка результату
+                if (selectedColor === winningColor) {
+                    const multiplier = (winningColor === 'green') ? 14 : 2;
+                    const winAmount = betAmount * multiplier;
+                    
+                    // Віддаємо виграш (списані гроші + профіт)
+                    await userRef.once('value').then(snap => {
+                        const actualChips = snap.val().chips;
+                        userRef.update({ chips: actualChips + winAmount });
+                    });
+
+                    resultBox.innerHTML = `Випало <span style="color:var(--${winningColor})">${winningColor.toUpperCase()}</span>! Ви виграли ${winAmount} фішок! 🎉`;
+                } else {
+                    resultBox.innerHTML = `Випало <span style="color:var(--${winningColor})">${winningColor.toUpperCase()}</span>. Ставка згоріла. 😔`;
+                }
+
+                isSpinning = false;
+                document.getElementById('spin-btn').disabled = false;
+            }, 2000); // 2 секунди анімації
+        }
+    </script>
+</body>
+</html>

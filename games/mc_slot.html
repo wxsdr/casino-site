@@ -305,7 +305,6 @@
             background-color: var(--c-right);
         }
 
-        /* Block colors */
         .block-dirt { --c-top: #6b4c3b; --c-front: #8b5e3c; --c-right: #5a3d2a; }
         .block-wood { --c-top: #8b6b4a; --c-front: #ab8b5a; --c-right: #6b4b3a; }
         .block-gold { --c-top: #fce029; --c-front: #d4b51c; --c-right: #a3890f; }
@@ -364,34 +363,18 @@
             z-index: 20;
         }
 
-        /* ========== РЕАЛЬНА 3D АНІМАЦІЯ ОБЕРТАННЯ БЛОКУ (текстура не змінюється) ========== */
         @keyframes real3DRotate {
-            0% {
-                transform: rotateX(-20deg) rotateY(-35deg) scale(1);
-            }
-            25% {
-                transform: rotateX(-20deg) rotateY(325deg) scale(1.1);
-                filter: drop-shadow(0 0 15px #ffd700);
-            }
-            50% {
-                transform: rotateX(340deg) rotateY(325deg) scale(1.15);
-                filter: drop-shadow(0 0 25px #ffd700);
-            }
-            75% {
-                transform: rotateX(340deg) rotateY(-35deg) scale(1.1);
-                filter: drop-shadow(0 0 15px #ffd700);
-            }
-            100% {
-                transform: rotateX(-20deg) rotateY(-35deg) scale(1);
-                filter: drop-shadow(0 0 0px #ffd700);
-            }
+            0% { transform: rotateX(-20deg) rotateY(-35deg) scale(1); }
+            25% { transform: rotateX(-20deg) rotateY(325deg) scale(1.1); filter: drop-shadow(0 0 15px #ffd700); }
+            50% { transform: rotateX(340deg) rotateY(325deg) scale(1.15); filter: drop-shadow(0 0 25px #ffd700); }
+            75% { transform: rotateX(340deg) rotateY(-35deg) scale(1.1); filter: drop-shadow(0 0 15px #ffd700); }
+            100% { transform: rotateX(-20deg) rotateY(-35deg) scale(1); filter: drop-shadow(0 0 0px #ffd700); }
         }
         
         .winning-block {
             animation: real3DRotate 0.7s cubic-bezier(0.34, 1.2, 0.64, 1) forwards !important;
         }
 
-        /* CONTROL PANEL */
         .control-panel {
             width: 1100px;
             display: flex;
@@ -515,7 +498,6 @@
             color: white;
         }
 
-        /* MODALS */
         .overlay {
             position: fixed;
             inset: 0;
@@ -620,7 +602,6 @@
 
     <div id="game-wrapper">
         <div class="game-container">
-            <!-- Історія виграшів ЗЛІВА -->
             <div class="win-history">
                 <h4>📜 ІСТОРІЯ ВИГРАШІВ</h4>
                 <div class="history-list" id="history-list">
@@ -708,7 +689,6 @@
     </div>
 
     <script>
-        // ========== AUDIO ==========
         let audioContext = null;
         
         function initAudio() {
@@ -723,55 +703,72 @@
                 const now = audioContext.currentTime;
                 const gainNode = audioContext.createGain();
                 gainNode.connect(audioContext.destination);
+                
                 if (type === 'spin') {
                     const osc = audioContext.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.value = 880;
-                    gainNode.gain.value = 0.1;
+                    osc.type = 'square';
+                    osc.frequency.value = 200;
+                    gainNode.gain.value = 0.08;
                     osc.connect(gainNode);
                     osc.start();
-                    osc.stop(now + 0.1);
+                    osc.stop(now + 0.15);
                 } else if (type === 'win') {
-                    const osc1 = audioContext.createOscillator();
-                    const osc2 = audioContext.createOscillator();
-                    osc1.type = 'sine';
-                    osc2.type = 'sine';
-                    osc1.frequency.value = 523.25;
-                    osc2.frequency.value = 659.25;
-                    gainNode.gain.value = 0.15;
-                    osc1.connect(gainNode);
-                    osc2.connect(gainNode);
-                    osc1.start();
-                    osc2.start();
-                    osc1.stop(now + 0.3);
-                    osc2.stop(now + 0.3);
-                } else if (type === 'bigwin') {
-                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    const notes = [523.25, 659.25, 783.99];
                     notes.forEach((freq, i) => {
                         const osc = audioContext.createOscillator();
                         const g = audioContext.createGain();
                         osc.type = 'sine';
                         osc.frequency.value = freq;
+                        g.gain.value = 0.1;
+                        osc.connect(g);
+                        g.connect(audioContext.destination);
+                        osc.start();
+                        osc.stop(now + 0.2 + i * 0.12);
+                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.25 + i * 0.12);
+                    });
+                } else if (type === 'bigwin') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.52];
+                    notes.forEach((freq, i) => {
+                        const osc = audioContext.createOscillator();
+                        const g = audioContext.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.value = freq;
                         g.gain.value = 0.12;
                         osc.connect(g);
                         g.connect(audioContext.destination);
                         osc.start();
-                        osc.stop(now + 0.2 + i * 0.1);
-                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.3 + i * 0.1);
+                        osc.stop(now + 0.15 + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.2 + i * 0.1);
                     });
                 } else if (type === 'bonus') {
                     const osc = audioContext.createOscillator();
-                    osc.type = 'triangle';
+                    osc.type = 'sine';
                     osc.frequency.value = 440;
-                    gainNode.gain.value = 0.2;
+                    gainNode.gain.value = 0.15;
                     osc.connect(gainNode);
                     osc.start();
-                    osc.stop(now + 0.4);
+                    osc.stop(now + 0.3);
+                    const osc2 = audioContext.createOscillator();
+                    osc2.type = 'sine';
+                    osc2.frequency.value = 880;
+                    const g2 = audioContext.createGain();
+                    g2.gain.value = 0.1;
+                    osc2.connect(g2);
+                    g2.connect(audioContext.destination);
+                    osc2.start();
+                    osc2.stop(now + 0.25);
+                } else if (type === 'reel') {
+                    const osc = audioContext.createOscillator();
+                    osc.type = 'sawtooth';
+                    osc.frequency.value = 150;
+                    gainNode.gain.value = 0.04;
+                    osc.connect(gainNode);
+                    osc.start();
+                    osc.stop(now + 0.05);
                 }
             } catch(e) { console.log('Audio error:', e); }
         }
 
-        // ========== RESIZE ==========
         function resizeGame() {
             const wrapper = document.getElementById('game-wrapper');
             const scene = document.getElementById('game-scene');
@@ -781,7 +778,6 @@
         window.addEventListener('resize', resizeGame);
         setTimeout(resizeGame, 100);
 
-        // ========== FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -800,7 +796,6 @@
             document.getElementById('balance-amount').innerText = currentBalance;
         });
 
-        // ========== GAME VARS ==========
         const blockTypes = ['block-dirt', 'block-wood', 'block-gold', 'block-diamond', 'block-emerald'];
         const wildBlock = 'block-wild';
         const scatterBlock = 'block-scatter';
@@ -842,7 +837,6 @@
         
         function addToHistory(message, type = 'win') {
             const historyDiv = document.getElementById('history-list');
-            // Видаляємо заглушку якщо є
             if (historyDiv.children.length === 1 && historyDiv.children[0].innerText.includes('немає записів')) {
                 historyDiv.innerHTML = '';
             }
@@ -1027,6 +1021,7 @@
                 const strip = document.getElementById(`strip-${x}`);
                 strip.style.transition = `transform ${animDuration}s cubic-bezier(0.2, 0.95, 0.4, 1.05)`;
                 strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * 138}px)`;
+                if (isTurbo) playSound('reel');
             }
             
             setTimeout(async () => {
@@ -1042,7 +1037,6 @@
                 const winAmount = winResult.totalWin;
                 const winPositions = winResult.winPositions;
                 
-                // Анімація ТІЛЬКИ на виграшних блоках - реальне 3D обертання (текстура не змінюється)
                 if (winAmount > 0) {
                     if (winAmount >= currentBet * 20) playSound('bigwin');
                     else playSound('win');

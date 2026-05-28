@@ -60,7 +60,7 @@
         .step.active .step-text { color: white; text-shadow: 0 0 10px white; transform: scale(1.15);}
 
         /* =========================================
-           ІСТОРІЯ ІГОР (НОВА ПАНЕЛЬ ЗЛІВА)
+           ІСТОРІЯ ІГОР
         ========================================= */
         .history-panel { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); background: rgba(10, 15, 25, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 10; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
         .history-title { font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; writing-mode: vertical-rl; transform: rotate(180deg);}
@@ -84,7 +84,6 @@
             transition: transform 0.1s ease-out;
         }
 
-        /* Анімація коли м'яч влітає в сітку */
         @keyframes net-impact {
             0% { transform: translateX(-50%) scale(1); }
             50% { transform: translateX(-50%) scale(1.02) translateY(-10px); }
@@ -93,12 +92,12 @@
         .goal-hit { animation: net-impact 0.4s ease-out; }
 
         /* =========================================
-           ПЕРЕМАЛЬОВАНИЙ ГОЛОГРАФІЧНИЙ ВОРОТАР
+           ГОЛОГРАФІЧНИЙ ВОРОТАР
         ========================================= */
         .goalkeeper { 
             position: absolute; bottom: 0; left: 50%; width: 160px; height: 210px; margin-left: -80px;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            z-index: 3; transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1); /* Стрибок з відтяжкою */
+            z-index: 3; transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
             filter: drop-shadow(0 0 20px var(--holo-red));
         }
         .gk-head { width: 45px; height: 50px; background: rgba(255,42,95,0.9); border: 2px solid #fff; border-radius: 40% 40% 50% 50%; margin-bottom: -5px; z-index: 2; box-shadow: inset 0 0 10px #fff;}
@@ -127,13 +126,12 @@
         .target-zones.active .zone:hover .target-icon { opacity: 1; transform: scale(1); border: 3px solid var(--neon); box-shadow: 0 0 25px rgba(0,255,157,0.6), inset 0 0 20px rgba(0,255,157,0.4); background: rgba(0,255,157,0.2);}
 
         /* =========================================
-           3D М'ЯЧ (КРАЩА БАЛІСТИКА)
+           3D М'ЯЧ
         ========================================= */
         .ball { 
             width: 90px; height: 90px; border-radius: 50%; position: absolute; bottom: 5%; left: 50%; margin-left: -45px; z-index: 10;
             background: radial-gradient(circle at 35% 35%, #fff 0%, #ddd 40%, #555 80%, #222 100%);
             box-shadow: -15px 25px 30px rgba(0,0,0,0.8), inset -5px -5px 15px rgba(0,0,0,0.7);
-            /* Нова анімація: Різкий старт, повільне приземлення в сітці */
             transition: transform 0.45s cubic-bezier(0.1, 0.9, 0.2, 1); pointer-events: none;
         }
         .ball::after {
@@ -145,7 +143,7 @@
         /* =========================================
            НИЖНЯ ПАНЕЛЬ КЕРУВАННЯ
         ========================================= */
-        .controls-bar { background: rgba(10, 15, 25, 0.98); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,229,255,0.2); z-index: 100; height: 100px; box-shadow: 0 -15px 40px rgba(0,0,0,0.8);}
+        .controls-bar { background: rgba(10, 15, 25, 0.98); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,229,255,0.2); z-index: 100; height: 100px; box-shadow: 0 -10px 30px rgba(0,0,0,0.8);}
         
         .panel-block { display: flex; align-items: center; gap: 30px; flex: 1;}
         .panel-block.right { justify-content: flex-end;}
@@ -322,13 +320,12 @@
         // ІГРОВА ЛОГІКА ТА ЖОРСТКИЙ БАЛАНС (50%)
         // ==========================================
         const multipliers = [1.92, 3.84, 7.68, 15.36, 30.72];
-        const WIN_CHANCE = 0.50; // Ідеально для казино
+        const WIN_CHANCE = 0.50; 
 
         let currentStep = -1; 
         let currentBet = 10;
         let potentialWin = 0;
         let isAnimating = false;
-        let sessionHistory = []; // Локальна історія ударів
 
         const playBtn = document.getElementById('play-btn');
         const collectBtn = document.getElementById('collect-btn');
@@ -391,11 +388,7 @@
             item.className = `history-item ${isWin ? 'hist-win' : 'hist-loss'}`;
             item.innerHTML = isWin ? '⚽' : '❌';
             historyList.prepend(item);
-            
-            // Зберігаємо не більше 8 елементів
-            if (historyList.children.length > 8) {
-                historyList.removeChild(historyList.lastChild);
-            }
+            if (historyList.children.length > 8) historyList.removeChild(historyList.lastChild);
         }
 
         function shoot(target) {
@@ -404,30 +397,27 @@
             targetZones.classList.remove('active');
             collectBtn.disabled = true;
 
-            // ЗВУК УДАРУ
             let soundKick = document.getElementById('sound-kick');
             soundKick.currentTime = 0; soundKick.play().catch(()=>{});
 
             const ball = document.getElementById('ball');
             const goalie = document.getElementById('goalkeeper');
 
-            // ІДЕАЛЬНА 3D БАЛІСТИКА
+            // ВИПРАВЛЕНА БАЛІСТИКА (Ідеальні дев'ятки та нижні кути)
             const targets = {
-                // Дев'ятки летять високо і далеко (scale 0.35)
-                'tl': { x: '-380px', y: '-330px', s: 0.35 },
-                'tc': { x: '0px',    y: '-320px', s: 0.35 },
-                'tr': { x: '380px',  y: '-330px', s: 0.35 },
-                // Нижні кути летять нижче, але здаються ближче (scale 0.45)
-                'bl': { x: '-400px', y: '-100px', s: 0.45 },
-                'br': { x: '400px',  y: '-100px', s: 0.45 }
+                'tl': { x: '-400px', y: '-550px', s: 0.25 },
+                'tc': { x: '0px',    y: '-550px', s: 0.25 },
+                'tr': { x: '400px',  y: '-550px', s: 0.25 },
+                'bl': { x: '-420px', y: '-250px', s: 0.35 },
+                'br': { x: '420px',  y: '-250px', s: 0.35 }
             };
 
             const dives = [
-                { id: 'tl', t: 'translate(-250px, -150px) rotate(-60deg) scale(1.1)' },
-                { id: 'tc', t: 'translate(0, -180px) scale(1.2)' },
-                { id: 'tr', t: 'translate(250px, -150px) rotate(60deg) scale(1.1)' },
-                { id: 'bl', t: 'translate(-280px, -20px) rotate(-85deg) scale(1.1)' },
-                { id: 'br', t: 'translate(280px, -20px) rotate(85deg) scale(1.1)' }
+                { id: 'tl', t: 'translate(-280px, -250px) rotate(-60deg) scale(1.1)' },
+                { id: 'tc', t: 'translate(0, -220px) scale(1.2)' },
+                { id: 'tr', t: 'translate(280px, -250px) rotate(60deg) scale(1.1)' },
+                { id: 'bl', t: 'translate(-300px, -40px) rotate(-85deg) scale(1.1)' },
+                { id: 'br', t: 'translate(300px, -40px) rotate(85deg) scale(1.1)' }
             ];
 
             const isGoal = Math.random() < WIN_CHANCE;
@@ -440,16 +430,16 @@
             }
 
             const pos = targets[target];
-            // М'яч летить різко, крутиться
+            
+            // Запускаємо м'яч
+            ball.style.transition = 'transform 0.45s cubic-bezier(0.1, 0.9, 0.2, 1)';
             ball.style.transform = `translateX(calc(-50% + ${pos.x})) translateY(${pos.y}) scale(${pos.s}) rotate(${Math.random() * 1080}deg)`;
             
-            // Воротар стрибає з мікрозатримкою
             setTimeout(() => { goalie.style.transform = goalieDive; }, 80);
 
-            // Оцінка удару (через 400мс, коли м'яч долетів)
+            // Оцінка удару (через 350мс - момент удару або сейву)
             setTimeout(() => {
                 if (isGoal) {
-                    // Анімація сітки ворот
                     goalNet.classList.add('goal-hit');
                     setTimeout(() => goalNet.classList.remove('goal-hit'), 400);
 
@@ -463,6 +453,14 @@
                     if (currentStep >= 5) setTimeout(() => collectWinnings(), 1500); 
                     else setTimeout(() => resetPitch(), 1500); 
                 } else {
+                    // ФІЗИКА ВІДСКОКУ: М'яч відлітає від воротаря!
+                    const bounceX = (Math.random() > 0.5 ? 1 : -1) * (600 + Math.random() * 600); 
+                    const bounceY = -200 - Math.random() * 600; 
+                    const bounceS = 0.4 + Math.random() * 0.4; 
+                    
+                    ball.style.transition = 'transform 0.5s ease-out';
+                    ball.style.transform = `translateX(calc(-50% + ${bounceX}px)) translateY(${bounceY}px) scale(${bounceS}) rotate(${Math.random() * 2000}deg)`;
+
                     addHistory(false);
                     showMsg("СЕЙВ!", "msg-save");
                     document.getElementById('sound-lose').currentTime = 0;
@@ -470,7 +468,7 @@
                     currentStep = -1; potentialWin = 0;
                     setTimeout(() => resetPitch(), 2000);
                 }
-            }, 400); // Синхронізовано з часом польоту м'яча
+            }, 350); 
         }
 
         async function collectWinnings() {
@@ -497,7 +495,6 @@
             goalie.style.transform = 'translateX(-50%) translateY(0) rotate(0deg) scale(1)';
             
             setTimeout(() => {
-                // Відновлюємо плавні переходи
                 ball.style.transition = 'transform 0.45s cubic-bezier(0.1, 0.9, 0.2, 1)';
                 goalie.style.transition = 'transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1)';
                 isAnimating = false; updateUI();

@@ -134,7 +134,6 @@
             gap: 25px;
         }
         
-        /* CARDS */
         .cards-container {
             display: flex;
             gap: 40px;
@@ -207,7 +206,6 @@
             font-weight: 600;
         }
         
-        /* BET OPTIONS */
         .bet-options {
             display: flex;
             gap: 20px;
@@ -483,7 +481,6 @@
             
             <div class="action-buttons">
                 <button class="action-btn primary" id="play-btn">🎴 ЗІГРАТИ</button>
-                <button class="action-btn" id="new-game-btn">🔄 НОВА ГРА</button>
             </div>
         </div>
         
@@ -496,7 +493,6 @@
     </div>
 
     <script>
-        // ========== ЗВУКИ ==========
         let audioContext = null;
         
         function initAudio() {
@@ -581,7 +577,6 @@
             } catch(e) {}
         }
 
-        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -599,7 +594,6 @@
         let isPlaying = false;
         let currentCard = null;
         let nextCard = null;
-        let gameActive = true;
         
         const betInput = document.getElementById('bet-input');
         const currentCardDiv = document.getElementById('current-card');
@@ -607,10 +601,8 @@
         const resultArea = document.getElementById('result-area');
         const resultText = document.getElementById('result-text');
         const playBtn = document.getElementById('play-btn');
-        const newGameBtn = document.getElementById('new-game-btn');
         const betOptions = document.querySelectorAll('.bet-option');
         
-        // Масті та значення карт
         const suits = ['♥', '♦', '♣', '♠'];
         const cardValues = [
             { name: '2', value: 2 }, { name: '3', value: 3 }, { name: '4', value: 4 },
@@ -753,7 +745,6 @@
         
         async function newGame() {
             if (isPlaying) return;
-            gameActive = true;
             currentCard = getRandomCard();
             nextCard = null;
             selectedBet = null;
@@ -761,7 +752,6 @@
             clearResult();
             updateUI();
             playBtn.disabled = false;
-            playBtn.innerText = '🎴 ЗІГРАТИ';
         }
         
         async function playGame() {
@@ -783,13 +773,10 @@
             
             clearResult();
             
-            // Знімаємо ставку
             await updateBalance(-currentBet);
             
-            // Генеруємо наступну карту
             nextCard = getRandomCard();
             
-            // Анімація появи карти
             playCardSound();
             updateUI();
             
@@ -834,11 +821,6 @@
             
             showResult(resultMessage, resultType);
             
-            isPlaying = false;
-            playBtn.disabled = false;
-            betOptions.forEach(opt => opt.style.pointerEvents = 'auto');
-            
-            // Починаємо нову гру автоматично після паузи
             setTimeout(() => {
                 currentCard = nextCard;
                 nextCard = null;
@@ -846,6 +828,9 @@
                 betOptions.forEach(opt => opt.classList.remove('selected'));
                 updateUI();
                 clearResult();
+                isPlaying = false;
+                playBtn.disabled = false;
+                betOptions.forEach(opt => opt.style.pointerEvents = 'auto');
             }, 2000);
         }
         
@@ -853,13 +838,11 @@
         document.getElementById('bet-plus').onclick = () => updateBet(10);
         betInput.onchange = manualBetChange;
         playBtn.onclick = playGame;
-        newGameBtn.onclick = newGame;
         
         betOptions.forEach(option => {
             option.onclick = () => selectBet(option.dataset.bet);
         });
         
-        // Ініціалізація
         newGame();
         updateBetUI();
         

@@ -16,7 +16,6 @@
             --gold: #ffd700;
             --nether: #ff4433;
             --ender: #9b30ff;
-            --obsidian: #1a1a2e;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
@@ -28,76 +27,55 @@
             position: relative;
         }
 
-        /* Анімовані партикули на фоні */
         body::before {
             content: '';
             position: absolute;
             inset: 0;
             background-image: radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
-                              radial-gradient(1px 1px at 80px 150px, var(--gold), rgba(0,0,0,0)),
-                              radial-gradient(1.5px 1.5px at 200px 400px, var(--diamond), rgba(0,0,0,0));
-            background-size: 250px 250px, 180px 180px, 300px 300px;
+                              radial-gradient(1px 1px at 80px 150px, var(--gold), rgba(0,0,0,0));
+            background-size: 200px 200px, 150px 150px;
             background-repeat: repeat;
-            opacity: 0.12;
+            opacity: 0.1;
             pointer-events: none;
             z-index: 0;
-            animation: starsFloat 20s linear infinite;
-        }
-        
-        @keyframes starsFloat {
-            0% { background-position: 0 0, 0 0, 0 0; }
-            100% { background-position: 500px 500px, -300px 300px, 200px -200px; }
         }
 
         body.bonus-sticky { background: radial-gradient(ellipse at 30% 40%, #3a0a0a 0%, #1a0303 100%); }
-        body.bonus-sticky::before { opacity: 0.2; background-image: radial-gradient(2px 2px at 20px 30px, #ff6633, rgba(0,0,0,0)); animation: fireFloat 1s infinite alternate; }
-        @keyframes fireFloat { 0% { opacity: 0.15; } 100% { opacity: 0.3; } }
-        
         body.bonus-raining { background: radial-gradient(ellipse at 30% 40%, #0a0a3a 0%, #03031a 100%); }
-        body.bonus-raining::before { opacity: 0.2; background-image: radial-gradient(2px 2px at 20px 30px, #00ccff, rgba(0,0,0,0)); animation: rainFloat 0.8s infinite alternate; }
-        @keyframes rainFloat { 0% { opacity: 0.1; } 100% { opacity: 0.35; } }
 
         .top-bar {
             position: relative; z-index: 100; display: flex; justify-content: space-between; align-items: center;
             padding: 12px 35px; background: rgba(8, 12, 20, 0.95); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,215,0,0.25); box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+            border-bottom: 1px solid rgba(255,215,0,0.25);
         }
         
         .btn-exit { 
             background: rgba(255,255,255,0.03); color: #fff; border: 1px solid rgba(255,255,255,0.15); 
-            padding: 10px 28px; border-radius: 40px; font-weight: 800; cursor: pointer; text-transform: uppercase; 
-            transition: all 0.2s ease; font-size: 13px; letter-spacing: 1.5px; backdrop-filter: blur(5px);
+            padding: 10px 28px; border-radius: 40px; font-weight: 800; cursor: pointer;
+            transition: all 0.2s;
         }
-        .btn-exit:hover { background: var(--nether); border-color: var(--nether); box-shadow: 0 0 20px rgba(255,68,51,0.4); transform: scale(1.02); }
+        .btn-exit:hover { background: var(--nether); border-color: var(--nether); box-shadow: 0 0 20px rgba(255,68,51,0.4); }
         
         .balance-badge { 
-            font-size: 22px; font-weight: 900; background: linear-gradient(135deg, rgba(0,255,157,0.15), rgba(0,255,157,0.05));
-            padding: 10px 32px; border-radius: 40px; border: 1px solid rgba(0,255,157,0.35); 
-            box-shadow: 0 0 20px rgba(0,255,157,0.1); backdrop-filter: blur(10px);
-            letter-spacing: 1px;
+            font-size: 22px; font-weight: 900; background: rgba(0,255,157,0.1);
+            padding: 10px 32px; border-radius: 40px; border: 1px solid rgba(0,255,157,0.35);
+            backdrop-filter: blur(10px);
         }
-        .balance-badge span { background: linear-gradient(135deg, var(--emerald), #00ffaa); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 28px; margin-left: 10px; font-weight: 900; }
+        .balance-badge span { color: var(--emerald); font-size: 28px; margin-left: 10px; }
 
         #game-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; position: relative; z-index: 1; }
-        #game-scene { width: 1600px; height: 900px; transform-origin: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; }
-
-        /* Анімація пульсації для слота */
-        @keyframes machinePulse {
-            0%, 100% { box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,255,157,0.03); }
-            50% { box-shadow: 0 25px 60px rgba(0,0,0,0.9), inset 0 0 70px rgba(0,255,157,0.08); }
-        }
+        #game-scene { width: 1600px; height: 900px; transform-origin: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
 
         .slot-machine {
             background: linear-gradient(145deg, rgba(18,22,35,0.95), rgba(8,10,20,0.98));
-            border-radius: 50px; border: 1px solid rgba(255,215,0,0.25); padding: 28px 42px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,255,157,0.03);
+            border-radius: 50px; border: 1px solid rgba(255,215,0,0.25); padding: 25px 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
             position: relative;
-            animation: machinePulse 4s infinite ease-in-out;
         }
         
         .machine-neon {
             position: absolute; inset: -2px; border-radius: 52px; z-index: -1; 
-            filter: blur(18px); opacity: 0.35; transition: 0.5s;
+            filter: blur(18px); opacity: 0.35;
             background: linear-gradient(45deg, var(--gold), var(--ender), var(--diamond)); 
             animation: neonBreathe 3s infinite alternate;
         }
@@ -105,42 +83,35 @@
         @keyframes neonBreathe { 0% { opacity: 0.25; filter: blur(12px); } 100% { opacity: 0.5; filter: blur(22px); } }
         body.bonus-sticky .machine-neon { background: linear-gradient(45deg, var(--nether), #ff8800, #ffcc00); animation: neonFire 0.4s infinite alternate; opacity: 0.7;}
         body.bonus-raining .machine-neon { background: linear-gradient(45deg, var(--diamond), var(--ender), var(--emerald)); animation: neonRain 0.4s infinite alternate; opacity: 0.7;}
-        
-        @keyframes neonFire { 
-            0% { filter: blur(12px); opacity: 0.5; } 
-            100% { filter: blur(32px); opacity: 0.9; box-shadow: 0 0 40px var(--nether); } 
-        }
-        @keyframes neonRain { 
-            0% { filter: blur(12px); opacity: 0.5; } 
-            100% { filter: blur(32px); opacity: 0.9; box-shadow: 0 0 40px var(--diamond); } 
-        }
+        @keyframes neonFire { 0% { filter: blur(12px); } 100% { filter: blur(32px); } }
+        @keyframes neonRain { 0% { filter: blur(12px); } 100% { filter: blur(32px); } }
 
-        .slot-title { font-family: 'Rubik', sans-serif; font-size: 44px; text-align: center; text-transform: uppercase; letter-spacing: 6px; margin-bottom: 8px; }
+        .slot-title { font-family: 'Rubik', sans-serif; font-size: 42px; text-align: center; letter-spacing: 6px; margin-bottom: 5px; }
         .slot-title .main { background: linear-gradient(135deg, #fff, var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .slot-title .accent { background: linear-gradient(135deg, var(--diamond), var(--emerald)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .slot-subtitle { text-align: center; font-size: 11px; letter-spacing: 5px; color: rgba(255,255,255,0.4); margin-top: -5px; margin-bottom: 12px; font-weight: 500; }
+        .slot-subtitle { text-align: center; font-size: 10px; letter-spacing: 4px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
 
         .reels-window {
-            background: #07090f; padding: 14px; border-radius: 28px;
-            border: 1px solid rgba(255,215,0,0.2); box-shadow: inset 0 15px 30px rgba(0,0,0,0.7), 0 0 25px rgba(0,255,157,0.08);
+            background: #07090f; padding: 12px; border-radius: 28px;
+            border: 1px solid rgba(255,215,0,0.2);
             display: flex; gap: 10px; overflow: hidden; height: 470px;
         }
-        .reel { width: 154px; height: 100%; position: relative; background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6)); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,215,0,0.15); }
+        .reel { width: 154px; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6)); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,215,0,0.15); }
         .reel-strip { width: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; transition: transform 0s ease; }
         
         .symbol-cell { width: 154px; height: 147px; display: flex; justify-content: center; align-items: center; position: relative; perspective: 1200px; }
 
         .iso-block {
             width: 82px; height: 82px; position: relative; transform-style: preserve-3d;
-            transform: rotateX(-18deg) rotateY(-38deg); transition: transform 0.15s cubic-bezier(0.34, 1.2, 0.64, 1);
+            transform: rotateX(-18deg) rotateY(-38deg);
+            transition: all 0.2s ease;
             z-index: 1;
         }
 
         .iso-face {
             position: absolute; width: 82px; height: 82px; box-sizing: border-box; 
-            border: 1.5px solid rgba(0,0,0,0.5); box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
-            background-image: 
-                linear-gradient(45deg, rgba(255,255,255,0.06) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.06) 75%);
+            border: 1.5px solid rgba(0,0,0,0.5);
+            background-image: linear-gradient(45deg, rgba(255,255,255,0.06) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.06) 75%);
             background-size: 14px 14px;
             background-color: var(--c-front);
         }
@@ -156,146 +127,114 @@
         .tex-dirt    { --c-top: #5cb85c; --c-front: #79553a; --c-right: #533824; }
         
         .tex-wild { --c-top: #2f1d40; --c-front: #1f122b; --c-right: #130a1c; }
-        .tex-wild .iso-face { border: 2px solid var(--gold); box-shadow: inset 0 0 15px var(--gold), 0 0 10px var(--gold); }
+        .tex-wild .iso-face { border: 2px solid var(--gold); box-shadow: inset 0 0 15px var(--gold); }
         
         .tex-scatter { --c-top: #4a1763; --c-front: #320d45; --c-right: #20062e; }
-        .tex-scatter .iso-face { border: 2px solid var(--ender); box-shadow: inset 0 0 15px var(--ender), 0 0 10px var(--ender); }
+        .tex-scatter .iso-face { border: 2px solid var(--ender); box-shadow: inset 0 0 15px var(--ender); }
         
         .block-text { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            font-size: 20px; font-weight: 900; z-index: 10; text-align: center; pointer-events: none;
-            text-shadow: 0 0 8px black, 0 0 8px black;
+            font-size: 20px; font-weight: 900; z-index: 10;
+            text-shadow: 0 0 8px black;
             white-space: nowrap;
         }
-        .text-wild { background: linear-gradient(135deg, var(--gold), #ffaa33); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 22px; font-weight: 900; }
-        .text-scatter { background: linear-gradient(135deg, var(--ender), #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 16px; font-weight: 900; letter-spacing: 1px;}
+        .text-wild { background: linear-gradient(135deg, var(--gold), #ffaa33); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 22px; }
+        .text-scatter { background: linear-gradient(135deg, var(--ender), #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 16px; }
 
         .sticky-mult {
-            position: absolute; bottom: 6px; right: 6px; background: linear-gradient(135deg, var(--gold), #ff8800); color: #1a0a00; 
-            font-size: 18px; font-weight: 900; padding: 2px 7px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.5); 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 20; pointer-events: none;
-            animation: multGlow 1s infinite alternate;
+            position: absolute; bottom: 6px; right: 6px; background: linear-gradient(135deg, var(--gold), #ff8800); 
+            color: #1a0a00; font-size: 18px; font-weight: 900; padding: 2px 7px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.5); z-index: 20;
         }
-        @keyframes multGlow { 0% { box-shadow: 0 0 0px var(--gold); } 100% { box-shadow: 0 0 10px var(--gold); } }
 
-        /* Покращена виграшна анімація */
-        .win-pop .iso-block { animation: winPop 0.3s cubic-bezier(0.34, 1.2, 0.64, 1) forwards; filter: drop-shadow(0 0 15px var(--gold)); }
-        @keyframes winPop { 
+        /* ========== АНІМАЦІЯ ВИГРАШНОЇ КОМІРКИ ========== */
+        @keyframes winSpin3D {
             0% { transform: rotateX(-18deg) rotateY(-38deg) scale(1); }
-            50% { transform: rotateX(-8deg) rotateY(-28deg) scale(1.25); }
+            25% { transform: rotateX(-180deg) rotateY(-38deg) scale(1.2); }
+            50% { transform: rotateX(-18deg) rotateY(-200deg) scale(1.3); filter: drop-shadow(0 0 25px var(--gold)); }
+            75% { transform: rotateX(-180deg) rotateY(-38deg) scale(1.2); }
             100% { transform: rotateX(-18deg) rotateY(-38deg) scale(1); }
         }
         
-        /* Анімація появи виграшу */
-        @keyframes winText {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); text-shadow: 0 0 20px var(--gold); }
-            100% { transform: scale(1); opacity: 1; }
+        @keyframes winGlow {
+            0% { filter: drop-shadow(0 0 5px var(--gold)); }
+            50% { filter: drop-shadow(0 0 30px var(--gold)) drop-shadow(0 0 10px #fff); }
+            100% { filter: drop-shadow(0 0 5px var(--gold)); }
+        }
+        
+        @keyframes winShake {
+            0%, 100% { transform: translateY(0px); }
+            25% { transform: translateY(-8px); }
+            75% { transform: translateY(8px); }
+        }
+        
+        .winning-cell .iso-block {
+            animation: winSpin3D 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards, winGlow 0.6s ease-in-out;
+        }
+        
+        .winning-cell {
+            animation: winShake 0.3s ease-in-out;
         }
 
-        .control-panel { width: 1400px; display: flex; justify-content: space-between; align-items: stretch; gap: 14px; }
-        .ctrl-box { background: rgba(10,14,22,0.85); backdrop-filter: blur(20px); border-radius: 28px; border: 1px solid rgba(255,215,0,0.15); padding: 15px 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.2s ease; }
-        .ctrl-box:hover { border-color: rgba(255,215,0,0.3); }
+        .control-panel { width: 1400px; display: flex; gap: 14px; }
+        .ctrl-box { background: rgba(10,14,22,0.85); backdrop-filter: blur(20px); border-radius: 28px; border: 1px solid rgba(255,215,0,0.15); padding: 12px 16px; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
         #status-text { 
             font-size: 20px; font-weight: 900; background: linear-gradient(135deg, var(--gold), #ffcc44); 
-            -webkit-background-clip: text; background-clip: text; color: transparent; text-transform: uppercase; 
+            -webkit-background-clip: text; background-clip: text; color: transparent;
             text-align: center; cursor: pointer; letter-spacing: 1.5px; 
-            transition: 0.2s; padding: 5px 10px; border-radius: 30px;
+            padding: 5px 10px;
         }
-        #status-text:hover { transform: scale(1.02); background: linear-gradient(135deg, var(--gold), #ffaa33); -webkit-background-clip: text; background-clip: text; }
-        
-        .status-hint {
-            font-size: 9px;
-            color: rgba(255,215,0,0.35);
-            margin-top: 4px;
-            letter-spacing: 1px;
-            transition: 0.2s;
-        }
+        .status-hint { font-size: 9px; color: rgba(255,215,0,0.3); margin-top: 4px; text-align: center; }
 
-        .bet-input-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-        .bet-btn { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #151b2a, #0a0e18); color: var(--gold); border: 1px solid rgba(255,215,0,0.3); font-size: 24px; font-weight: bold; cursor: pointer; transition: 0.05s linear; box-shadow: 0 3px 0 #05070c; }
-        .bet-btn:active { transform: translateY(3px); box-shadow: none; }
-        .bet-btn:hover { background: linear-gradient(135deg, #1a2035, #0f1320); border-color: var(--gold); }
-        .bet-input { background: #0a0e18; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); border-radius: 14px; font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 900; text-align: center; width: 120px; height: 44px; outline: none; transition: 0.1s; }
-        .bet-input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+        .bet-input-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+        .bet-btn { width: 42px; height: 42px; border-radius: 14px; background: #151b2a; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); font-size: 24px; font-weight: bold; cursor: pointer; }
+        .bet-btn:active { transform: scale(0.95); }
+        .bet-input { background: #0a0e18; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); border-radius: 14px; font-size: 28px; font-weight: 900; text-align: center; width: 110px; height: 42px; outline: none; }
 
-        .toggle-btn { background: linear-gradient(135deg, #151b2a, #0a0e18); color: #8a8a9a; border: 1px solid #2a2a3a; border-radius: 14px; width: 100%; padding: 9px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.15s; margin-bottom: 6px; letter-spacing: 1px; }
-        .toggle-btn:hover { border-color: #5a5a7a; color: #ccc; }
-        .toggle-btn.active { background: linear-gradient(135deg, rgba(0,255,157,0.2), rgba(0,255,157,0.05)); color: var(--emerald); border-color: var(--emerald); box-shadow: 0 0 12px rgba(0,255,157,0.2); }
+        .toggle-btn { background: #151b2a; color: #8a8a9a; border: 1px solid #2a2a3a; border-radius: 14px; width: 100%; padding: 8px; font-size: 13px; font-weight: 800; cursor: pointer; margin-bottom: 5px; }
+        .toggle-btn.active { background: rgba(0,255,157,0.15); color: var(--emerald); border-color: var(--emerald); }
 
-        .spin-btn { background: linear-gradient(135deg, var(--emerald), #00aa55); color: #0a1a0a; border: none; border-radius: 18px; width: 100%; height: 70px; font-size: 26px; font-weight: 900; font-family: 'Montserrat', sans-serif; text-transform: uppercase; cursor: pointer; box-shadow: 0 5px 0 #006633, 0 8px 20px rgba(0,255,157,0.2); transition: 0.05s linear; margin-bottom: 6px; letter-spacing: 3px; }
+        .spin-btn { background: linear-gradient(135deg, var(--emerald), #00aa55); color: #0a1a0a; border: none; border-radius: 18px; width: 100%; height: 68px; font-size: 26px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #006633; margin-bottom: 5px; letter-spacing: 3px; }
         .spin-btn:active:not(:disabled) { transform: translateY(5px); box-shadow: none; }
         .spin-btn:disabled { background: #2a2a3a; color: #5a5a6a; box-shadow: 0 5px 0 #1a1a2a; cursor: not-allowed; }
-        .spin-btn:hover:not(:disabled) { filter: brightness(1.05); box-shadow: 0 5px 0 #006633, 0 12px 30px rgba(0,255,157,0.3); }
 
-        .buy-bonus-btn { background: linear-gradient(135deg, rgba(155,48,255,0.15), rgba(155,48,255,0.05)); border: 1px solid var(--ender); color: var(--ender); border-radius: 14px; width: 100%; padding: 9px; font-size: 14px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px; }
-        .buy-bonus-btn:hover:not(:disabled) { background: var(--ender); color: white; box-shadow: 0 0 20px rgba(155,48,255,0.4); }
+        .buy-bonus-btn { background: rgba(155,48,255,0.1); border: 1px solid var(--ender); color: var(--ender); border-radius: 14px; width: 100%; padding: 8px; font-size: 13px; font-weight: 800; cursor: pointer; }
+        .buy-bonus-btn:hover:not(:disabled) { background: var(--ender); color: white; }
 
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); display: none; justify-content: center; align-items: center; z-index: 9999; animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); display: none; justify-content: center; align-items: center; z-index: 9999; }
         
-        .auto-menu { background: linear-gradient(135deg, #0f1422, #080b14); border: 1px solid var(--emerald); padding: 30px 35px; border-radius: 35px; text-align: center; box-shadow: 0 0 50px rgba(0,255,157,0.15); animation: modalPop 0.2s cubic-bezier(0.34, 1.2, 0.64, 1); }
-        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .auto-menu h2 { background: linear-gradient(135deg, var(--emerald), #00ffaa); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 18px; font-size: 28px; }
-        .auto-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .auto-opt { background: #111622; border: 1px solid #2a2a3a; color: #ddd; padding: 12px 18px; font-size: 20px; font-weight: 800; border-radius: 16px; cursor: pointer; transition: 0.15s; }
-        .auto-opt:hover { border-color: var(--emerald); background: rgba(0,255,157,0.08); color: var(--emerald); transform: scale(1.02); }
+        .auto-menu { background: #0f1422; border: 1px solid var(--emerald); padding: 25px 30px; border-radius: 35px; text-align: center; }
+        .auto-menu h2 { color: var(--emerald); margin-bottom: 15px; font-size: 26px; }
+        .auto-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .auto-opt { background: #111622; border: 1px solid #2a2a3a; color: #ddd; padding: 10px 15px; font-size: 18px; font-weight: 800; border-radius: 14px; cursor: pointer; }
+        .auto-opt:hover { border-color: var(--emerald); color: var(--emerald); }
 
-        .bonus-menu { background: linear-gradient(135deg, #1a0f2a, #0a0515); border: 2px solid var(--ender); padding: 40px; border-radius: 45px; text-align: center; box-shadow: 0 0 70px rgba(155,48,255,0.2); max-width: 950px; animation: modalPop 0.2s cubic-bezier(0.34, 1.2, 0.64, 1); }
-        .bonus-title { font-size: 42px; background: linear-gradient(135deg, var(--ender), #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 3px; }
-        .bonus-subtitle { font-size: 16px; color: #888; margin-bottom: 30px; }
-        .bonus-cards { display: flex; gap: 25px; justify-content: center; }
-        .b-card { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid #444; border-radius: 28px; padding: 30px 20px; cursor: pointer; transition: 0.25s; backdrop-filter: blur(5px); }
-        .b-card:hover { transform: translateY(-6px); }
-        .b-card.sticky:hover { border-color: var(--nether); box-shadow: 0 15px 35px rgba(255,68,51,0.25); background: rgba(255,68,51,0.08); }
-        .b-card.sticky h3 { color: var(--nether); font-size: 26px; margin-bottom: 12px; text-shadow: 0 0 8px rgba(255,68,51,0.5); }
-        .b-card.raining:hover { border-color: var(--diamond); box-shadow: 0 15px 35px rgba(0,242,255,0.25); background: rgba(0,242,255,0.08); }
-        .b-card.raining h3 { color: var(--diamond); font-size: 26px; margin-bottom: 12px; text-shadow: 0 0 8px rgba(0,242,255,0.5); }
-        .b-spins { background: linear-gradient(135deg, #1a1a2a, #0f0f1a); display: inline-block; padding: 6px 18px; border-radius: 40px; font-size: 18px; font-weight: 800; margin-bottom: 12px; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); }
-        .b-card p { font-size: 13px; color: #bbb; line-height: 1.4; }
+        .bonus-menu { background: linear-gradient(135deg, #1a0f2a, #0a0515); border: 2px solid var(--ender); padding: 35px; border-radius: 45px; text-align: center; max-width: 900px; }
+        .bonus-title { font-size: 38px; background: linear-gradient(135deg, var(--ender), #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 10px; }
+        .bonus-subtitle { font-size: 14px; color: #888; margin-bottom: 25px; }
+        .bonus-cards { display: flex; gap: 20px; }
+        .b-card { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid #444; border-radius: 25px; padding: 25px 15px; cursor: pointer; transition: 0.2s; }
+        .b-card:hover { transform: translateY(-5px); }
+        .b-card.sticky:hover { border-color: var(--nether); background: rgba(255,68,51,0.1); }
+        .b-card.sticky h3 { color: var(--nether); font-size: 24px; }
+        .b-card.raining:hover { border-color: var(--diamond); background: rgba(0,242,255,0.1); }
+        .b-card.raining h3 { color: var(--diamond); font-size: 24px; }
+        .b-spins { background: #1a1a2a; display: inline-block; padding: 5px 15px; border-radius: 30px; font-size: 16px; font-weight: 800; margin-bottom: 10px; color: var(--gold); }
+        .b-card p { font-size: 12px; color: #bbb; }
 
         .win-history {
-            position: fixed;
-            right: 15px;
-            bottom: 15px;
-            background: rgba(8,12,20,0.92);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            border-left: 3px solid var(--emerald);
-            padding: 10px 16px;
-            min-width: 220px;
-            z-index: 50;
-            pointer-events: none;
-            font-family: 'Montserrat', sans-serif;
+            position: fixed; right: 15px; bottom: 15px;
+            background: rgba(8,12,20,0.92); backdrop-filter: blur(15px);
+            border-radius: 20px; border-left: 3px solid var(--emerald);
+            padding: 8px 14px; min-width: 210px; z-index: 50;
         }
-        .win-history h4 { color: var(--emerald); font-size: 11px; margin-bottom: 6px; letter-spacing: 2px; opacity: 0.7; }
-        .history-list { max-height: 130px; overflow-y: auto; font-size: 11px; font-weight: 600; pointer-events: auto; scrollbar-width: thin; }
-        .history-list div { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #aaa; animation: slideIn 0.2s ease; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        .win-history h4 { color: var(--emerald); font-size: 10px; margin-bottom: 5px; }
+        .history-list { max-height: 120px; overflow-y: auto; font-size: 10px; }
+        .history-list div { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .history-list .win { color: var(--emerald); }
-        .history-list .big-win { background: linear-gradient(135deg, var(--gold), #ffaa44); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 900; }
+        .history-list .big-win { color: var(--gold); font-weight: 900; }
         .history-list .bonus { color: var(--ender); }
-        
-        /* Анімація спіну */
-        @keyframes reelSpin {
-            0% { transform: translateY(0px); }
-            100% { transform: translateY(-2205px); }
-        }
-        
-        /* Блиск на кнопках */
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        
-        .spin-btn {
-            background: linear-gradient(135deg, var(--emerald), #00aa55);
-            background-size: 200% auto;
-        }
-        .spin-btn:hover:not(:disabled) {
-            animation: shimmer 0.8s ease infinite;
-        }
     </style>
 </head>
 <body>
@@ -324,7 +263,7 @@
 
             <div class="control-panel">
                 <div class="ctrl-box" style="flex: 1;">
-                    <div id="status-text">✨ ГОТОВИЙ ДО ГРИ</div>
+                    <div id="status-text" onclick="stopAutoGame()">✨ ГОТОВИЙ ДО ГРИ</div>
                     <div class="status-hint">▼ КЛІК ЩОБ ЗУПИНИТИ АВТО ▼</div>
                 </div>
                 
@@ -334,7 +273,7 @@
                 </div>
 
                 <div class="ctrl-box" style="flex: 1;">
-                    <div style="color: var(--gold); font-weight: 800; letter-spacing: 2px; font-size: 12px;">✦ СТАВКА ✦</div>
+                    <div style="color: var(--gold); font-size: 12px; letter-spacing: 2px;">✦ СТАВКА ✦</div>
                     <div class="bet-input-row">
                         <button class="bet-btn" onclick="updateBet(-10)">−</button>
                         <input type="number" id="bet-input" class="bet-input" value="10" min="10" max="50000" onchange="manualBetChange()">
@@ -342,7 +281,7 @@
                     </div>
                 </div>
                 
-                <div class="ctrl-box" style="background: transparent; border: none; box-shadow: none; padding: 0; flex: 1.2;">
+                <div class="ctrl-box" style="background: transparent; border: none; padding: 0; flex: 1.2;">
                     <button class="spin-btn" id="spin-btn" onclick="spin()">🎲 КРУТИТИ</button>
                     <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">✨ КУПИТИ БОНУС <span id="bonus-price">1000</span></button>
                 </div>
@@ -366,9 +305,9 @@
                 <button class="auto-opt" onclick="startAuto(50)">50</button>
                 <button class="auto-opt" onclick="startAuto(100)">100</button>
                 <button class="auto-opt" onclick="startAuto(250)">250</button>
-                <button class="auto-opt" onclick="startAuto(999)">∞ НЕСКІНЧ.</button>
+                <button class="auto-opt" onclick="startAuto(999)">∞</button>
             </div>
-            <button class="toggle-btn" style="margin-top: 22px; width: auto; padding: 10px 35px;" onclick="closeAutoModal()">ЗАКРИТИ</button>
+            <button class="toggle-btn" style="margin-top: 18px; width: auto; padding: 8px 30px;" onclick="closeAutoModal()">ЗАКРИТИ</button>
         </div>
     </div>
 
@@ -380,19 +319,18 @@
                 <div class="b-card sticky" onclick="selectBonus('sticky')">
                     <h3>🔥 НЕЗЕР-РЕАКТОР</h3>
                     <div class="b-spins">10 - 15 СПІНІВ</div>
-                    <p>WILD-блоки залишаються на екрані та накопичують множники! Пекельний режим активовано.</p>
+                    <p>WILD-блоки залишаються на екрані з множниками</p>
                 </div>
                 <div class="b-card raining" onclick="selectBonus('raining')">
                     <h3>🌊 ЕНДЕР-ШТОРМ</h3>
                     <div class="b-spins">15 - 25 СПІНІВ</div>
-                    <p>Метеоритний дощ із WILD-блоків! Портал у Край відкрито.</p>
+                    <p>Метеоритний дощ із WILD-блоків</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ========== 1. АВТОМАСШТАБУВАННЯ ==========
         function resizeGame() {
             const wrapper = document.getElementById('game-wrapper');
             const scene = document.getElementById('game-scene');
@@ -402,7 +340,7 @@
         window.addEventListener('resize', resizeGame);
         setTimeout(resizeGame, 100);
 
-        // ========== 2. FIREBASE ТА БАЛАНС ==========
+        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -421,7 +359,7 @@
             document.getElementById('balance-amount').innerText = currentBalance;
         });
 
-        // ========== 3. НАЛАШТУВАННЯ ГРИ ==========
+        // Game vars
         const symbols = ['tex-dirt', 'tex-wood', 'tex-gold', 'tex-diamond', 'tex-emerald'];
         const wildSymbol = 'tex-wild';      
         const scatterSymbol = 'tex-scatter'; 
@@ -435,6 +373,7 @@
         let isTurbo = false;
         let autoSpinsLeft = 0;
         let currentBet = 10;
+        let pendingStopAuto = false;
         
         const betInput = document.getElementById('bet-input');
         
@@ -457,21 +396,8 @@
             betInput.value = currentBet;
         }
         
-        function setStatus(text, showHint = true) {
-            const statusDiv = document.getElementById('status-text');
-            statusDiv.innerHTML = text;
-            const hint = document.querySelector('.status-hint');
-            if (hint) {
-                hint.style.opacity = showHint ? '0.35' : '0';
-            }
-        }
-        
-        function updateStatusDisplay() {
-            if (autoSpinsLeft > 0 && !isBonusGame && !isSpinning) {
-                setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`, true);
-            } else if (!isSpinning) {
-                setStatus("✨ ГОТОВИЙ ДО ГРИ", true);
-            }
+        function setStatus(text) {
+            document.getElementById('status-text').innerHTML = text;
         }
         
         function addToHistory(message, type = 'win') {
@@ -481,15 +407,12 @@
             const time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             newEntry.innerHTML = `[${time}] ${message}`;
             historyDiv.prepend(newEntry);
-            while (historyDiv.children.length > 20) {
-                historyDiv.removeChild(historyDiv.lastChild);
-            }
-            if (historyDiv.children.length > 0 && historyDiv.children[historyDiv.children.length-1]?.innerText.includes('немає записів')) {
+            while (historyDiv.children.length > 15) historyDiv.removeChild(historyDiv.lastChild);
+            if (historyDiv.children.length && historyDiv.children[historyDiv.children.length-1]?.innerText.includes('немає записів')) {
                 historyDiv.removeChild(historyDiv.lastChild);
             }
         }
         
-        // ========== 4. КЕРУВАННЯ ТУРБО ТА АВТОГРОЮ ==========
         function toggleTurbo() {
             isTurbo = !isTurbo;
             const btn = document.getElementById('turbo-btn');
@@ -508,25 +431,27 @@
         
         function startAuto(count) {
             if (isSpinning) return;
+            pendingStopAuto = false;
             autoSpinsLeft = count === 999 ? 999999 : count;
             closeAutoModal();
             addToHistory(`🎰 АВТОГРА: ${count === 999 ? 'НЕСКІНЧЕННА' : count + ' спінів'}`, 'bonus');
-            setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`, true);
+            setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`);
             spin();
         }
         
         function stopAutoGame() {
-            if (autoSpinsLeft > 0 && !isBonusGame && !isSpinning) {
-                addToHistory(`⏹ Автогру зупинено (залишилось: ${autoSpinsLeft} спінів)`, 'win');
-                autoSpinsLeft = 0;
-                setStatus("✨ ГОТОВИЙ ДО ГРИ", true);
-            } else if (autoSpinsLeft > 0 && !isBonusGame && isSpinning) {
-                autoSpinsLeft = 0;
-                addToHistory(`⏹ Автогру зупинено після поточного спіну`, 'win');
+            if (autoSpinsLeft > 0 && !isBonusGame) {
+                if (isSpinning) {
+                    pendingStopAuto = true;
+                    addToHistory(`⏹ Автогру зупинено після поточного спіну`, 'win');
+                } else {
+                    addToHistory(`⏹ Автогру зупинено (залишилось: ${autoSpinsLeft} спінів)`, 'win');
+                    autoSpinsLeft = 0;
+                    setStatus("✨ ГОТОВИЙ ДО ГРИ");
+                }
             }
         }
         
-        // ========== 5. РЕНДЕР СИМВОЛІВ ==========
         const STRIP_LENGTH = 16;
         
         function getSymbolDisplay(sym, hasStickyMult = false, multValue = 1) {
@@ -534,27 +459,11 @@
             let isScatter = (sym === scatterSymbol);
             let blockClass = sym;
             let textHtml = '';
-            
-            if (isWild) {
-                textHtml = `<div class="block-text text-wild">⚡WILD⚡</div>`;
-            } else if (isScatter) {
-                textHtml = `<div class="block-text text-scatter">✦СКАРБ✦</div>`;
-            }
-            
+            if (isWild) textHtml = `<div class="block-text text-wild">⚡WILD⚡</div>`;
+            else if (isScatter) textHtml = `<div class="block-text text-scatter">✦СКАРБ✦</div>`;
             let multHtml = '';
-            if (hasStickyMult && multValue > 1) {
-                multHtml = `<div class="sticky-mult">✧${multValue}✧</div>`;
-            }
-            
-            return `<div class="symbol-cell">
-                        <div class="iso-block ${blockClass}">
-                            <div class="iso-face face-top"></div>
-                            <div class="iso-face face-front"></div>
-                            <div class="iso-face face-right"></div>
-                        </div>
-                        ${textHtml}
-                        ${multHtml}
-                    </div>`;
+            if (hasStickyMult && multValue > 1) multHtml = `<div class="sticky-mult">✧${multValue}✧</div>`;
+            return `<div class="symbol-cell"><div class="iso-block ${blockClass}"><div class="iso-face face-top"></div><div class="iso-face face-front"></div><div class="iso-face face-right"></div></div>${textHtml}${multHtml}</div>`;
         }
         
         function buildReels(matrix) {
@@ -564,8 +473,7 @@
                 let cellsHtml = '';
                 for (let y = 0; y < 3; y++) {
                     let sym = matrix[y][x];
-                    let hasMult = false;
-                    let multVal = 1;
+                    let hasMult = false, multVal = 1;
                     if (stickyWilds[`${x}-${y}`] && activeBonusType === 'sticky') {
                         hasMult = true;
                         multVal = stickyMultipliers[`${x}-${y}`] || 2;
@@ -573,40 +481,29 @@
                     cellsHtml += getSymbolDisplay(sym, hasMult, multVal);
                 }
                 for (let i = 0; i < STRIP_LENGTH - 3; i++) {
-                    let fakeSym = symbols[Math.floor(Math.random() * symbols.length)];
-                    cellsHtml += getSymbolDisplay(fakeSym);
+                    cellsHtml += getSymbolDisplay(symbols[Math.floor(Math.random() * symbols.length)]);
                 }
                 stripDiv.innerHTML = cellsHtml;
                 stripDiv.style.transform = 'translateY(0px)';
             }
         }
         
-        function generateMatrix(forceBonus = false) {
+        function generateMatrix() {
             let matrix = [[], [], []];
             let rainingWilds = (isBonusGame && activeBonusType === 'raining') ? Math.floor(Math.random() * 4) + 2 : 0;
-            
             for (let y = 0; y < 3; y++) {
                 for (let x = 0; x < 5; x++) {
                     if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) {
                         matrix[y][x] = wildSymbol;
                         continue;
                     }
-                    
-                    if (forceBonus && y === 1 && [0, 2, 4].includes(x)) {
-                        matrix[y][x] = scatterSymbol;
-                        continue;
-                    }
-                    
                     if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.4) {
                         matrix[y][x] = wildSymbol;
                         rainingWilds--;
                     } else {
                         let r = Math.random();
-                        if (!isBonusGame && r < 0.1) {
-                            matrix[y][x] = wildSymbol;
-                        } else {
-                            matrix[y][x] = symbols[Math.floor(Math.random() * symbols.length)];
-                        }
+                        if (!isBonusGame && r < 0.1) matrix[y][x] = wildSymbol;
+                        else matrix[y][x] = symbols[Math.floor(Math.random() * symbols.length)];
                     }
                 }
             }
@@ -615,15 +512,10 @@
         
         function countScatters(matrix) {
             let count = 0;
-            for (let row of matrix) {
-                for (let sym of row) {
-                    if (sym === scatterSymbol) count++;
-                }
-            }
+            for (let row of matrix) for (let sym of row) if (sym === scatterSymbol) count++;
             return count;
         }
         
-        // ========== 6. РОЗРАХУНОК ВИГРАШІВ ==========
         const payTable = {
             'tex-dirt': { 3: 10, 4: 25, 5: 60 },
             'tex-wood': { 3: 15, 4: 35, 5: 80 },
@@ -634,65 +526,55 @@
         
         function calculateWin(matrix, bet) {
             let totalWin = 0;
-            let winLines = [];
-            
+            let winPositions = [];
             const lines = [
-                { name: "🔹 Верхня", indices: [[0,0],[0,1],[0,2],[0,3],[0,4]] },
-                { name: "🔸 Центральна", indices: [[1,0],[1,1],[1,2],[1,3],[1,4]] },
-                { name: "🔹 Нижня", indices: [[2,0],[2,1],[2,2],[2,3],[2,4]] }
+                { name: "Верхня", indices: [[0,0],[0,1],[0,2],[0,3],[0,4]] },
+                { name: "Центральна", indices: [[1,0],[1,1],[1,2],[1,3],[1,4]] },
+                { name: "Нижня", indices: [[2,0],[2,1],[2,2],[2,3],[2,4]] }
             ];
-            
             for (let line of lines) {
                 let firstSym = matrix[line.indices[0][0]][line.indices[0][1]];
                 if (firstSym === wildSymbol) continue;
                 let count = 1;
                 for (let i = 1; i < 5; i++) {
                     let sym = matrix[line.indices[i][0]][line.indices[i][1]];
-                    if (sym === firstSym || sym === wildSymbol) {
-                        count++;
-                    } else {
-                        break;
-                    }
+                    if (sym === firstSym || sym === wildSymbol) count++;
+                    else break;
                 }
                 if (count >= 3 && payTable[firstSym] && payTable[firstSym][count]) {
                     let winAmount = payTable[firstSym][count] * bet;
                     totalWin += winAmount;
-                    winLines.push(`${line.name} x${count}`);
+                    for (let i = 0; i < count; i++) {
+                        winPositions.push(`${line.indices[i][0]}-${line.indices[i][1]}`);
+                    }
                 }
             }
-            return { totalWin, winLines };
+            return { totalWin, winPositions };
         }
         
-        // ========== 7. ОСНОВНА ЛОГІКА СПІНУ ==========
         async function spin() {
             if (isSpinning) return;
-            
             if (!isBonusGame && currentBalance < currentBet) {
                 if (autoSpinsLeft > 0) {
                     addToHistory(`⛔ Автогра зупинена: недостатньо коштів!`, 'win');
                     autoSpinsLeft = 0;
                 }
-                setStatus("❌ НЕДОСТАТНЬО ФІШОК!", false);
+                setStatus("❌ НЕДОСТАТНЬО ФІШОК!");
                 return;
             }
             
             isSpinning = true;
-            
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('buy-bonus-btn').disabled = true;
             betInput.disabled = true;
+            setStatus("🌀 КРУТИМО...");
             
-            setStatus("🌀 КРУТИМО...", false);
+            if (!isBonusGame) await userRef.update({ chips: currentBalance - currentBet });
+            else freeSpinsLeft--;
             
-            if (!isBonusGame) {
-                await userRef.update({ chips: currentBalance - currentBet });
-            } else {
-                freeSpinsLeft--;
-            }
+            const targetMatrix = generateMatrix();
+            const animDuration = isTurbo ? 0.2 : 0.85;
             
-            const targetMatrix = generateMatrix(false);
-            
-            const animDuration = isTurbo ? 0.18 : 0.85;
             for (let x = 0; x < 5; x++) {
                 const strip = document.getElementById(`strip-${x}`);
                 strip.style.transition = `transform ${animDuration}s cubic-bezier(0.2, 0.95, 0.4, 1.05)`;
@@ -710,32 +592,27 @@
                 const scatters = countScatters(targetMatrix);
                 const winResult = calculateWin(targetMatrix, currentBet);
                 const winAmount = winResult.totalWin;
+                const winPositions = winResult.winPositions;
                 
+                // Анімація ТІЛЬКИ на виграшних комірках
                 if (winAmount > 0) {
-                    for (let y = 0; y < 3; y++) {
-                        for (let x = 0; x < 5; x++) {
-                            const cell = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${y+1})`);
-                            if (cell) cell.classList.add('win-pop');
-                            setTimeout(() => {
-                                if (cell) cell.classList.remove('win-pop');
-                            }, 600);
+                    for (let pos of winPositions) {
+                        const [y, x] = pos.split('-');
+                        const cell = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${parseInt(y)+1})`);
+                        if (cell) {
+                            cell.classList.add('winning-cell');
+                            setTimeout(() => cell.classList.remove('winning-cell'), 800);
                         }
                     }
                 }
                 
                 if (winAmount > 0) {
-                    const winMsg = `+${winAmount} 🪙 (${winResult.winLines.join(', ')})`;
-                    addToHistory(winMsg, winAmount >= currentBet * 20 ? 'big-win' : 'win');
-                    setStatus(`🏆 ВИГРАШ: ${winAmount}`, false);
-                    setTimeout(() => {
-                        if (!isSpinning) updateStatusDisplay();
-                    }, 1500);
-                    if (!isBonusGame) {
-                        await userRef.update({ chips: currentBalance + winAmount });
-                    }
+                    addToHistory(`+${winAmount} 🪙`, winAmount >= currentBet * 20 ? 'big-win' : 'win');
+                    setStatus(`🏆 ВИГРАШ: ${winAmount}`);
+                    if (!isBonusGame) await userRef.update({ chips: currentBalance + winAmount });
                 } else if (scatters >= 3) {
                     addToHistory(`✨ АКТИВАЦІЯ БОНУСУ! ✨`, 'bonus');
-                    setStatus("✨ БОНУС!", false);
+                    setStatus("✨ БОНУС!");
                     startBonusGame();
                     return;
                 } else if (isBonusGame && freeSpinsLeft === 0) {
@@ -751,16 +628,27 @@
                 setTimeout(() => {
                     isSpinning = false;
                     
+                    if (pendingStopAuto && autoSpinsLeft > 0 && !isBonusGame) {
+                        pendingStopAuto = false;
+                        addToHistory(`⏹ Автогру зупинено`, 'win');
+                        autoSpinsLeft = 0;
+                        setStatus("✨ ГОТОВИЙ ДО ГРИ");
+                        document.getElementById('spin-btn').disabled = false;
+                        document.getElementById('buy-bonus-btn').disabled = false;
+                        betInput.disabled = false;
+                        return;
+                    }
+                    
                     if (isBonusGame && freeSpinsLeft > 0) {
                         setTimeout(() => spin(), isTurbo ? 150 : 400);
                     } else if (autoSpinsLeft > 0 && !isBonusGame) {
                         autoSpinsLeft--;
                         if (autoSpinsLeft > 0) {
-                            setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`, true);
+                            setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`);
                             setTimeout(() => spin(), isTurbo ? 150 : 400);
                         } else {
                             addToHistory(`✅ Автогра завершена!`, 'win');
-                            setStatus("✨ ГОТОВИЙ ДО ГРИ", true);
+                            setStatus("✨ ГОТОВИЙ ДО ГРИ");
                             document.getElementById('spin-btn').disabled = false;
                             document.getElementById('buy-bonus-btn').disabled = false;
                             betInput.disabled = false;
@@ -769,40 +657,28 @@
                         document.getElementById('spin-btn').disabled = false;
                         document.getElementById('buy-bonus-btn').disabled = false;
                         betInput.disabled = false;
-                        updateStatusDisplay();
+                        setStatus("✨ ГОТОВИЙ ДО ГРИ");
                     }
-                }, 250);
-                
+                }, 300);
             }, animDuration * 1000 + 30);
         }
         
-        // ========== 8. БОНУСНА СИСТЕМА ==========
         async function buyBonus() {
             if (isSpinning) return;
-            const bonusCost = 1000;
-            if (currentBalance >= bonusCost) {
-                await userRef.update({ chips: currentBalance - bonusCost });
-                addToHistory(`🎁 Куплено бонус за ${bonusCost} 🪙`, 'bonus');
+            if (currentBalance >= 1000) {
+                await userRef.update({ chips: currentBalance - 1000 });
+                addToHistory(`🎁 Куплено бонус за 1000 🪙`, 'bonus');
                 document.getElementById('bonus-modal').style.display = 'flex';
-            } else {
-                setStatus("❌ НЕ ВИСТАЧАЄ ФІШОК!", false);
-            }
+            } else setStatus("❌ НЕ ВИСТАЧАЄ ФІШОК!");
         }
         
         function startBonusGame() {
             isBonusGame = true;
-            const spins = Math.floor(Math.random() * 12) + 10;
-            freeSpinsLeft = spins;
+            freeSpinsLeft = Math.floor(Math.random() * 12) + 10;
             activeBonusType = Math.random() > 0.5 ? 'sticky' : 'raining';
             document.body.className = activeBonusType === 'sticky' ? 'bonus-sticky' : 'bonus-raining';
-            
-            if (activeBonusType === 'sticky') {
-                stickyWilds = {};
-                stickyMultipliers = {};
-                addToHistory(`🔥 НЕЗЕР-РЕАКТОР! ${freeSpinsLeft} фріспінів`, 'bonus');
-            } else {
-                addToHistory(`🌊 ЕНДЕР-ШТОРМ! ${freeSpinsLeft} фріспінів`, 'bonus');
-            }
+            if (activeBonusType === 'sticky') stickyWilds = {};
+            addToHistory(`${activeBonusType === 'sticky' ? '🔥 НЕЗЕР-РЕАКТОР' : '🌊 ЕНДЕР-ШТОРМ'}! ${freeSpinsLeft} фріспінів`, 'bonus');
             spin();
         }
         
@@ -811,7 +687,6 @@
             activeBonusType = null;
             freeSpinsLeft = 0;
             stickyWilds = {};
-            stickyMultipliers = {};
             document.body.className = '';
         }
         
@@ -821,17 +696,11 @@
             activeBonusType = type;
             document.body.className = type === 'sticky' ? 'bonus-sticky' : 'bonus-raining';
             freeSpinsLeft = type === 'sticky' ? 12 : 18;
-            
-            if (type === 'sticky') {
-                stickyWilds = {};
-                stickyMultipliers = {};
-            }
-            
+            if (type === 'sticky') stickyWilds = {};
             addToHistory(`${type === 'sticky' ? '🔥' : '🌊'} Вибрано бонус: ${type === 'sticky' ? 'НЕЗЕР-РЕАКТОР' : 'ЕНДЕР-ШТОРМ'} (${freeSpinsLeft} спінів)`, 'bonus');
             spin();
         };
         
-        // Ініціалізація
         function initGame() {
             const initMatrix = [
                 [symbols[2], symbols[1], symbols[3], symbols[0], symbols[4]],

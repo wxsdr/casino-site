@@ -75,6 +75,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
         }
 
         .game-table {
@@ -131,33 +132,33 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 40px;
+            gap: 30px;
         }
         
         .dice-container {
             display: flex;
-            gap: 50px;
+            gap: 40px;
             justify-content: center;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .dice {
-            width: 150px;
-            height: 150px;
+            width: 130px;
+            height: 130px;
             background: white;
             border-radius: 25px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 70px;
+            font-size: 65px;
             font-weight: 900;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
             transition: all 0.2s;
-            position: relative;
         }
         
         .dice.rolling {
-            animation: diceRoll 0.3s ease-in-out;
+            animation: diceRoll 0.2s ease-in-out infinite;
         }
         
         @keyframes diceRoll {
@@ -168,11 +169,15 @@
             100% { transform: rotate(360deg) scale(1); }
         }
         
-        .dice-value {
-            font-family: 'Rubik', sans-serif;
+        .sum-display {
+            font-size: 28px;
+            font-weight: 900;
+            color: #d4af37;
+            margin-top: 10px;
+            text-align: center;
         }
         
-        .bet-buttons {
+        .bet-options {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
@@ -180,48 +185,54 @@
             margin-top: 20px;
         }
         
-        .number-btn {
-            width: 70px;
-            height: 70px;
+        .bet-option {
             background: linear-gradient(135deg, #1a1a2a, #0f0f1a);
             border: 2px solid #d4af37;
             border-radius: 20px;
+            padding: 12px 25px;
             color: #d4af37;
-            font-size: 28px;
-            font-weight: 900;
+            font-size: 18px;
+            font-weight: 800;
             cursor: pointer;
             transition: 0.2s;
-            font-family: 'Rubik', sans-serif;
+            text-align: center;
+            min-width: 120px;
         }
         
-        .number-btn:hover:not(:disabled) {
+        .bet-option:hover:not(:disabled) {
             background: #d4af37;
             color: #0a0e18;
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
         
-        .number-btn.selected {
+        .bet-option.selected {
             background: #d4af37;
             color: #0a0e18;
             box-shadow: 0 0 20px #d4af37;
         }
         
-        .number-btn:disabled {
+        .bet-option .multiplier {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .bet-option:disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
         
         .result-area {
             text-align: center;
-            margin: 20px 0;
-            padding: 15px;
+            margin: 15px 0;
+            padding: 12px;
             background: rgba(0, 0, 0, 0.6);
             border-radius: 50px;
             backdrop-filter: blur(10px);
         }
         
         .result-text {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 900;
         }
         
@@ -306,10 +317,9 @@
             color: #0a1a0a;
         }
 
-        /* Історія виграшів */
         .history-panel {
             position: absolute;
-            right: -280px;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
             width: 260px;
@@ -345,6 +355,7 @@
         .history-list .win { color: #00ff88; border-left-color: #00ff88; }
         .history-list .lose { color: #ff4433; border-left-color: #ff4433; }
         .history-list .big-win { color: #ffd700; border-left-color: #ffd700; font-weight: 900; background: rgba(255, 215, 0, 0.1); }
+        .history-list .push { color: #d4af37; border-left-color: #d4af37; }
     </style>
 </head>
 <body>
@@ -359,23 +370,41 @@
             <div class="table-neon"></div>
             <div class="table-title">
                 <h1>🎲 MINECRAFT DICE 🎲</h1>
-                <p>✦ ВГАДАЙ ЧИСЛО ВІД 1 ДО 6 | ВИГРАШ ×6 ✦</p>
+                <p>✦ ДВА КУБИКИ | СТАВТЕ НА ПАРНЕ/НЕПАРНЕ АБО СУМУ ✦</p>
             </div>
             
             <div class="dice-area">
                 <div class="dice-container">
-                    <div class="dice" id="dice">
-                        <div class="dice-value" id="dice-value">🎲</div>
+                    <div class="dice" id="dice1">
+                        <div class="dice-value" id="dice1-value">🎲</div>
+                    </div>
+                    <div class="dice" id="dice2">
+                        <div class="dice-value" id="dice2-value">🎲</div>
                     </div>
                 </div>
+                <div class="sum-display" id="sum-display"></div>
                 
-                <div class="bet-buttons" id="bet-buttons">
-                    <button class="number-btn" data-number="1">1</button>
-                    <button class="number-btn" data-number="2">2</button>
-                    <button class="number-btn" data-number="3">3</button>
-                    <button class="number-btn" data-number="4">4</button>
-                    <button class="number-btn" data-number="5">5</button>
-                    <button class="number-btn" data-number="6">6</button>
+                <div class="bet-options" id="bet-options">
+                    <div class="bet-option" data-bet="even">
+                        🟢 ПАРНЕ
+                        <div class="multiplier">×2</div>
+                    </div>
+                    <div class="bet-option" data-bet="odd">
+                        🔴 НЕПАРНЕ
+                        <div class="multiplier">×2</div>
+                    </div>
+                    <div class="bet-option" data-bet="over8">
+                        📈 БІЛЬШЕ 8
+                        <div class="multiplier">×2</div>
+                    </div>
+                    <div class="bet-option" data-bet="under8">
+                        📉 МЕНШЕ 8
+                        <div class="multiplier">×2</div>
+                    </div>
+                    <div class="bet-option" data-bet="exact8">
+                        🎯 РІВНО 8
+                        <div class="multiplier">×5</div>
+                    </div>
                 </div>
                 
                 <div class="result-area" id="result-area" style="display: none;">
@@ -391,7 +420,7 @@
             </div>
             
             <div class="action-buttons">
-                <button class="action-btn primary" id="roll-btn">🎲 КИНУТИ КІСТКУ</button>
+                <button class="action-btn primary" id="roll-btn">🎲 КИНУТИ КУБИКИ</button>
             </div>
         </div>
         
@@ -418,23 +447,25 @@
         
         let currentBalance = 0;
         let currentBet = 10;
-        let selectedNumber = null;
+        let selectedBet = null;
         let isRolling = false;
         
         // DOM елементи
         const betInput = document.getElementById('bet-input');
-        const diceDiv = document.getElementById('dice');
-        const diceValueSpan = document.getElementById('dice-value');
+        const dice1Div = document.getElementById('dice1');
+        const dice2Div = document.getElementById('dice2');
+        const dice1ValueSpan = document.getElementById('dice1-value');
+        const dice2ValueSpan = document.getElementById('dice2-value');
+        const sumDisplay = document.getElementById('sum-display');
         const resultArea = document.getElementById('result-area');
         const resultText = document.getElementById('result-text');
         const rollBtn = document.getElementById('roll-btn');
-        const numberBtns = document.querySelectorAll('.number-btn');
+        const betOptions = document.querySelectorAll('.bet-option');
         
         function updateBalanceDisplay() {
             document.getElementById('balance-amount').innerText = currentBalance;
         }
         
-        // Отримуємо баланс з Firebase
         userRef.on('value', snap => {
             const data = snap.val();
             currentBalance = data ? (data.chips || 1000) : 1000;
@@ -476,45 +507,81 @@
             while (historyDiv.children.length > 20) historyDiv.removeChild(historyDiv.lastChild);
         }
         
-        function selectNumber(number) {
+        function selectBet(betType) {
             if (isRolling) return;
-            selectedNumber = number;
-            numberBtns.forEach(btn => {
-                const btnNum = parseInt(btn.dataset.number);
-                if (btnNum === number) {
-                    btn.classList.add('selected');
+            selectedBet = betType;
+            betOptions.forEach(option => {
+                if (option.dataset.bet === betType) {
+                    option.classList.add('selected');
                 } else {
-                    btn.classList.remove('selected');
+                    option.classList.remove('selected');
                 }
             });
         }
         
-        // Анімація кубика
-        async function animateDice(finalValue) {
+        function getBetMultiplier(betType) {
+            switch(betType) {
+                case 'even': return 2;
+                case 'odd': return 2;
+                case 'over8': return 2;
+                case 'under8': return 2;
+                case 'exact8': return 5;
+                default: return 1;
+            }
+        }
+        
+        function checkWin(betType, sum) {
+            switch(betType) {
+                case 'even': return sum % 2 === 0;
+                case 'odd': return sum % 2 === 1;
+                case 'over8': return sum > 8;
+                case 'under8': return sum < 8;
+                case 'exact8': return sum === 8;
+                default: return false;
+            }
+        }
+        
+        function getBetName(betType) {
+            const names = {
+                'even': 'ПАРНЕ',
+                'odd': 'НЕПАРНЕ',
+                'over8': 'БІЛЬШЕ 8',
+                'under8': 'МЕНШЕ 8',
+                'exact8': 'РІВНО 8'
+            };
+            return names[betType] || betType;
+        }
+        
+        // Анімація кубиків
+        async function animateDice(finalValue1, finalValue2) {
             return new Promise((resolve) => {
                 let rolls = 0;
-                const maxRolls = 12;
+                const maxRolls = 10;
                 const interval = setInterval(() => {
-                    const randomValue = Math.floor(Math.random() * 6) + 1;
+                    const random1 = Math.floor(Math.random() * 6) + 1;
+                    const random2 = Math.floor(Math.random() * 6) + 1;
                     const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-                    diceValueSpan.innerHTML = diceSymbols[randomValue - 1];
-                    diceDiv.classList.add('rolling');
+                    dice1ValueSpan.innerHTML = diceSymbols[random1 - 1];
+                    dice2ValueSpan.innerHTML = diceSymbols[random2 - 1];
+                    dice1Div.classList.add('rolling');
+                    dice2Div.classList.add('rolling');
                     rolls++;
                     
                     if (rolls >= maxRolls) {
                         clearInterval(interval);
                         setTimeout(() => {
-                            diceDiv.classList.remove('rolling');
+                            dice1Div.classList.remove('rolling');
+                            dice2Div.classList.remove('rolling');
                             const diceSymbolsFinal = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-                            diceValueSpan.innerHTML = diceSymbolsFinal[finalValue - 1];
+                            dice1ValueSpan.innerHTML = diceSymbolsFinal[finalValue1 - 1];
+                            dice2ValueSpan.innerHTML = diceSymbolsFinal[finalValue2 - 1];
                             resolve();
                         }, 100);
                     }
-                }, 80);
+                }, 70);
             });
         }
         
-        // Функція для безпечного оновлення балансу
         async function updateBalance(changeAmount) {
             const snap = await userRef.once('value');
             const currentData = snap.val();
@@ -528,10 +595,10 @@
         
         async function rollDice() {
             if (isRolling) return;
-            if (selectedNumber === null) {
+            if (selectedBet === null) {
                 resultArea.style.display = 'block';
                 resultText.className = 'result-text result-lose';
-                resultText.innerHTML = `❌ ОБЕРІТЬ ЧИСЛО (1-6)!`;
+                resultText.innerHTML = `❌ ОБЕРІТЬ СТАВКУ!`;
                 return;
             }
             if (currentBet > currentBalance) {
@@ -543,34 +610,73 @@
             
             isRolling = true;
             rollBtn.disabled = true;
-            numberBtns.forEach(btn => btn.disabled = true);
+            betOptions.forEach(opt => opt.style.pointerEvents = 'none');
             resultArea.style.display = 'none';
             
             // Знімаємо ставку
             await updateBalance(-currentBet);
             
             // Генеруємо результат
-            const diceResult = Math.floor(Math.random() * 6) + 1;
+            const dice1 = Math.floor(Math.random() * 6) + 1;
+            const dice2 = Math.floor(Math.random() * 6) + 1;
+            const sum = dice1 + dice2;
             
             // Анімація
-            await animateDice(diceResult);
+            await animateDice(dice1, dice2);
+            
+            // Показуємо суму
+            sumDisplay.innerHTML = `СУМА: ${sum}`;
             
             // Перевірка виграшу
+            const isWin = checkWin(selectedBet, sum);
+            const multiplier = getBetMultiplier(selectedBet);
+            const betName = getBetName(selectedBet);
+            
             let winAmount = 0;
             let resultMessage = '';
             let resultType = '';
             
-            if (selectedNumber === diceResult) {
-                winAmount = currentBet * 6;
+            if (isWin) {
+                winAmount = currentBet * multiplier;
                 resultType = 'win';
-                resultMessage = `🎉 ВІТАННЯ! ВИПАЛО ${diceResult}! ВИ ВИГРАЛИ ${winAmount} 🪙`;
+                resultMessage = `🎉 ВИГРАШ! ${betName} - СУМА ${sum}! ВИ ВИГРАЛИ ${winAmount} 🪙`;
                 await updateBalance(winAmount);
-                addToHistory(`🎲 +${winAmount} 🪙 (Випало ${diceResult}, ставка ${currentBet})`, 
-                            winAmount >= currentBet * 10 ? 'big-win' : 'win');
-            } else {
+                addToHistory(`🎲 +${winAmount} 🪙 (${betName}, сума ${sum}, ставка ${currentBet})`, 
+                            winAmount >= currentBet * 8 ? 'big-win' : 'win');
+            } else if (selectedBet === 'exact8' && sum !== 8) {
                 resultType = 'lose';
-                resultMessage = `😔 ВИПАЛО ${diceResult}. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
-                addToHistory(`🎲 -${currentBet} 🪙 (Випало ${diceResult}, ви обрали ${selectedNumber})`, 'lose');
+                resultMessage = `😔 НЕ ВГАДАЛИ! СУМА ${sum}, А ВИ СТАВИЛИ НА РІВНО 8. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
+                addToHistory(`🎲 -${currentBet} 🪙 (РІВНО 8, випало ${sum})`, 'lose');
+            } else if (selectedBet === 'over8' && sum <= 8) {
+                if (sum === 8) {
+                    resultType = 'push';
+                    resultMessage = `🤝 НІЧИЯ! СУМА 8, СТАВКУ ПОВЕРНЕНО ${currentBet} 🪙`;
+                    await updateBalance(currentBet);
+                    addToHistory(`🔄 +${currentBet} 🪙 (НІЧИЯ, сума 8)`, 'push');
+                } else {
+                    resultType = 'lose';
+                    resultMessage = `😔 ВИПАЛО ${sum}. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
+                    addToHistory(`🎲 -${currentBet} 🪙 (БІЛЬШЕ 8, випало ${sum})`, 'lose');
+                }
+            } else if (selectedBet === 'under8' && sum >= 8) {
+                if (sum === 8) {
+                    resultType = 'push';
+                    resultMessage = `🤝 НІЧИЯ! СУМА 8, СТАВКУ ПОВЕРНЕНО ${currentBet} 🪙`;
+                    await updateBalance(currentBet);
+                    addToHistory(`🔄 +${currentBet} 🪙 (НІЧИЯ, сума 8)`, 'push');
+                } else {
+                    resultType = 'lose';
+                    resultMessage = `😔 ВИПАЛО ${sum}. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
+                    addToHistory(`🎲 -${currentBet} 🪙 (МЕНШЕ 8, випало ${sum})`, 'lose');
+                }
+            } else if (selectedBet === 'even' && sum % 2 === 1) {
+                resultType = 'lose';
+                resultMessage = `😔 ВИПАЛО ${sum} (НЕПАРНЕ). ВИ ПРОГРАЛИ ${currentBet} 🪙`;
+                addToHistory(`🎲 -${currentBet} 🪙 (ПАРНЕ, випало ${sum})`, 'lose');
+            } else if (selectedBet === 'odd' && sum % 2 === 0) {
+                resultType = 'lose';
+                resultMessage = `😔 ВИПАЛО ${sum} (ПАРНЕ). ВИ ПРОГРАЛИ ${currentBet} 🪙`;
+                addToHistory(`🎲 -${currentBet} 🪙 (НЕПАРНЕ, випало ${sum})`, 'lose');
             }
             
             resultArea.style.display = 'block';
@@ -579,7 +685,7 @@
             
             isRolling = false;
             rollBtn.disabled = false;
-            numberBtns.forEach(btn => btn.disabled = false);
+            betOptions.forEach(opt => opt.style.pointerEvents = 'auto');
         }
         
         // Кнопки
@@ -588,9 +694,9 @@
         betInput.onchange = manualBetChange;
         rollBtn.onclick = rollDice;
         
-        // Вибір числа
-        numberBtns.forEach(btn => {
-            btn.onclick = () => selectNumber(parseInt(btn.dataset.number));
+        // Вибір ставки
+        betOptions.forEach(option => {
+            option.onclick = () => selectBet(option.dataset.bet);
         });
         
         // Початковий стан

@@ -85,6 +85,11 @@
         .status-dot.ready { background: var(--neon); box-shadow: 0 0 10px var(--neon);}
 
         #status-text { font-size: 28px; font-weight: bold; color: var(--gold); text-align: center; width: 100%; text-shadow: 0 2px 10px rgba(0,0,0,0.8); margin-bottom: 20px;}
+
+        /* КНОПКА ЗВУКУ */
+        .sound-btn { background: transparent; border: 1px solid #444; color: #ccc; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        .sound-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .sound-btn.muted { border-color: #c62828; color: #c62828; }
     </style>
 </head>
 <body>
@@ -117,9 +122,6 @@
     // 🔊 НАЛАШТУВАННЯ ЗВУКІВ — ЗМІНЮЙ ЦЕЙ БЛОК
     // ══════════════════════════════════════════════════════
     const SOUND_CONFIG = {
-        // Обертання кола (довгий звук — грає під час спіну)
-        spin:       'https://raw.githubusercontent.com/USER/REPO/main/sounds/spin.mp3',
-
         // Клацання шарика по сектору (короткий тік)
         ballTick:   null,  // 'https://raw.githubusercontent.com/USER/REPO/main/sounds/ball_tick.mp3'
 
@@ -385,15 +387,34 @@
                 }
             },
 
-            setVolume: function(v) { masterVolume = Math.max(0, Math.min(1, v)); }
+            setVolume: function(v) { masterVolume = Math.max(0, Math.min(1, v)); },
+
+            toggleMute: function() {
+                this._muted = !this._muted;
+                masterVolume = this._muted ? 0 : 0.7;
+                const btn = document.getElementById('sound-toggle-btn');
+                if (btn) {
+                    btn.textContent = this._muted ? '🔇' : '🔊';
+                    btn.classList.toggle('muted', this._muted);
+                }
+                // Якщо вимкнули під час спіну — зупиняємо луп
+                if (this._muted) this.stopSpin();
+            },
+
+            _muted: false
         };
     })();
+
+    function toggleMute() { SoundEngine.toggleMute(); }
     </script>
 
     <div class="nav-bar">
         <button class="back-btn" onclick="leaveTable()">⬅ Втекти</button>
         <h2 id="table-title" style="margin: 0; color: var(--gold); letter-spacing: 2px;">EUROPEAN ROULETTE #1</h2>
-        <div style="font-size: 18px; font-weight: bold;">БАЛАНС: <strong id="balance-display" style="color: var(--neon); font-size: 24px; margin-left: 10px;">0</strong></div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="font-size: 18px; font-weight: bold;">БАЛАНС: <strong id="balance-display" style="color: var(--neon); font-size: 24px; margin-left: 10px;">0</strong></div>
+            <button class="sound-btn" id="sound-toggle-btn" onclick="toggleMute()" title="Звук">🔊</button>
+        </div>
     </div>
 
     <div class="casino-table">

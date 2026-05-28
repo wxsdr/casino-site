@@ -327,7 +327,7 @@
             border: 2px solid #d4af37;
             color: #d4af37;
             border-radius: 40px;
-            padding: 10px 28px;
+            padding: 10px 35px;
             font-size: 16px;
             font-weight: 800;
             cursor: pointer;
@@ -415,7 +415,6 @@
             <div class="action-buttons">
                 <button class="action-btn primary" id="hit-btn">🎴 ВЗЯТИ</button>
                 <button class="action-btn" id="stand-btn">✋ ДОСТАТНЬО</button>
-                <button class="action-btn" id="double-btn">💰 ПОДВОЇТИ</button>
             </div>
         </div>
     </div>
@@ -518,8 +517,7 @@
         let gameActive = false;
         let currentBet = 10;
         let gameResult = null;
-        let isDoubled = false;
-        let isProcessing = false;  // блокування повторних викликів
+        let isProcessing = false;
         
         const betInput = document.getElementById('bet-input');
         const playerCardsDiv = document.getElementById('player-cards');
@@ -531,7 +529,6 @@
         
         const hitBtn = document.getElementById('hit-btn');
         const standBtn = document.getElementById('stand-btn');
-        const doubleBtn = document.getElementById('double-btn');
         const newGameBtn = document.getElementById('new-game-btn');
         const betMinus = document.getElementById('bet-minus');
         const betPlus = document.getElementById('bet-plus');
@@ -653,35 +650,44 @@
             gameActive = false;
             const playerScore = calculateScore(playerCards);
             const dealerScore = calculateScore(dealerCards);
-            const finalBet = isDoubled ? currentBet * 2 : currentBet;
             let winAmount = 0;
             let resultType = '';
             let resultMessage = '';
             
-            if (playerScore > 21) {
+            // Блекджек (21 з двох карт)
+            const isPlayerBlackjack = playerCards.length === 2 && playerScore === 21;
+            const isDealerBlackjack = dealerCards.length === 2 && dealerScore === 21;
+            
+            if (isPlayerBlackjack && !isDealerBlackjack) {
+                winAmount = currentBet * 2.5; // Блекджек виплачує 3:2 (ставка 10 → виграш 25)
+                resultType = 'win';
+                resultMessage = `🃏 БЛЕКДЖЕК! ВИ ВИГРАЛИ ${Math.floor(winAmount)} 🪙`;
+                await addWin(winAmount);
+                playSound('blackjack');
+            } else if (playerScore > 21) {
                 resultType = 'lose';
-                resultMessage = `❌ ПЕРЕБІР! ВИ ПРОГРАЛИ ${finalBet} 🪙`;
+                resultMessage = `❌ ПЕРЕБІР! ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 playSound('lose');
             } else if (dealerScore > 21) {
-                winAmount = finalBet * 2;  // повертаємо ставку + виграш = 2x ставки
+                winAmount = currentBet * 2;
                 resultType = 'win';
                 resultMessage = `🎉 ДИЛЕР ПЕРЕБРАВ! ВИ ВИГРАЛИ ${winAmount} 🪙`;
                 await addWin(winAmount);
                 playSound('win');
             } else if (playerScore > dealerScore) {
-                winAmount = finalBet * 2;
+                winAmount = currentBet * 2;
                 resultType = 'win';
                 resultMessage = `🎉 ВИ ВИГРАЛИ! ${winAmount} 🪙`;
                 await addWin(winAmount);
                 playSound('win');
             } else if (playerScore < dealerScore) {
                 resultType = 'lose';
-                resultMessage = `❌ ВИ ПРОГРАЛИ ${finalBet} 🪙`;
+                resultMessage = `❌ ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 playSound('lose');
             } else {
-                winAmount = finalBet;  // повертаємо тільки ставку
+                winAmount = currentBet;
                 resultType = 'push';
-                resultMessage = `🤝 НІЧИЯ! СТАВКУ ПОВЕРНЕНО ${finalBet} 🪙`;
+                resultMessage = `🤝 НІЧИЯ! СТАВКУ ПОВЕРНЕНО ${currentBet} 🪙`;
                 await addWin(winAmount);
                 playSound('win');
             }
@@ -695,8 +701,6 @@
             
             hitBtn.disabled = true;
             standBtn.disabled = true;
-            doubleBtn.disabled = true;
-            isDoubled = false;
             isProcessing = false;
         }
         
@@ -721,37 +725,9 @@
             playSound('card');
             hitBtn.disabled = true;
             standBtn.disabled = true;
-            doubleBtn.disabled = true;
             
             await dealerPlay();
             await endGame();
-        }
-        
-        async function doubleDown() {
-            if (!gameActive || playerCards.length !== 2 || isProcessing) return;
-            if (currentBalance < currentBet) return;
-            
-            isProcessing = true;
-            playSound('chip');
-            await userRef.update({ chips: currentBalance - currentBet });
-            currentBalance -= currentBet;
-            document.getElementById('balance-amount').innerText = currentBalance;
-            isDoubled = true;
-            
-            const newCard = deck.pop();
-            playerCards.push(newCard);
-            updateUI(true);
-            
-            hitBtn.disabled = true;
-            standBtn.disabled = true;
-            doubleBtn.disabled = true;
-            
-            if (calculateScore(playerCards) > 21) {
-                await endGame();
-            } else {
-                await dealerPlay();
-                await endGame();
-            }
         }
         
         async function startNewGame() {
@@ -764,8 +740,6 @@
             resultArea.style.display = 'none';
             hitBtn.disabled = false;
             standBtn.disabled = false;
-            doubleBtn.disabled = false;
-            isDoubled = false;
             
             const betPlaced = await placeBet();
             if (!betPlaced) {
@@ -782,7 +756,6 @@
             
             const playerScore = calculateScore(playerCards);
             if (playerScore === 21) {
-                playSound('blackjack');
                 await stand();
             } else {
                 isProcessing = false;
@@ -795,11 +768,9 @@
         newGameBtn.onclick = startNewGame;
         hitBtn.onclick = hit;
         standBtn.onclick = stand;
-        doubleBtn.onclick = doubleDown;
         
         hitBtn.disabled = true;
         standBtn.disabled = true;
-        doubleBtn.disabled = true;
         updateBetUI();
         
         document.body.addEventListener('click', function initAudioOnClick() {

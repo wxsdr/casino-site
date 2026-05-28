@@ -19,17 +19,14 @@
         
         body {
             background: radial-gradient(ellipse at 30% 40%, #0d1117 0%, #05080f 100%);
-            color: white;
             font-family: 'Montserrat', sans-serif;
             height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            position: relative;
         }
 
         .top-bar {
-            position: relative;
             z-index: 100;
             display: flex;
             justify-content: space-between;
@@ -38,7 +35,6 @@
             background: rgba(8, 12, 20, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 215, 0, 0.25);
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
         }
         
         .btn-exit {
@@ -49,14 +45,11 @@
             border-radius: 40px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s;
             font-size: 13px;
-            letter-spacing: 1.5px;
         }
         .btn-exit:hover {
             background: #ff4433;
             border-color: #ff4433;
-            box-shadow: 0 0 20px rgba(255, 68, 51, 0.4);
         }
         
         .balance-badge {
@@ -66,7 +59,6 @@
             padding: 10px 32px;
             border-radius: 40px;
             border: 1px solid rgba(0, 255, 157, 0.35);
-            backdrop-filter: blur(10px);
             color: #00ff9d;
         }
         .balance-badge span {
@@ -80,9 +72,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%;
-            position: relative;
-            z-index: 1;
             padding: 20px;
         }
 
@@ -90,13 +79,13 @@
             background: linear-gradient(145deg, #0a5a3a, #064a2a);
             border-radius: 80px;
             border: 4px solid #d4af37;
-            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), inset 0 0 50px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5);
             padding: 30px 50px;
-            position: relative;
             width: 1100px;
             height: 650px;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         
         .table-neon {
@@ -126,13 +115,6 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: 4px;
-        }
-        .table-title p {
-            font-size: 11px;
-            color: rgba(255, 215, 0, 0.5);
-            letter-spacing: 3px;
-            margin-top: 5px;
         }
 
         .cards-area {
@@ -141,14 +123,12 @@
             flex-direction: column;
             justify-content: center;
             gap: 30px;
-            margin-bottom: 20px;
         }
         
         .dealer-area, .player-area {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 20px;
             padding: 15px 20px;
-            backdrop-filter: blur(5px);
         }
         
         .area-label {
@@ -156,16 +136,9 @@
             font-weight: 800;
             color: #d4af37;
             margin-bottom: 12px;
-            letter-spacing: 2px;
             display: flex;
             align-items: center;
             gap: 15px;
-        }
-        
-        .area-label span:first-child {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 4px 12px;
-            border-radius: 20px;
         }
         
         .score-badge {
@@ -192,37 +165,19 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 32px;
-            font-weight: 900;
             box-shadow: -3px 3px 8px rgba(0, 0, 0, 0.4);
-            transition: all 0.2s;
             animation: cardDeal 0.25s ease-out;
-            position: relative;
         }
         
         @keyframes cardDeal {
-            0% {
-                transform: translateY(-100px) rotate(-10deg);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0) rotate(0);
-                opacity: 1;
-            }
+            from { transform: translateY(-100px) rotate(-10deg); opacity: 0; }
+            to { transform: translateY(0) rotate(0); opacity: 1; }
         }
         
         .card.red { color: #e33; }
         .card.black { color: #222; }
-        
-        .card .card-suit {
-            font-size: 28px;
-            margin-top: 5px;
-        }
-        
-        .card .card-value {
-            font-size: 36px;
-            font-weight: 900;
-        }
+        .card .card-value { font-size: 36px; font-weight: 900; }
+        .card .card-suit { font-size: 28px; margin-top: 5px; }
         
         .card-back {
             background: linear-gradient(135deg, #1a3a5a, #0a2a4a);
@@ -239,9 +194,6 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        .card-back .card-value, .card-back .card-suit {
-            display: none;
-        }
 
         .result-area {
             text-align: center;
@@ -249,24 +201,15 @@
             padding: 12px;
             background: rgba(0, 0, 0, 0.6);
             border-radius: 50px;
-            backdrop-filter: blur(10px);
         }
         
         .result-text {
             font-size: 24px;
             font-weight: 900;
-            animation: resultPulse 0.5s ease;
         }
-        
-        @keyframes resultPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); text-shadow: 0 0 15px #d4af37; }
-        }
-        
         .result-win { color: #00ff88; }
         .result-lose { color: #ff4433; }
         .result-push { color: #d4af37; }
-        .result-blackjack { color: #9b30ff; }
 
         .bet-panel {
             display: flex;
@@ -279,12 +222,7 @@
             margin-top: 10px;
         }
         
-        .bet-label {
-            color: #d4af37;
-            font-weight: 800;
-            font-size: 14px;
-            letter-spacing: 2px;
-        }
+        .bet-label { color: #d4af37; font-weight: 800; font-size: 14px; }
         
         .chip-btn {
             width: 48px;
@@ -296,10 +234,8 @@
             font-size: 18px;
             font-weight: 900;
             cursor: pointer;
-            transition: 0.1s;
-            box-shadow: 0 3px 0 #886622;
         }
-        .chip-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #886622; }
+        .chip-btn:active { transform: scale(0.95); }
         
         .bet-input {
             background: #0a0e18;
@@ -312,7 +248,6 @@
             width: 120px;
             height: 48px;
             outline: none;
-            font-family: monospace;
         }
         
         .action-buttons {
@@ -331,18 +266,12 @@
             font-size: 16px;
             font-weight: 800;
             cursor: pointer;
-            transition: 0.2s;
-            letter-spacing: 1px;
         }
         .action-btn:hover:not(:disabled) {
             background: #d4af37;
             color: #0a0e18;
-            transform: scale(1.02);
         }
-        .action-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         
         .action-btn.primary {
             background: linear-gradient(135deg, #00ff88, #00aa55);
@@ -361,10 +290,6 @@
             cursor: pointer;
             margin-left: 20px;
         }
-        .new-game-btn:hover {
-            transform: scale(1.02);
-            filter: brightness(1.05);
-        }
     </style>
 </head>
 <body>
@@ -379,7 +304,6 @@
             <div class="table-neon"></div>
             <div class="table-title">
                 <h1>BLACKJACK 21</h1>
-                <p>✦ CASINO ROYALE ✦</p>
             </div>
             
             <div class="cards-area">
@@ -420,79 +344,7 @@
     </div>
 
     <script>
-        let audioContext = null;
-        
-        function initAudio() {
-            if (audioContext) return;
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        
-        function playSound(type) {
-            try {
-                initAudio();
-                if (audioContext.state === 'suspended') audioContext.resume();
-                const now = audioContext.currentTime;
-                const gainNode = audioContext.createGain();
-                gainNode.connect(audioContext.destination);
-                
-                if (type === 'card') {
-                    gainNode.gain.value = 0.06;
-                    const osc = audioContext.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.value = 880;
-                    osc.connect(gainNode);
-                    osc.start();
-                    osc.stop(now + 0.08);
-                } else if (type === 'win') {
-                    gainNode.gain.value = 0.1;
-                    const notes = [523.25, 659.25, 783.99];
-                    notes.forEach((freq, i) => {
-                        const osc = audioContext.createOscillator();
-                        const g = audioContext.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.value = freq;
-                        g.gain.value = 0.08;
-                        osc.connect(g);
-                        g.connect(audioContext.destination);
-                        osc.start();
-                        osc.stop(now + 0.2 + i * 0.12);
-                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.25 + i * 0.12);
-                    });
-                } else if (type === 'lose') {
-                    gainNode.gain.value = 0.07;
-                    const osc = audioContext.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.value = 440;
-                    osc.connect(gainNode);
-                    osc.start();
-                    osc.stop(now + 0.3);
-                } else if (type === 'blackjack') {
-                    gainNode.gain.value = 0.12;
-                    const notes = [523.25, 659.25, 783.99, 1046.50];
-                    notes.forEach((freq, i) => {
-                        const osc = audioContext.createOscillator();
-                        const g = audioContext.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.value = freq;
-                        g.gain.value = 0.1;
-                        osc.connect(g);
-                        g.connect(audioContext.destination);
-                        osc.start();
-                        osc.stop(now + 0.15 + i * 0.1);
-                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.2 + i * 0.1);
-                    });
-                } else if (type === 'chip') {
-                    gainNode.gain.value = 0.05;
-                    const osc = audioContext.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.value = 660;
-                    osc.connect(gainNode);
-                    osc.start();
-                    osc.stop(now + 0.05);
-                }
-            } catch(e) { console.log('Audio error:', e); }
-        }
-
+        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -505,19 +357,26 @@
         
         let currentBalance = 0;
         const userRef = database.ref('users_by_name/' + (username ? username.toLowerCase() : 'guest'));
+        
+        function updateBalanceDisplay() {
+            document.getElementById('balance-amount').innerText = currentBalance;
+        }
+        
         userRef.on('value', snap => {
             const data = snap.val();
-            currentBalance = data ? (data.chips || 0) : 1000;
-            document.getElementById('balance-amount').innerText = currentBalance;
+            currentBalance = data ? (data.chips || 1000) : 1000;
+            updateBalanceDisplay();
         });
 
+        // Ігрові змінні
         let deck = [];
         let playerCards = [];
         let dealerCards = [];
-        let gameActive = false;
+        let gameInProgress = false;
         let currentBet = 10;
-        let betPlacedThisRound = false;  // Запобігає подвійному списанню ставки
+        let betAlreadyTaken = false;  // КЛЮЧОВА ЗМІННА - чи вже зняли ставку
         
+        // DOM елементи
         const betInput = document.getElementById('bet-input');
         const playerCardsDiv = document.getElementById('player-cards');
         const dealerCardsDiv = document.getElementById('dealer-cards');
@@ -525,29 +384,25 @@
         const dealerScoreSpan = document.getElementById('dealer-score');
         const resultArea = document.getElementById('result-area');
         const resultText = document.getElementById('result-text');
-        
         const hitBtn = document.getElementById('hit-btn');
         const standBtn = document.getElementById('stand-btn');
         const newGameBtn = document.getElementById('new-game-btn');
-        const betMinus = document.getElementById('bet-minus');
-        const betPlus = document.getElementById('bet-plus');
         
         function updateBetUI() {
             betInput.value = currentBet;
         }
         
         function updateBet(delta) {
-            if (gameActive) return;
+            if (gameInProgress) return;
             let newVal = currentBet + delta;
             if (newVal >= 10 && newVal <= Math.min(50000, currentBalance)) {
                 currentBet = newVal;
                 updateBetUI();
-                playSound('chip');
             }
         }
         
         function manualBetChange() {
-            if (gameActive) return;
+            if (gameInProgress) return;
             let val = parseInt(betInput.value);
             if (isNaN(val)) val = 10;
             if (val < 10) val = 10;
@@ -595,7 +450,7 @@
         
         function renderCard(card, isHidden = false) {
             if (isHidden) {
-                return `<div class="card card-back"><div class="card-value"></div><div class="card-suit"></div></div>`;
+                return `<div class="card card-back"></div>`;
             }
             const isRed = card.suit === '♥' || card.suit === '♦';
             return `<div class="card ${isRed ? 'red' : 'black'}">
@@ -604,35 +459,40 @@
                     </div>`;
         }
         
-        function updateUI(hideDealerSecond = true) {
+        function updateUI(hideDealerCard = true) {
+            // Гравець
             playerCardsDiv.innerHTML = playerCards.map(c => renderCard(c, false)).join('');
             playerScoreSpan.innerText = calculateScore(playerCards);
             
-            if (hideDealerSecond && gameActive && !resultArea.style.display === 'block' && dealerCards.length === 2) {
+            // Дилер
+            if (hideDealerCard && gameInProgress && dealerCards.length === 2) {
                 const visibleCards = dealerCards.map((c, i) => renderCard(c, i === 1));
                 dealerCardsDiv.innerHTML = visibleCards.join('');
-                const visibleScore = calculateScore(dealerCards.slice(0, 1));
-                dealerScoreSpan.innerText = visibleScore + '?';
+                const firstCardScore = calculateScore([dealerCards[0]]);
+                dealerScoreSpan.innerText = firstCardScore + '?';
             } else {
                 dealerCardsDiv.innerHTML = dealerCards.map(c => renderCard(c, false)).join('');
                 dealerScoreSpan.innerText = calculateScore(dealerCards);
             }
         }
         
-        async function placeBet() {
-            if (betPlacedThisRound) return true;
+        // Функція зняття ставки - ТІЛЬКИ ОДИН РАЗ
+        async function takeBet() {
+            if (betAlreadyTaken) return true;
             if (currentBet > currentBalance) return false;
+            
             await userRef.update({ chips: currentBalance - currentBet });
             currentBalance -= currentBet;
-            document.getElementById('balance-amount').innerText = currentBalance;
-            betPlacedThisRound = true;
+            updateBalanceDisplay();
+            betAlreadyTaken = true;
             return true;
         }
         
-        async function addWin(amount) {
+        // Функція виплати виграшу
+        async function payout(amount) {
             await userRef.update({ chips: currentBalance + amount });
             currentBalance += amount;
-            document.getElementById('balance-amount').innerText = currentBalance;
+            updateBalanceDisplay();
         }
         
         async function dealerPlay() {
@@ -642,45 +502,39 @@
                 dealerCards.push(newCard);
                 dealerScore = calculateScore(dealerCards);
                 updateUI(false);
-                await new Promise(r => setTimeout(r, 350));
+                await new Promise(r => setTimeout(r, 300));
             }
             return dealerScore;
         }
         
         async function endGame() {
-            gameActive = false;
+            gameInProgress = false;
             const playerScore = calculateScore(playerCards);
             const dealerScore = calculateScore(dealerCards);
-            let winAmount = 0;
-            let resultType = '';
+            
             let resultMessage = '';
+            let resultType = '';
             
             if (playerScore > 21) {
                 resultType = 'lose';
                 resultMessage = `❌ ПЕРЕБІР! ВИ ПРОГРАЛИ ${currentBet} 🪙`;
-                playSound('lose');
             } else if (dealerScore > 21) {
-                winAmount = currentBet * 2;
                 resultType = 'win';
+                const winAmount = currentBet * 2;
                 resultMessage = `🎉 ДИЛЕР ПЕРЕБРАВ! ВИ ВИГРАЛИ ${winAmount} 🪙`;
-                await addWin(winAmount);
-                playSound('win');
+                await payout(winAmount);
             } else if (playerScore > dealerScore) {
-                winAmount = currentBet * 2;
                 resultType = 'win';
+                const winAmount = currentBet * 2;
                 resultMessage = `🎉 ВИ ВИГРАЛИ! ${winAmount} 🪙`;
-                await addWin(winAmount);
-                playSound('win');
+                await payout(winAmount);
             } else if (playerScore < dealerScore) {
                 resultType = 'lose';
                 resultMessage = `❌ ВИ ПРОГРАЛИ ${currentBet} 🪙`;
-                playSound('lose');
             } else {
-                winAmount = currentBet;
                 resultType = 'push';
                 resultMessage = `🤝 НІЧИЯ! СТАВКУ ПОВЕРНЕНО ${currentBet} 🪙`;
-                await addWin(winAmount);
-                playSound('win');
+                await payout(currentBet);
             }
             
             resultArea.style.display = 'block';
@@ -688,14 +542,12 @@
             resultText.innerHTML = resultMessage;
             
             updateUI(false);
-            
             hitBtn.disabled = true;
             standBtn.disabled = true;
         }
         
         async function hit() {
-            if (!gameActive) return;
-            playSound('card');
+            if (!gameInProgress) return;
             const newCard = deck.pop();
             playerCards.push(newCard);
             updateUI(true);
@@ -706,54 +558,63 @@
         }
         
         async function stand() {
-            if (!gameActive) return;
+            if (!gameInProgress) return;
             hitBtn.disabled = true;
             standBtn.disabled = true;
-            
             await dealerPlay();
             await endGame();
         }
         
         async function startNewGame() {
-            if (gameActive) return;
+            if (gameInProgress) return;
             
             // Скидаємо стан
-            betPlacedThisRound = false;
             resultArea.style.display = 'none';
             hitBtn.disabled = false;
             standBtn.disabled = false;
             
-            // Ставимо ставку
-            const betPlaced = await placeBet();
-            if (!betPlaced) return;
+            // Знімаємо ставку (ТІЛЬКИ ОДИН РАЗ)
+            const success = await takeBet();
+            if (!success) {
+                resultArea.style.display = 'block';
+                resultText.className = 'result-text result-lose';
+                resultText.innerHTML = `❌ НЕДОСТАТНЬО КОШТІВ ДЛЯ СТАВКИ ${currentBet}!`;
+                return;
+            }
             
-            // Нова колода
+            // Нова гра
             deck = createDeck();
             playerCards = [deck.pop(), deck.pop()];
             dealerCards = [deck.pop(), deck.pop()];
             
-            gameActive = true;
+            gameInProgress = true;
             updateUI(true);
             
-            // Перевірка на блекджек
+            // Перевірка на блекджек (21 відразу)
             if (calculateScore(playerCards) === 21) {
                 await stand();
             }
         }
         
-        betMinus.onclick = () => updateBet(-10);
-        betPlus.onclick = () => updateBet(10);
+        // Кнопки
+        document.getElementById('bet-minus').onclick = () => updateBet(-10);
+        document.getElementById('bet-plus').onclick = () => updateBet(10);
         betInput.onchange = manualBetChange;
         newGameBtn.onclick = startNewGame;
         hitBtn.onclick = hit;
         standBtn.onclick = stand;
         
+        // Початковий стан
         hitBtn.disabled = true;
         standBtn.disabled = true;
         updateBetUI();
         
-        document.body.addEventListener('click', function initAudioOnClick() {
-            if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+        // Аудіо (опціонально)
+        let audioContext = null;
+        document.body.addEventListener('click', () => {
+            if (audioContext) return;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            audioContext.resume();
         }, { once: true });
     </script>
 </body>

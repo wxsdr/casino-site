@@ -1,32 +1,55 @@
 /* ==========================================================================
-   1. АВТОМАТИЧНЕ МАСШТАБУВАННЯ СЦЕНИ (Щоб завжди влазило в екран)
+   1. АВТОМАСШТАБИРОВАНИЕ СЦЕНЫ
    ========================================================================== */
 function resizeGame() {
     const wrapper = document.getElementById('game-wrapper');
     const scene = document.getElementById('game-scene');
-    
-    // Сцена завжди має базовий розмір 1920x1080
     const baseWidth = 1920;
     const baseHeight = 1080;
     
-    // Рахуємо коефіцієнт масштабування (щоб помістилося по ширині і висоті)
     const scale = Math.min(
         wrapper.clientWidth / baseWidth,
         wrapper.clientHeight / baseHeight
     );
-    
-    // Застосовуємо масштаб
     scene.style.transform = `scale(${scale})`;
 }
-
-// Викликаємо при завантаженні та при зміні розміру вікна
 window.addEventListener('resize', resizeGame);
 resizeGame();
 
 
 /* ==========================================================================
-   2. ІНІЦІАЛІЗАЦІЯ FIREBASE ТА БАЛАНСУ
+   2. СИСТЕМНЫЕ МОДАЛЬНЫЕ ОКНА И FIREBASE
    ========================================================================== */
+function showModal(title, desc, isConfirm = false, onConfirm = null) {
+    document.getElementById('modal-title').innerText = title;
+    document.getElementById('modal-desc').innerText = desc;
+    const actionsBox = document.getElementById('modal-actions');
+    actionsBox.innerHTML = '';
+
+    if (isConfirm) {
+        const btnConfirm = document.createElement('button');
+        btnConfirm.className = 'modal-btn confirm'; btnConfirm.innerText = 'ТАК';
+        btnConfirm.onclick = () => { closeModal(); if(onConfirm) onConfirm(); };
+        
+        const btnCancel = document.createElement('button');
+        btnCancel.className = 'modal-btn cancel'; btnCancel.innerText = 'НЕТ';
+        btnCancel.onclick = closeModal;
+
+        actionsBox.appendChild(btnConfirm); actionsBox.appendChild(btnCancel);
+    } else {
+        const btnOk = document.createElement('button');
+        btnOk.className = 'modal-btn confirm'; btnOk.innerText = 'ОК';
+        btnOk.onclick = closeModal; actionsBox.appendChild(btnOk);
+    }
+    const overlay = document.getElementById('ui-modal');
+    overlay.style.display = 'flex'; setTimeout(() => overlay.classList.add('show'), 10);
+}
+
+function closeModal() {
+    const overlay = document.getElementById('ui-modal');
+    overlay.classList.remove('show'); setTimeout(() => overlay.style.display = 'none', 300);
+}
+
 const firebaseConfig = {
     apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
     authDomain: "kurahivka-casino.firebaseapp.com",
@@ -35,9 +58,8 @@ const firebaseConfig = {
 };
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
-
 const username = localStorage.getItem('casino_user');
-if (!username) window.location.href = '../index.html'; // Якщо не авторизований - в лобі
+if (!username) window.location.href = '../index.html';
 
 let currentBalance = 0;
 const userRef = database.ref('users_by_name/' + username.toLowerCase());
@@ -45,8 +67,7 @@ const userRef = database.ref('users_by_name/' + username.toLowerCase());
 userRef.on('value', snap => {
     const data = snap.val();
     if (data && data.in_casino === false) {
-        alert("ДОСТУП ЗАБЛОКОВАНО: Ви покинули казино.");
-        window.location.href = '../index.html';
+        showModal("ДОСТУП ЗАКРЫТ", "Вы покинули территорию казино.", false, () => window.location.href = '../index.html');
     }
     currentBalance = data ? (data.chips || 0) : 0;
     document.getElementById('balance-amount').innerText = currentBalance;
@@ -54,226 +75,278 @@ userRef.on('value', snap => {
 
 
 /* ==========================================================================
-   3. НАЛАШТУВАННЯ СЛОТА ТА СИМВОЛІВ
+   3. ЧАСТИЦЫ И СПЕЦЭФФЕКТЫ
    ========================================================================== */
-// Використовуємо надійні SVG іконки з CDN для AAA якості
+function initParticles() {
+    const container = document.getElementById('particles-container');
+    for(let i=0; i<35; i++) {
+        let p = document.createElement('div');
+        p.style.position = 'absolute'; p.style.width = '6px'; p.style.height = '6px';
+        p.style.background = '#fff'; p.style.borderRadius = '50%';
+        p.style.boxShadow = '0 0 15px 5px #ffdf00'; p.style.opacity = '0';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = (Math.random() * 50 + 50) + 'vh';
+        p.style.animation = `floatFirefly ${Math.random()*5+3}s linear infinite ${Math.random()*5}s`;
+        
+        const keyframes = `
+        @keyframes floatFirefly {
+            0% { transform: translateY(0) scale(0); opacity: 0; }
+            20% { opacity: 0.8; transform: translateY(-20vh) scale(1); }
+            100% { transform: translateY(-100vh) translateX(${Math.random()*100-50}px) scale(0.5); opacity: 0; }
+        }`;
+        const styleSheet = document.createElement("style"); styleSheet.innerText = keyframes; document.head.appendChild(styleSheet);
+        container.appendChild(p);
+    }
+}
+initParticles();
+
+function spawnCoinShower() {
+    const shower = document.getElementById('coin-shower');
+    shower.style.display = 'block'; shower.innerHTML = '';
+    for(let i=0; i<100; i++) {
+        let coin = document.createElement('div');
+        coin.className = 'falling-coin';
+        coin.style.left = Math.random() * 100 + 'vw';
+        coin.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+        coin.style.animationDelay = (Math.random() * 1.5) + 's';
+        shower.appendChild(coin);
+    }
+    setTimeout(() => { shower.style.display = 'none'; shower.innerHTML = ''; }, 4000);
+}
+
+
+/* ==========================================================================
+   4. ЛОГИКА СЛОТА И УПРАВЛЕНИЕ СТАВКАМИ
+   ========================================================================== */
 const standardSymbols = [
-    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f436.svg">', // Собака 1
-    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f429.svg">', // Собака 2
-    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f43a.svg">', // Вовк/Хаскі
-    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f9b4.svg">', // Кістка
-    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f969.svg">', // М'ясо
+    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f436.svg">',
+    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f429.svg">',
+    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f43a.svg">',
+    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f9b4.svg">',
+    '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f969.svg">',
     '<span class="card-symbol color-a">A</span>',
     '<span class="card-symbol color-k">K</span>',
     '<span class="card-symbol color-q">Q</span>',
     '<span class="card-symbol color-j">J</span>',
     '<span class="card-symbol color-10">10</span>'
 ]; 
-const scatterSymbol = '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f43e.svg">'; // Лапа (Scatter)
-const wildSymbol = '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f3e0.svg">'; // Будка (Wild)
+const scatterSymbol = '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f43e.svg">'; 
+const wildSymbol = '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f3e0.svg">'; 
 
-const SYMBOL_HEIGHT = 180; // 165px символ + 15px відступ
-const SYMBOLS_PER_REEL = 35; // Довжина стрічки для крутої анімації
+const SYMBOL_HEIGHT = 180; 
+const SYMBOLS_PER_REEL = 35; 
 
 let currentBet = 10;
 let isSpinning = false;
 let isBonusGame = false;
+let activeBonusType = null; // 'sticky' | 'raining'
 let freeSpinsLeft = 0;
-let stickyWilds = {}; // Формат: { "0-1": 2 } (колонка-рядок: множник)
+let stickyWilds = {}; 
 
-// Поточна матриця на екрані (3 рядки, 5 колонок)
 let currentMatrix = [
     [standardSymbols[0], standardSymbols[1], standardSymbols[2], standardSymbols[3], standardSymbols[4]],
     [standardSymbols[5], standardSymbols[6], standardSymbols[7], standardSymbols[8], standardSymbols[9]],
     [standardSymbols[0], standardSymbols[1], standardSymbols[2], standardSymbols[3], standardSymbols[4]]
 ];
 
+// РУЧНОЙ ВВОД СТАВКИ
+const betInput = document.getElementById('bet-input');
+const bonusPriceDisplay = document.getElementById('bonus-price');
+
+function updateBet(newBet) {
+    if (isSpinning || isBonusGame) {
+        betInput.value = currentBet; // Возвращаем обратно, если крутится
+        return;
+    }
+    newBet = parseInt(newBet);
+    if (isNaN(newBet) || newBet < 10) newBet = 10;
+    if (newBet > 50000) newBet = 50000;
+    
+    currentBet = newBet;
+    betInput.value = currentBet;
+    bonusPriceDisplay.innerText = currentBet * 100;
+}
+
+document.getElementById('bet-minus').addEventListener('click', () => updateBet(currentBet - 10));
+document.getElementById('bet-plus').addEventListener('click', () => updateBet(currentBet + 10));
+betInput.addEventListener('change', (e) => updateBet(e.target.value));
+
+
 /* ==========================================================================
-   4. ФІЗИКА БАРАБАНІВ (ГЕНЕРАЦІЯ ТА АНІМАЦІЯ)
+   5. ВРАЩЕНИЕ БАРАБАНОВ
    ========================================================================== */
 function buildReels(matrixToShow) {
     for (let c = 0; c < 5; c++) {
         const strip = document.getElementById(`strip-${c}`);
-        strip.innerHTML = ''; // Очищаємо стрічку
+        strip.innerHTML = ''; 
         
-        // Генеруємо 35 символів для стрічки
         for (let i = 0; i < SYMBOLS_PER_REEL; i++) {
             const cell = document.createElement('div');
             cell.className = 'symbol-cell';
             cell.id = `cell-${c}-${i}`;
             
-            // Перші 3 символи (0, 1, 2) - це ТЕ, ЩО ВИПАДЕ (результат спіну)
             if (i < 3) {
                 let symbolHTML = matrixToShow[i][c];
                 
-                // Якщо це бонуска і тут є липка будка - малюємо її з множником
-                if (isBonusGame && stickyWilds[`${c}-${i}`]) {
+                // Рендерим липкие будки, если активен режим 'sticky'
+                if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${c}-${i}`]) {
                     cell.innerHTML = `${wildSymbol}<div class="wild-multiplier">x${stickyWilds[`${c}-${i}`]}</div>`;
                     cell.classList.add('sticky');
-                } else if (symbolHTML === wildSymbol) {
-                    let mult = Math.random() > 0.5 ? 2 : 3; // Звичайна будка
+                } 
+                // Рендерим случайно упавшие будки (или Raining Wilds)
+                else if (symbolHTML === wildSymbol) {
+                    let mult = Math.random() > 0.5 ? 2 : 3; 
                     cell.innerHTML = `${wildSymbol}<div class="wild-multiplier">x${mult}</div>`;
+                    cell.classList.add('sticky');
                 } else {
                     cell.innerHTML = symbolHTML;
                 }
             } 
-            // Останні 3 символи (32, 33, 34) - це ТЕ, ЩО БУЛО НА ЕКРАНІ ДО СПІНУ
             else if (i >= SYMBOLS_PER_REEL - 3) {
                 let oldRow = i - (SYMBOLS_PER_REEL - 3);
                 cell.innerHTML = currentMatrix[oldRow][c];
             } 
-            // Всі інші символи посередині - просто розмитий рандом для ефекту руху
             else {
                 cell.innerHTML = standardSymbols[Math.floor(Math.random() * standardSymbols.length)];
-                cell.classList.add('spinning-blur'); // Додаємо блюр
+                cell.classList.add('spinning-blur'); 
             }
-            
             strip.appendChild(cell);
         }
         
-        // Встановлюємо стрічку в самий низ (щоб було видно старий результат)
         const startY = -((SYMBOLS_PER_REEL - 3) * SYMBOL_HEIGHT);
         strip.style.transition = 'none';
         strip.style.transform = `translateY(${startY}px)`;
     }
 }
 
-// Ініціалізація барабанів при старті
 buildReels(currentMatrix);
 
-// Управління ставкою
-function changeBet(amount) {
-    if (isSpinning || isBonusGame) return;
-    let newBet = currentBet + amount;
-    if (newBet >= 10 && newBet <= 5000) {
-        currentBet = newBet;
-        document.getElementById('bet-amount').innerText = currentBet;
-        document.getElementById('bonus-price').innerText = currentBet * 100;
-    }
-}
-document.getElementById('bet-minus').addEventListener('click', () => changeBet(-10));
-document.getElementById('bet-plus').addEventListener('click', () => changeBet(10));
-
-
-/* ==========================================================================
-   5. ІГРОВИЙ ЦИКЛ (СПІН, ГЕНЕРАЦІЯ РЕЗУЛЬТАТУ)
-   ========================================================================== */
 function generateRandomMatrix(forceBonus = false) {
     let newMatrix = [[], [], []];
+    
+    // Переменная для режима Raining Wilds
+    let rainingWildsToDrop = 0;
+    if (isBonusGame && activeBonusType === 'raining') {
+        rainingWildsToDrop = Math.floor(Math.random() * 6) + 1; // 1-6 будок каждый спин
+    }
+
     for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 5; c++) {
-            // Форсуємо скатери, якщо куплено бонус (падають на 1, 3, 5 барабани)
             if (forceBonus && r === 1 && (c === 0 || c === 2 || c === 4)) {
-                newMatrix[r].push(scatterSymbol);
-                continue;
+                newMatrix[r].push(scatterSymbol); continue;
             }
             
             let isScatterReel = (c === 0 || c === 2 || c === 4);
-            // Шанс випадання Скаттера (лише на непарних барабанах)
-            if (!isBonusGame && !forceBonus && isScatterReel && Math.random() < 0.06) {
+            if (!isBonusGame && !forceBonus && isScatterReel && Math.random() < 0.05) {
                 newMatrix[r].push(scatterSymbol);
+            } 
+            // Добавляем Raining Wilds
+            else if (isBonusGame && activeBonusType === 'raining' && rainingWildsToDrop > 0 && (c === 1 || c === 2 || c === 3) && Math.random() < 0.3) {
+                newMatrix[r].push(wildSymbol);
+                rainingWildsToDrop--;
+            }
+            // Обычные Wilds (только в основной игре)
+            else if (!isBonusGame && (c === 1 || c === 2 || c === 3) && Math.random() < 0.12) {
+                newMatrix[r].push(wildSymbol);
             } else {
-                // Будки (Wild) падають тільки на 2, 3 і 4 барабани
-                if ((c === 1 || c === 2 || c === 3) && Math.random() < 0.12) {
-                    newMatrix[r].push(wildSymbol);
-                } else {
-                    newMatrix[r].push(standardSymbols[Math.floor(Math.random() * standardSymbols.length)]);
-                }
+                newMatrix[r].push(standardSymbols[Math.floor(Math.random() * standardSymbols.length)]);
             }
         }
     }
     return newMatrix;
 }
 
+
+/* ==========================================================================
+   6. ИГРОВОЙ ЦИКЛ И ВЫБОР БОНУСА
+   ========================================================================== */
 document.getElementById('spin-btn').addEventListener('click', async () => {
     if (isSpinning) return;
-    if (!isBonusGame && currentBalance < currentBet) return alert("Недостатньо фішок!");
+    updateBet(betInput.value); // Синхронизируем перед спином
     
-    isSpinning = true;
-    updateStatus("КРУТИМО...", "#fff");
+    if (!isBonusGame && currentBalance < currentBet) return showModal("Ошибка", "Недостаточно фишек!");
     
-    // Списуємо ставку (якщо це не фріспін)
-    if (!isBonusGame) {
-        await userRef.update({ chips: currentBalance - currentBet });
-    } else {
-        freeSpinsLeft--;
-    }
+    isSpinning = true; lockButtons(true);
+    setStatus("ВРАЩЕНИЕ...", "#fff");
     
+    if (!isBonusGame) await userRef.update({ chips: currentBalance - currentBet });
+    else freeSpinsLeft--;
+
     executeSpin(false);
 });
 
-document.getElementById('buy-bonus-btn').addEventListener('click', async () => {
+// ПОКУПКА БОНУСА (Открываем меню выбора)
+document.getElementById('buy-bonus-btn').addEventListener('click', () => {
     const cost = currentBet * 100;
     if (isSpinning || isBonusGame) return;
-    if (currentBalance < cost) return alert("Недостатньо фішок для покупки бонусу!");
+    if (currentBalance < cost) return showModal("Ошибка", `Недостаточно фишек!\nНужно: ${cost} 🪙`);
     
-    if(confirm(`Купити бонус за ${cost} 🪙?`)) {
-        isSpinning = true;
-        updateStatus("ПОКУПКА БОНУСУ...", "#fff");
+    showModal("ПОКУПКА БОНУСА", `Оплатить ${cost} 🪙 для запуска?`, true, async () => {
+        isSpinning = true; lockButtons(true);
         await userRef.update({ chips: currentBalance - cost });
-        executeSpin(true); // true = force bonus scatters
-    }
+        setStatus("АКТИВАЦИЯ...", "#fff");
+        executeSpin(true); // Вращаем и выдаем скаттеры
+    });
 });
 
 function executeSpin(forceBonus) {
-    // 1. Генеруємо фінальний результат
     let targetMatrix = generateRandomMatrix(forceBonus);
-    
-    // 2. Логіка "Липких будок" у бонусці
     let scatterCount = 0;
+    
     for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 5; c++) {
-            if (isBonusGame && !stickyWilds[`${c}-${r}`] && targetMatrix[r][c] === wildSymbol && (c === 1 || c === 2 || c === 3)) {
+            // Если режим Sticky - сохраняем будки навсегда
+            if (isBonusGame && activeBonusType === 'sticky' && !stickyWilds[`${c}-${r}`] && targetMatrix[r][c] === wildSymbol && (c === 1 || c === 2 || c === 3)) {
                 stickyWilds[`${c}-${r}`] = Math.random() > 0.5 ? 2 : 3; 
             }
             if (targetMatrix[r][c] === scatterSymbol) scatterCount++;
         }
     }
     
-    // 3. Відмальовуємо нові стрічки з результатами нагорі
     buildReels(targetMatrix);
     
-    // 4. ЗАПУСКАЄМО АНІМАЦІЮ ПАДІННЯ (Затримка для кожного барабана)
-    // Використовуємо cubic-bezier для ефекту різкого падіння і пружного відскоку
     for (let c = 0; c < 5; c++) {
         setTimeout(() => {
             const strip = document.getElementById(`strip-${c}`);
-            strip.style.transition = 'transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1.15)';
+            strip.style.transition = 'transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1.15)';
             strip.style.transform = `translateY(0px)`;
             
-            // Знімаємо блюр з фінальних символів
             setTimeout(() => {
                 document.getElementById(`cell-${c}-0`).classList.remove('spinning-blur');
                 document.getElementById(`cell-${c}-1`).classList.remove('spinning-blur');
                 document.getElementById(`cell-${c}-2`).classList.remove('spinning-blur');
-            }, 1000);
+            }, 800);
             
-        }, c * 200); // Кожен наступний барабан стартує на 200мс пізніше
+        }, c * 150);
     }
     
-    // 5. Чекаємо завершення анімації останнього барабана і перевіряємо виграш
     setTimeout(() => {
-        currentMatrix = targetMatrix; // Оновлюємо поточну матрицю
+        currentMatrix = targetMatrix; 
         checkWin(scatterCount);
-    }, 1500 + (4 * 200));
+    }, 1200 + (4 * 150));
 }
 
-/* ==========================================================================
-   6. ПЕРЕВІРКА ВИГРАШУ ТА БОНУСНОЇ ГРИ
-   ========================================================================== */
 async function checkWin(scatterCount) {
     let winAmount = 0;
-    
-    // Спрощена перевірка виграшу (3 в ряд по горизонталі)
+    let hasBigWin = false;
+
     for (let r = 0; r < 3; r++) {
+        // Упрощенная проверка выигрыша (горизонталь)
         if (currentMatrix[r][0] === currentMatrix[r][1] || currentMatrix[r][1] === wildSymbol) {
             if (Math.random() > 0.4) {
-                let lineWin = currentBet * (Math.floor(Math.random() * 8) + 1);
+                document.getElementById(`cell-0-${r}`).classList.add('win-glow'); // Заметка: id ячеек создаются как cell-Колонка-Ряд
+                document.getElementById(`cell-1-${r}`).classList.add('win-glow');
+                document.getElementById(`cell-2-${r}`).classList.add('win-glow');
                 
-                // Множимо на будки, якщо вони є
+                let lineWin = currentBet * (Math.floor(Math.random() * 8) + 1);
                 let multiplier = 1;
                 for(let c = 1; c <= 3; c++) {
-                    if(stickyWilds[`${c}-${r}`]) multiplier += stickyWilds[`${c}-${r}`];
+                    // Учитываем сохраненные множители для Sticky, либо проверяем Raining на лету
+                    if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${c}-${r}`]) {
+                        multiplier += stickyWilds[`${c}-${r}`];
+                    } else if (currentMatrix[r][c] === wildSymbol) {
+                        multiplier += 2; // Базовый множитель для обычной игры или Raining
+                    }
                 }
                 winAmount += (lineWin * (multiplier > 1 ? multiplier : 1));
             }
@@ -281,49 +354,80 @@ async function checkWin(scatterCount) {
     }
 
     if (winAmount > 0) {
-        updateStatus(`ВИГРАШ: +${winAmount} 🪙`, "#00ff9d");
+        setStatus(`ВЫИГРЫШ: +${winAmount} 🪙`, "#00ff9d");
         await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + winAmount }); });
+        
+        if (winAmount >= currentBet * 20) {
+            spawnCoinShower();
+            hasBigWin = true;
+        }
     } else if (!isBonusGame) {
-        updateStatus("НЕ ПОЩАСТИЛО", "#888");
+        setStatus("НЕ ПОВЕЗЛО", "#888");
     }
 
-    // Затримка перед наступною дією
+    let delay = hasBigWin ? 2500 : 1000;
+
     setTimeout(() => {
         if (!isBonusGame && scatterCount >= 3) {
-            startBonusGame();
+            // ОТКРЫВАЕМ МЕНЮ ВЫБОРА БОНУСА
+            document.getElementById('bonus-choice-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('bonus-choice-modal').classList.add('show'), 10);
         } else if (isBonusGame && freeSpinsLeft <= 0) {
             endBonusGame();
         } else if (isBonusGame && freeSpinsLeft > 0) {
-            updateStatus(`ФРІСПІНИ: ${freeSpinsLeft}`, "#ff3366");
+            setStatus(`ФРИСПИНЫ: ${freeSpinsLeft}`, "#ff3366", true);
             isSpinning = false;
         } else {
-            isSpinning = false;
-            updateStatus("ГОТОВИЙ ДО ГРИ", "#ffdf00");
+            resetControls();
         }
-    }, 1200);
+    }, delay);
 }
 
-function startBonusGame() {
-    isBonusGame = true;
-    freeSpinsLeft = Math.floor(Math.random() * 9) + 9; // Від 9 до 18 спінів
-    stickyWilds = {}; 
-    
-    alert(`🐾 БОНУСНА ГРА!\nВи виграли ${freeSpinsLeft} безкоштовних обертань.\nВсі будки тепер стають липкими!`);
-    updateStatus(`🔥 БОНУСКА: ${freeSpinsLeft} 🔥`, "#ff3366");
-    
-    isSpinning = false;
+// ЭТУ ФУНКЦИЮ ВЫЗЫВАЮТ КНОПКИ В МЕНЮ
+window.selectBonus = function(type) {
+    document.getElementById('bonus-choice-modal').classList.remove('show');
+    setTimeout(() => {
+        document.getElementById('bonus-choice-modal').style.display = 'none';
+        
+        isBonusGame = true;
+        activeBonusType = type;
+        stickyWilds = {}; 
+        
+        if (type === 'sticky') {
+            freeSpinsLeft = Math.floor(Math.random() * 9) + 7; // 7 - 15
+            setStatus(`🔥 ЛИПКИЕ БУДКИ: ${freeSpinsLeft} 🔥`, "#ffdf00", true);
+        } else {
+            freeSpinsLeft = Math.floor(Math.random() * 16) + 15; // 15 - 30
+            setStatus(`🌧 ДОЖДЬ ИЗ БУДОК: ${freeSpinsLeft} 🌧`, "#00d4ff", true);
+        }
+        
+        isSpinning = false; 
+    }, 300);
 }
 
 function endBonusGame() {
-    alert("Бонусні обертання завершені. Повертаємось до звичайної гри.");
+    showModal("БОНУС ЗАВЕРШЕН", "Все бесплатные вращения использованы.");
     isBonusGame = false;
+    activeBonusType = null;
     stickyWilds = {}; 
-    isSpinning = false;
-    updateStatus("ГОТОВИЙ ДО ГРИ", "#ffdf00");
+    resetControls();
 }
 
-function updateStatus(text, color) {
-    const statusEl = document.getElementById('status-screen');
-    statusEl.innerText = text;
-    statusEl.style.color = color;
+function resetControls() {
+    isSpinning = false; lockButtons(false); 
+    setStatus("ГОТОВ К ИГРЕ", "#ffdf00", false);
+    document.querySelectorAll('.win-glow').forEach(el => el.classList.remove('win-glow'));
+}
+
+function lockButtons(lock) {
+    document.getElementById('spin-btn').disabled = lock; 
+    document.getElementById('buy-bonus-btn').disabled = lock;
+    betInput.disabled = lock;
+    document.querySelectorAll('.bet-btn').forEach(btn => btn.disabled = lock);
+}
+
+function setStatus(text, color, isBonus = false) {
+    const st = document.getElementById('status-text');
+    st.innerText = text; st.style.color = color;
+    if(isBonus) st.classList.add('bonus-active'); else st.classList.remove('bonus-active');
 }

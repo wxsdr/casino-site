@@ -90,47 +90,47 @@
         
         .game-container {
             display: flex;
-            gap: 25px;
+            gap: 30px;
             align-items: center;
             justify-content: center;
         }
         
         /* HISTORY - зліва від слотів */
         .win-history {
-            background: rgba(8, 12, 20, 0.85);
+            background: rgba(8, 12, 20, 0.9);
             backdrop-filter: blur(15px);
             border-radius: 20px;
             border-right: 3px solid #00ff88;
-            padding: 15px 20px;
-            width: 260px;
-            height: 470px;
+            padding: 20px;
+            width: 300px;
+            height: 500px;
             display: flex;
             flex-direction: column;
         }
         .win-history h4 {
             color: #00ff88;
-            font-size: 14px;
-            margin-bottom: 12px;
+            font-size: 18px;
+            margin-bottom: 15px;
             letter-spacing: 2px;
             text-align: center;
-            padding-bottom: 8px;
+            padding-bottom: 10px;
             border-bottom: 1px solid rgba(0, 255, 136, 0.3);
         }
         .history-list {
             flex: 1;
             overflow-y: auto;
-            font-size: 11px;
-            font-family: monospace;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
         .history-list div {
-            padding: 6px 10px;
-            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
-            border-left: 2px solid;
-            transition: 0.2s;
+            border-left: 3px solid;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
         }
         .history-list .win { 
             color: #00ff88; 
@@ -139,7 +139,7 @@
         .history-list .big-win { 
             color: #ffd700; 
             border-left-color: #ffd700;
-            font-weight: bold;
+            font-weight: 900;
             background: rgba(255, 215, 0, 0.1);
         }
         .history-list .bonus { 
@@ -364,26 +364,22 @@
             z-index: 20;
         }
 
-        /* ========== РЕАЛЬНА 3D АНІМАЦІЯ ОБЕРТАННЯ БЛОКУ ========== */
+        /* ========== РЕАЛЬНА 3D АНІМАЦІЯ ОБЕРТАННЯ БЛОКУ (текстура не змінюється) ========== */
         @keyframes real3DRotate {
             0% {
                 transform: rotateX(-20deg) rotateY(-35deg) scale(1);
             }
-            20% {
+            25% {
                 transform: rotateX(-20deg) rotateY(325deg) scale(1.1);
                 filter: drop-shadow(0 0 15px #ffd700);
             }
-            40% {
+            50% {
                 transform: rotateX(340deg) rotateY(325deg) scale(1.15);
                 filter: drop-shadow(0 0 25px #ffd700);
             }
-            60% {
+            75% {
                 transform: rotateX(340deg) rotateY(-35deg) scale(1.1);
-                filter: drop-shadow(0 0 20px #ffd700);
-            }
-            80% {
-                transform: rotateX(-20deg) rotateY(-35deg) scale(1.05);
-                filter: drop-shadow(0 0 10px #ffd700);
+                filter: drop-shadow(0 0 15px #ffd700);
             }
             100% {
                 transform: rotateX(-20deg) rotateY(-35deg) scale(1);
@@ -392,7 +388,7 @@
         }
         
         .winning-block {
-            animation: real3DRotate 0.8s cubic-bezier(0.34, 1.2, 0.64, 1) forwards !important;
+            animation: real3DRotate 0.7s cubic-bezier(0.34, 1.2, 0.64, 1) forwards !important;
         }
 
         /* CONTROL PANEL */
@@ -846,15 +842,15 @@
         
         function addToHistory(message, type = 'win') {
             const historyDiv = document.getElementById('history-list');
+            // Видаляємо заглушку якщо є
+            if (historyDiv.children.length === 1 && historyDiv.children[0].innerText.includes('немає записів')) {
+                historyDiv.innerHTML = '';
+            }
             const newEntry = document.createElement('div');
             newEntry.className = type;
-            const time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            newEntry.innerHTML = `[${time}] ${message}`;
+            newEntry.innerHTML = message;
             historyDiv.prepend(newEntry);
             while (historyDiv.children.length > 15) historyDiv.removeChild(historyDiv.lastChild);
-            if (historyDiv.children.length && historyDiv.children[historyDiv.children.length-1]?.innerText.includes('немає записів')) {
-                historyDiv.removeChild(historyDiv.lastChild);
-            }
         }
         
         function toggleTurbo() {
@@ -878,7 +874,7 @@
             pendingStopAuto = false;
             autoSpinsLeft = count === 999 ? 999999 : count;
             closeAutoModal();
-            addToHistory(`🎰 АВТОГРА: ${count === 999 ? 'НЕСКІНЧЕННА' : count + ' спінів'}`, 'bonus');
+            addToHistory(`🎰 АВТОГРА: ${count === 999 ? 'НЕСКІНЧЕННА' : count + ' СПІНІВ'}`, 'bonus');
             setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`);
             spin();
         }
@@ -887,9 +883,9 @@
             if (autoSpinsLeft > 0 && !isBonusGame) {
                 if (isSpinning) {
                     pendingStopAuto = true;
-                    addToHistory(`⏹ Автогру зупинено після спіну`, 'win');
+                    addToHistory(`⏹ АВТОГРУ ЗУПИНЕНО ПІСЛЯ СПІНУ`, 'win');
                 } else {
-                    addToHistory(`⏹ Автогру зупинено`, 'win');
+                    addToHistory(`⏹ АВТОГРУ ЗУПИНЕНО`, 'win');
                     autoSpinsLeft = 0;
                     setStatus("✨ ГОТОВИЙ ДО ГРИ");
                 }
@@ -1007,7 +1003,7 @@
             if (isSpinning) return;
             if (!isBonusGame && currentBalance < currentBet) {
                 if (autoSpinsLeft > 0) {
-                    addToHistory(`⛔ Автогра зупинена: недостатньо коштів!`, 'win');
+                    addToHistory(`⛔ АВТОГРА ЗУПИНЕНА: НЕДОСТАТНЬО КОШТІВ!`, 'win');
                     autoSpinsLeft = 0;
                 }
                 setStatus("❌ НЕДОСТАТНЬО ФІШОК!");
@@ -1046,7 +1042,7 @@
                 const winAmount = winResult.totalWin;
                 const winPositions = winResult.winPositions;
                 
-                // Анімація ТІЛЬКИ на виграшних блоках - реальне 3D обертання
+                // Анімація ТІЛЬКИ на виграшних блоках - реальне 3D обертання (текстура не змінюється)
                 if (winAmount > 0) {
                     if (winAmount >= currentBet * 20) playSound('bigwin');
                     else playSound('win');
@@ -1056,13 +1052,13 @@
                         const block = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${parseInt(y)+1}) .minecraft-block`);
                         if (block) {
                             block.classList.add('winning-block');
-                            setTimeout(() => block.classList.remove('winning-block'), 800);
+                            setTimeout(() => block.classList.remove('winning-block'), 700);
                         }
                     }
                 }
                 
                 if (winAmount > 0) {
-                    addToHistory(`+${winAmount} 🪙`, winAmount >= currentBet * 20 ? 'big-win' : 'win');
+                    addToHistory(`🏆 +${winAmount} 🪙`, winAmount >= currentBet * 20 ? 'big-win' : 'win');
                     setStatus(`🏆 ВИГРАШ: ${winAmount}`);
                     if (!isBonusGame) await userRef.update({ chips: currentBalance + winAmount });
                 } else if (scatters >= 3) {
@@ -1072,7 +1068,7 @@
                     startBonusGame();
                     return;
                 } else if (isBonusGame && freeSpinsLeft === 0) {
-                    addToHistory(`🏁 Бонус завершено`, 'win');
+                    addToHistory(`🏁 БОНУС ЗАВЕРШЕНО`, 'win');
                     endBonus();
                 }
                 
@@ -1086,7 +1082,7 @@
                     
                     if (pendingStopAuto && autoSpinsLeft > 0 && !isBonusGame) {
                         pendingStopAuto = false;
-                        addToHistory(`⏹ Автогру зупинено`, 'win');
+                        addToHistory(`⏹ АВТОГРУ ЗУПИНЕНО`, 'win');
                         autoSpinsLeft = 0;
                         setStatus("✨ ГОТОВИЙ ДО ГРИ");
                         document.getElementById('spin-btn').disabled = false;
@@ -1103,7 +1099,7 @@
                             setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`);
                             setTimeout(() => spin(), isTurbo ? 150 : 400);
                         } else {
-                            addToHistory(`✅ Автогра завершена!`, 'win');
+                            addToHistory(`✅ АВТОГРА ЗАВЕРШЕНА!`, 'win');
                             setStatus("✨ ГОТОВИЙ ДО ГРИ");
                             document.getElementById('spin-btn').disabled = false;
                             document.getElementById('buy-bonus-btn').disabled = false;
@@ -1123,7 +1119,7 @@
             if (isSpinning) return;
             if (currentBalance >= 1000) {
                 await userRef.update({ chips: currentBalance - 1000 });
-                addToHistory(`🎁 Куплено бонус за 1000 🪙`, 'bonus');
+                addToHistory(`🎁 КУПЛЕНО БОНУС ЗА 1000 🪙`, 'bonus');
                 document.getElementById('bonus-modal').style.display = 'flex';
             } else setStatus("❌ НЕ ВИСТАЧАЄ ФІШОК!");
         }
@@ -1134,7 +1130,7 @@
             activeBonusType = Math.random() > 0.5 ? 'sticky' : 'raining';
             document.body.className = activeBonusType === 'sticky' ? 'bonus-sticky' : 'bonus-raining';
             if (activeBonusType === 'sticky') stickyWilds = {};
-            addToHistory(`${activeBonusType === 'sticky' ? '🔥 НЕЗЕР-РЕАКТОР' : '🌊 ЕНДЕР-ШТОРМ'}! ${freeSpinsLeft} фріспінів`, 'bonus');
+            addToHistory(`${activeBonusType === 'sticky' ? '🔥 НЕЗЕР-РЕАКТОР' : '🌊 ЕНДЕР-ШТОРМ'}! ${freeSpinsLeft} ФРІСПІНІВ`, 'bonus');
             spin();
         }
         
@@ -1153,7 +1149,7 @@
             document.body.className = type === 'sticky' ? 'bonus-sticky' : 'bonus-raining';
             freeSpinsLeft = type === 'sticky' ? 12 : 18;
             if (type === 'sticky') stickyWilds = {};
-            addToHistory(`${type === 'sticky' ? '🔥' : '🌊'} Вибрано бонус: ${type === 'sticky' ? 'НЕЗЕР-РЕАКТОР' : 'ЕНДЕР-ШТОРМ'} (${freeSpinsLeft} спінів)`, 'bonus');
+            addToHistory(`${type === 'sticky' ? '🔥' : '🌊'} ВИБРАНО БОНУС: ${type === 'sticky' ? 'НЕЗЕР-РЕАКТОР' : 'ЕНДЕР-ШТОРМ'} (${freeSpinsLeft} СПІНІВ)`, 'bonus');
             spin();
         };
         

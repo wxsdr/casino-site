@@ -268,160 +268,240 @@
         </div>
     </div>
     <script>
-        // --- 1. АВТОМАСШТАБУВАННЯ ---
-        function resizeGame() {
-            const wrapper = document.getElementById('game-wrapper');
-            const scene = document.getElementById('game-scene');
-            const scale = Math.min(wrapper.clientWidth / 1600, wrapper.clientHeight / 900);
-            scene.style.transform = `scale(${scale})`;
-        }
-        window.addEventListener('resize', resizeGame);
-        resizeGame();
+    // --- 1. АВТОМАСШТАБУВАННЯ ---
+    function resizeGame() {
+        const wrapper = document.getElementById('game-wrapper');
+        const scene = document.getElementById('game-scene');
+        const scale = Math.min(wrapper.clientWidth / 1600, wrapper.clientHeight / 900);
+        scene.style.transform = `scale(${scale})`;
+    }
 
-        // --- 2. FIREBASE ТА БАЛАНС ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
-            authDomain: "kurahivka-casino.firebaseapp.com",
-            databaseURL: "https://kurahivka-casino-default-rtdb.europe-west1.firebasedatabase.app/",
-            projectId: "kurahivka-casino"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const username = localStorage.getItem('casino_user');
+    window.addEventListener('resize', resizeGame);
+    resizeGame();
+
+    // --- 2. FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
+        authDomain: "kurahivka-casino.firebaseapp.com",
+        databaseURL: "https://kurahivka-casino-default-rtdb.europe-west1.firebasedatabase.app/",
+        projectId: "kurahivka-casino"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    const database = firebase.database();
+    const username = localStorage.getItem('casino_user') || 'guest';
+
+    let currentBalance = 100000;
+
+    const userRef = database.ref('users_by_name/' + username.toLowerCase());
+
+    userRef.on('value', snap => {
+        const data = snap.val();
+
+        currentBalance = data ? (data.chips || 0) : 100000;
+
+        document.getElementById('balance-amount').innerText = currentBalance;
+    });
         
-        let currentBalance = 0;
-        const userRef = database.ref('users_by_name/' + username.toLowerCase());
-        userRef.on('value', snap => {
-            const data = snap.val();
-            currentBalance = data ? (data.chips || 0) : 0;
+    // --- 3. НАЛАШТУВАННЯ ---
+    const symbols = ['tex-dirt', 'tex-wood', 'tex-gold', 'tex-diamond', 'tex-emerald'];
+    const wildSymbol = 'tex-wild';
+    const scatterSymbol = 'tex-scatter';
+
+    const betInput = document.getElementById('bet-input');
+
+    let currentBet = 10;
+    let isSpinning = false;
+    let isTurbo = false;
+    let autoSpinsLeft = 0;
+
+    const STRIP_LENGTH = 20;
+
+    // --- 4. UI ---
+    function setStatus(text, color = '#fff') {
+        const el = document.getElementById('status-text');
+        el.innerText = text;
+        el.style.color = color;
+    }
+
+    function updateBonusPrice() {
+        document.getElementById('bonus-price').innerText = currentBet * 100;
+    }
+
+    function updateBet(amount) {
+        currentBet += amount;
+
+        if (currentBet < 10) currentBet = 10;
+        if (currentBet > 50000) currentBet = 50000;
+
+        betInput.value = currentBet;
+
+        updateBonusPrice();
+    }
+        
+        isTurbo = !isTurbo;
+
+        const btn = document.getElementById('turbo-btn');
+
+        btn.classList.toggle('active');
+        btn.innerText = isTurbo
+            ? '⚡ ТУРБО: ВКЛ'
+            : '⚡ ТУРБО: ВИМК';
+    }
+
+    function openAutoModal() {
+        document.getElementById('auto-modal').style.display = 'flex';
+    }
+
+    function startAuto(count) {
+        autoSpinsLeft = count;
+
+        document.getElementById('auto-modal').style.display = 'none';
+
+        spin();
+    }
+
+    function lockButtons(lock) {
+        document.getElementById('spin-btn').disabled = lock;
+        document.getElementById('buy-bonus-btn').disabled = lock;
+
+        betInput.disabled = lock;
+    }
+        
+    // --- 5. БАРАБАНИ ---
+    function buildReels(matrix) {
+        for (let x = 0; x < 5; x++) {
+            const strip = document.getElementById(`strip-${x}`);
+
+            strip.innerHTML = '';
+
+            for (let i = 0; i < STRIP_LENGTH; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'symbol-cell blur';
+
+                let symbol;
+
+                if (i >= STRIP_LENGTH - 3) {
+                    symbol = matrix[i - (STRIP_LENGTH - 3)][x];
+                } else {
+                    const allSymbols = [...symbols, wildSymbol, scatterSymbol];
+
+                    symbol = allSymbols[Math.floor(Math.random() * allSymbols.length)];
+                }
+
+                const block = document.createElement('div');
+                block.className = `iso-block ${symbol}`;
+
+                block.innerHTML = `
+                    <div class="iso-face face-top"></div>
+                    <div class="iso-face face-front"></div>
+                    <div class="iso-face face-right"></div>
+                `;
+
+                const text = document.createElement('div');
+                text.className = 'block-text';
+
+                if (symbol === wildSymbol) {
+                    text.innerHTML = '<span class="text-wild">WILD</span>';
+                } else if (symbol === scatterSymbol) {
+                    text.innerHTML = '<span class="text-scatter">BONUS</span>';
+                }
+
+                cell.appendChild(block);
+                cell.appendChild(text);
+                strip.appendChild(cell);
+            }
+
+            strip.style.transition = 'none';
+            strip.style.transform = 'translateY(0px)';
+        }
+    }
+
+    // --- 6. ГЕНЕРАЦІЯ ---
+    function generateMatrix() {
+        let matrix = [[], [], []];
+
+        for (let y = 0; y < 3; y++) {
+            for (let x = 0; x < 5; x++) {
+                const allSymbols = [...symbols, wildSymbol, scatterSymbol];
+
+                matrix[y][x] = allSymbols[Math.floor(Math.random() * allSymbols.length)];
+            }
+        }
+
+        return matrix;
+    }
+// --- 7. СПІН ---
+    async function spin() {
+        if (isSpinning) return;
+
+        if (currentBalance < currentBet) {
+            alert('Недостатньо фішок!');
+            return;
+        }
+
+        isSpinning = true;
+
+        lockButtons(true);
+
+        setStatus('КРУТИМО...', '#00ff9d');
+
+        const matrix = generateMatrix();
+
+        buildReels(matrix);
+
+        const duration = isTurbo ? 800 : 2500;
+
+        for (let x = 0; x < 5; x++) {
+            setTimeout(() => {
+                const strip = document.getElementById(`strip-${x}`);
+
+                strip.style.transition = `transform ${duration / 1000}s cubic-bezier(0.15,0.9,0.2,1.05)`;
+
+                strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * 160}px)`;
+
+                setTimeout(() => {
+                    strip.querySelectorAll('.blur').forEach(el => {
+                        el.classList.remove('blur');
+                    });
+                }, duration / 2);
+            }, x * (isTurbo ? 50 : 200));
+        }
+
+        setTimeout(async () => {
+            currentBalance -= currentBet;
+
             document.getElementById('balance-amount').innerText = currentBalance;
-        });
 
-        // --- 3. НАЛАШТУВАННЯ ГРИ ---
-        const symbols = ['tex-dirt', 'tex-wood', 'tex-gold', 'tex-diamond', 'tex-emerald'];
-        const wildSymbol = 'tex-wild';      
-        const scatterSymbol = 'tex-scatter'; 
-        
-        let isSpinning = false;
-        let isBonusGame = false;
-        let activeBonusType = null;
-        let freeSpinsLeft = 0;
-        let stickyWilds = {}; 
-        let isTurbo = false;
-        let autoSpinsLeft = 0;
+            await userRef.update({
+                chips: currentBalance
+            });
 
-        // --- 4. КЕРУВАННЯ ТУРБО ТА АВТОГРОЮ ---
-        function toggleTurbo() {
-            isTurbo = !isTurbo;
-            const btn = document.getElementById('turbo-btn');
-            btn.classList.toggle('active');
-            btn.innerText = isTurbo ? "⚡ ТУРБО: ВКЛ" : "⚡ ТУРБО: ВИМК";
-        }
+            setStatus('ГОТОВИЙ', '#ffdf00');
 
-        function openAutoModal() { document.getElementById('auto-modal').style.display = 'flex'; }
-        
-        function startAuto(count) {
-            autoSpinsLeft = count;
-            document.getElementById('auto-modal').style.display = 'none';
-            spin(); // Запускаємо перший спін
-        }
+            isSpinning = false;
 
-        // --- 5. ЛОГІКА ОБЕРТАННЯ ---
-        async function spin() {
-            if (isSpinning) return;
-            if (!isBonusGame && currentBalance < currentBet) {
-                autoSpinsLeft = 0; // Зупиняємо автогру
-                return alert("Недостатньо фішок!");
-            }
-            
-            isSpinning = true; lockButtons(true);
-            setStatus("КРУТИМО...", "#fff");
-            document.querySelectorAll('.win-pop').forEach(el => el.classList.remove('win-pop'));
+            lockButtons(false);
 
-            if (!isBonusGame) await userRef.update({ chips: currentBalance - currentBet });
-            else freeSpinsLeft--;
-
-            executeSpin(false);
-        }
-
-        function executeSpin(forceBonus) {
-            let targetMatrix = generateMatrix(forceBonus);
-            buildReels(targetMatrix);
-
-            // Швидкість спіну залежить від Turbo
-            let duration = isTurbo ? 0.8 : 2.5; 
-            
-            setTimeout(() => {
-                for (let x = 0; x < 5; x++) {
-                    setTimeout(() => {
-                        const strip = document.getElementById(`strip-${x}`);
-                        strip.style.transition = `transform ${duration}s cubic-bezier(0.15, 0.9, 0.2, 1.05)`;
-                        strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * 160}px)`;
-                        setTimeout(() => strip.querySelectorAll('.blur').forEach(el => el.classList.remove('blur')), duration * 500);
-                    }, x * (isTurbo ? 50 : 200));
-                }
-            }, 50);
-
-            setTimeout(() => {
-                checkWin(targetMatrix, countScatters(targetMatrix));
-            }, (duration * 1000) + 1000);
-        }
-
-        function generateMatrix(forceBonus) {
-            let matrix = [[],[],[]];
-            let rainingWilds = (isBonusGame && activeBonusType === 'raining') ? Math.floor(Math.random()*4)+1 : 0;
-            
-            for(let y=0; y<3; y++){
-                for(let x=0; x<5; x++){
-                    if(isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) { matrix[y][x] = wildSymbol; continue; }
-                    
-                    if(forceBonus && y === 1 && [0,2,4].includes(x)) { matrix[y][x] = scatterSymbol; continue; }
-                    
-                    if(isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && [1,2,3].includes(x) && Math.random() < 0.3) {
-                        matrix[y][x] = wildSymbol; rainingWilds--;
-                    } else if (!isBonusGame && [1,2,3].includes(x) && Math.random() < 0.12) {
-                        matrix[y][x] = wildSymbol;
-                        if(activeBonusType === 'sticky') stickyWilds[`${x}-${y}`] = Math.random() > 0.5 ? 2 : 3;
-                    } else {
-                        matrix[y][x] = symbols[Math.floor(Math.random() * symbols.length)];
-                    }
-                }
-            }
-            return matrix;
-        }
-
-        function countScatters(matrix) {
-            return matrix.flat().filter(s => s === scatterSymbol).length;
-        }
-
-        async function checkWin(matrix, scatters) {
-            // (Логіка перемоги ідентична попередній, просто тепер вона викликає autoSpins)
-            // ... [Логіка перевірки winAmount] ...
-            
-            // Завершення
-            if (isBonusGame && freeSpinsLeft > 0) {
-                setTimeout(spin, isTurbo ? 300 : 1000);
-            } else if (autoSpinsLeft > 0) {
+            if (autoSpinsLeft > 0) {
                 autoSpinsLeft--;
-                setTimeout(spin, isTurbo ? 200 : 800);
-            } else {
-                isSpinning = false; lockButtons(false); setStatus("ГОТОВИЙ");
+
+                setTimeout(() => {
+                    spin();
+                }, isTurbo ? 200 : 800);
             }
-        }
+        }, duration + 1500);
+    }
 
-        // --- 7. БОНУСИ ---
-        function buyBonus() { /* ... та ж логіка, що раніше ... */ }
-        window.selectBonus = function(type) {
-            document.getElementById('bonus-modal').style.display = 'none';
-            isBonusGame = true; activeBonusType = type;
-            document.body.className = type === 'sticky' ? 'bonus-sticky' : 'bonus-raining';
-            freeSpinsLeft = type === 'sticky' ? 10 : 20;
-            spin();
-        };
+    // --- 8. БОНУС ---
+    function buyBonus() {
+        alert('Бонус поки вимкнений');
+    }
 
-        function lockButtons(lock) {
-            document.getElementById('spin-btn').disabled = lock;
-            document.getElementById('buy-bonus-btn').disabled = lock;
-            betInput.disabled = lock;
-        }
-    </script>
+    // --- 9. СТАРТ ---
+    updateBonusPrice();
+    setStatus('ГОТОВИЙ');
+
+    buildReels(generateMatrix());
+</script>

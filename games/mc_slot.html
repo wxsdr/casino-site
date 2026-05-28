@@ -18,7 +18,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a1a 0%, #0a1a0a 50%, #0d0f1a 100%);
+            background: radial-gradient(ellipse at 30% 40%, #0d1117 0%, #05080f 100%);
             color: white;
             font-family: 'Montserrat', sans-serif;
             height: 100vh;
@@ -28,21 +28,9 @@
             position: relative;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: 
-                repeating-linear-gradient(0deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 2px, transparent 2px, transparent 8px),
-                repeating-linear-gradient(90deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 8px);
-            pointer-events: none;
-            z-index: 0;
-        }
+        body.bonus-sticky { background: radial-gradient(ellipse at 30% 40%, #3a0a0a 0%, #1a0303 100%); }
+        body.bonus-raining { background: radial-gradient(ellipse at 30% 40%, #0a0a3a 0%, #03031a 100%); }
 
-        body.bonus-sticky { background: linear-gradient(135deg, #3a1a0a 0%, #2a0a00 100%); }
-        body.bonus-raining { background: linear-gradient(135deg, #0a1a3a 0%, #000a2a 100%); }
-
-        /* TOP BAR */
         .top-bar {
             position: relative;
             z-index: 100;
@@ -50,51 +38,46 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 35px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            border-bottom: 3px solid #5a5a3a;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            background: rgba(8, 12, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.25);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
         }
         
         .btn-exit {
-            background: #3a2a1a;
-            color: #ffaa44;
-            border: 2px solid #ffaa44;
-            padding: 8px 24px;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 10px 28px;
+            border-radius: 40px;
             font-weight: 800;
             cursor: pointer;
-            font-size: 14px;
-            text-transform: uppercase;
             transition: all 0.2s;
-            box-shadow: inset 0 -2px 0 #5a4a2a;
+            font-size: 13px;
+            letter-spacing: 1.5px;
         }
         .btn-exit:hover {
             background: #ff4433;
-            border-color: #fff;
-            color: white;
-            transform: scale(1.02);
+            border-color: #ff4433;
+            box-shadow: 0 0 20px rgba(255, 68, 51, 0.4);
         }
         
         .balance-badge {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 900;
-            background: #1a1a0a;
-            padding: 8px 28px;
-            border-radius: 8px;
-            border: 2px solid #ffaa44;
-            color: #ffaa44;
-            text-shadow: 0 0 5px rgba(255,170,68,0.5);
-            font-family: 'Courier New', monospace;
+            background: rgba(0, 255, 157, 0.1);
+            padding: 10px 32px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 255, 157, 0.35);
+            backdrop-filter: blur(10px);
+            color: #00ff9d;
         }
         .balance-badge span {
-            color: #44ffaa;
-            font-size: 26px;
+            color: #00ff88;
+            font-size: 28px;
             margin-left: 10px;
-            text-shadow: 0 0 5px #44ffaa;
         }
 
-        /* GAME WRAPPER */
         #game-wrapper {
             flex: 1;
             display: flex;
@@ -112,104 +95,102 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 18px;
+            gap: 20px;
         }
 
-        /* SLOT MACHINE - MINECRAFT STYLE */
+        /* SLOT MACHINE */
         .slot-machine {
-            background: #2a2a1a;
-            border-radius: 20px;
-            border: 4px solid #5a5a3a;
-            padding: 20px 35px;
-            box-shadow: inset 0 0 0 2px #3a3a2a, 0 15px 35px rgba(0,0,0,0.5);
+            background: linear-gradient(145deg, rgba(18, 22, 35, 0.95), rgba(8, 10, 20, 0.98));
+            border-radius: 50px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            padding: 25px 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
             position: relative;
         }
         
         .machine-neon {
             position: absolute;
-            inset: -3px;
-            border-radius: 22px;
+            inset: -2px;
+            border-radius: 52px;
             z-index: -1;
-            filter: blur(15px);
-            opacity: 0.4;
-            background: linear-gradient(45deg, #ffaa44, #aa44ff, #44ffaa);
-            animation: neonGlow 3s infinite alternate;
+            filter: blur(18px);
+            opacity: 0.35;
+            background: linear-gradient(45deg, #ffd700, #9b30ff, #00f2ff);
+            animation: neonBreathe 3s infinite alternate;
         }
         
-        @keyframes neonGlow {
-            0% { opacity: 0.2; filter: blur(10px); }
-            100% { opacity: 0.6; filter: blur(20px); }
+        @keyframes neonBreathe {
+            0% { opacity: 0.25; filter: blur(12px); }
+            100% { opacity: 0.5; filter: blur(22px); }
         }
         
         body.bonus-sticky .machine-neon {
-            background: linear-gradient(45deg, #ff6633, #ffaa33, #ff4433);
-            animation: fireGlow 0.3s infinite alternate;
+            background: linear-gradient(45deg, #ff4433, #ff8800, #ffcc00);
+            animation: fireGlow 0.4s infinite alternate;
             opacity: 0.7;
         }
         body.bonus-raining .machine-neon {
-            background: linear-gradient(45deg, #33aaff, #33ffaa, #44aaff);
-            animation: waterGlow 0.3s infinite alternate;
+            background: linear-gradient(45deg, #00f2ff, #9b30ff, #00ff88);
+            animation: waterGlow 0.4s infinite alternate;
             opacity: 0.7;
         }
         @keyframes fireGlow {
-            0% { filter: blur(10px); opacity: 0.5; }
-            100% { filter: blur(30px); opacity: 0.9; }
+            0% { filter: blur(12px); opacity: 0.5; }
+            100% { filter: blur(32px); opacity: 0.9; }
         }
         @keyframes waterGlow {
-            0% { filter: blur(10px); opacity: 0.5; }
-            100% { filter: blur(30px); opacity: 0.9; }
+            0% { filter: blur(12px); opacity: 0.5; }
+            100% { filter: blur(32px); opacity: 0.9; }
         }
 
         .slot-title {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         .slot-title .main {
             font-family: 'Rubik', sans-serif;
-            font-size: 40px;
-            background: linear-gradient(135deg, #ffaa44, #ffdd88);
+            font-size: 42px;
+            background: linear-gradient(135deg, #fff, #ffd700);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: none;
-            letter-spacing: 4px;
+            letter-spacing: 6px;
         }
         .slot-title .accent {
             font-family: 'Rubik', sans-serif;
-            font-size: 40px;
-            background: linear-gradient(135deg, #44ffaa, #88ffcc);
+            font-size: 42px;
+            background: linear-gradient(135deg, #00f2ff, #00ff88);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: 4px;
+            letter-spacing: 6px;
         }
         .slot-subtitle {
             text-align: center;
             font-size: 10px;
-            letter-spacing: 3px;
-            color: #8a8a6a;
-            margin-bottom: 8px;
-            font-family: 'Courier New', monospace;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 10px;
         }
 
         /* REELS */
         .reels-window {
-            background: #0a0a05;
+            background: #07090f;
             padding: 12px;
-            border-radius: 16px;
-            border: 3px solid #5a5a3a;
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: inset 0 15px 30px rgba(0, 0, 0, 0.7);
             display: flex;
-            gap: 8px;
+            gap: 10px;
             height: 440px;
         }
         .reel {
             width: 148px;
             height: 100%;
-            background: #1a1a0f;
-            border-radius: 12px;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+            border-radius: 20px;
             overflow: hidden;
-            border: 2px solid #3a3a2a;
+            border: 1px solid rgba(255, 215, 0, 0.15);
             position: relative;
         }
         .reel-strip {
@@ -222,7 +203,7 @@
             transition: transform 0s ease;
         }
         
-        /* SYMBOL CELL - MINECRAFT BLOCK STYLE */
+        /* SYMBOL CELL */
         .symbol-cell {
             width: 148px;
             height: 138px;
@@ -230,77 +211,59 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            background: #1a1a0a;
-            border-bottom: 1px solid #3a3a2a;
         }
 
-        /* MINECRAFT STYLE 3D BLOCK */
+        /* 3D MINECRAFT BLOCK */
         .minecraft-block {
-            width: 90px;
-            height: 90px;
+            width: 85px;
+            height: 85px;
             position: relative;
             transform-style: preserve-3d;
-            transform: rotateX(-25deg) rotateY(-35deg);
-            transition: all 0.15s ease;
-            cursor: pointer;
+            transform: rotateX(-20deg) rotateY(-35deg);
+            transition: all 0.2s ease;
+            z-index: 1;
         }
 
         .block-face {
             position: absolute;
-            width: 90px;
-            height: 90px;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
+            width: 85px;
+            height: 85px;
+            box-sizing: border-box;
+            border: 1.5px solid rgba(0, 0, 0, 0.5);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+            background-size: 14px 14px;
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.06) 75%);
         }
 
-        /* Pixelated texture style */
         .face-top {
-            transform: rotateX(90deg) translateZ(45px);
-            background-size: 16px 16px;
-            background-repeat: repeat;
+            transform: rotateX(90deg) translateZ(42.5px);
+            background-color: var(--c-top);
         }
         .face-front {
-            transform: translateZ(45px);
-            background-size: 16px 16px;
-            background-repeat: repeat;
+            transform: translateZ(42.5px);
+            background-color: var(--c-front);
         }
         .face-right {
-            transform: rotateY(90deg) translateZ(45px);
-            background-size: 16px 16px;
-            background-repeat: repeat;
+            transform: rotateY(90deg) translateZ(42.5px);
+            background-color: var(--c-right);
         }
 
-        /* Block colors with pixelated pattern */
+        /* Block colors */
         .block-dirt { --c-top: #6b4c3b; --c-front: #8b5e3c; --c-right: #5a3d2a; }
         .block-wood { --c-top: #8b6b4a; --c-front: #ab8b5a; --c-right: #6b4b3a; }
         .block-gold { --c-top: #fce029; --c-front: #d4b51c; --c-right: #a3890f; }
         .block-diamond { --c-top: #51eeea; --c-front: #35c4c4; --c-right: #229494; }
         .block-emerald { --c-top: #41f384; --c-front: #27c964; --c-right: #189647; }
-        .block-wild { --c-top: #4a2a5a; --c-front: #3a1a4a; --c-right: #2a0a3a; }
-        .block-scatter { --c-top: #6a1a3a; --c-front: #5a0a2a; --c-right: #4a0a1a; }
+        .block-wild { --c-top: #2f1d40; --c-front: #1f122b; --c-right: #130a1c; }
+        .block-scatter { --c-top: #4a1763; --c-front: #320d45; --c-right: #20062e; }
 
-        .face-top { background-color: var(--c-top); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), inset 0 0 0 3px rgba(0,0,0,0.2); }
-        .face-front { background-color: var(--c-front); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15), inset 0 0 0 3px rgba(0,0,0,0.2); }
-        .face-right { background-color: var(--c-right); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 0 0 3px rgba(0,0,0,0.25); }
-
-        /* Add pixel pattern */
-        .face-top::before, .face-front::before, .face-right::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 8px),
-                              repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 8px);
-            pointer-events: none;
+        .block-wild .block-face {
+            border: 2px solid #ffd700;
+            box-shadow: inset 0 0 15px #ffd700, 0 0 10px #ffd700;
         }
-
-        /* WILD and SCATTER special styling */
-        .block-wild .face-front, .block-wild .face-top, .block-wild .face-right {
-            border: 2px solid #ffaa44;
-            box-shadow: inset 0 0 10px #ffaa44, 0 0 10px #ffaa44;
-        }
-        .block-scatter .face-front, .block-scatter .face-top, .block-scatter .face-right {
-            border: 2px solid #aa44ff;
-            box-shadow: inset 0 0 10px #aa44ff, 0 0 10px #aa44ff;
+        .block-scatter .block-face {
+            border: 2px solid #9b30ff;
+            box-shadow: inset 0 0 15px #9b30ff, 0 0 10px #9b30ff;
         }
 
         .block-text {
@@ -308,47 +271,66 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 900;
             z-index: 10;
-            text-align: center;
-            text-shadow: 0 0 5px black, 0 0 5px black;
+            text-shadow: 0 0 8px black;
             white-space: nowrap;
-            font-family: 'Courier New', monospace;
+            pointer-events: none;
         }
-        .text-wild { color: #ffaa44; font-size: 18px; text-shadow: 0 0 8px #ffaa44; }
-        .text-scatter { color: #aa44ff; font-size: 14px; text-shadow: 0 0 8px #aa44ff; }
+        .text-wild {
+            background: linear-gradient(135deg, #ffd700, #ffaa33);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 20px;
+        }
+        .text-scatter {
+            background: linear-gradient(135deg, #9b30ff, #cc66ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 14px;
+        }
 
         .sticky-mult {
             position: absolute;
-            bottom: 4px;
-            right: 4px;
-            background: #ffaa44;
+            bottom: 6px;
+            right: 6px;
+            background: linear-gradient(135deg, #ffd700, #ff8800);
             color: #1a0a00;
             font-size: 16px;
             font-weight: 900;
-            padding: 2px 6px;
-            border-radius: 6px;
-            border: 1px solid white;
+            padding: 2px 7px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
             z-index: 20;
         }
 
-        /* WINNING ANIMATION - 3D SPIN */
+        /* 3D WINNING ANIMATION - block rotates in 3D space */
         @keyframes win3DRotate {
-            0% { transform: rotateX(-25deg) rotateY(-35deg) scale(1); }
-            25% { transform: rotateX(-205deg) rotateY(-35deg) scale(1.15); filter: drop-shadow(0 0 20px #ffaa44); }
-            50% { transform: rotateX(-25deg) rotateY(-215deg) scale(1.3); filter: drop-shadow(0 0 30px #ffaa44); }
-            75% { transform: rotateX(-205deg) rotateY(-35deg) scale(1.15); filter: drop-shadow(0 0 20px #ffaa44); }
-            100% { transform: rotateX(-25deg) rotateY(-35deg) scale(1); }
-        }
-        
-        @keyframes winGlow {
-            0%, 100% { filter: drop-shadow(0 0 5px #ffaa44); }
-            50% { filter: drop-shadow(0 0 25px #ffaa44) drop-shadow(0 0 10px white); }
+            0% {
+                transform: rotateX(-20deg) rotateY(-35deg) scale(1);
+            }
+            25% {
+                transform: rotateX(-200deg) rotateY(-35deg) scale(1.1);
+                filter: drop-shadow(0 0 20px #ffd700);
+            }
+            50% {
+                transform: rotateX(-20deg) rotateY(-215deg) scale(1.2);
+                filter: drop-shadow(0 0 30px #ffd700);
+            }
+            75% {
+                transform: rotateX(-200deg) rotateY(-35deg) scale(1.1);
+                filter: drop-shadow(0 0 20px #ffd700);
+            }
+            100% {
+                transform: rotateX(-20deg) rotateY(-35deg) scale(1);
+            }
         }
         
         .winning-block {
-            animation: win3DRotate 0.7s cubic-bezier(0.34, 1.2, 0.64, 1) forwards, winGlow 0.7s ease-in-out;
+            animation: win3DRotate 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
         }
 
         /* CONTROL PANEL */
@@ -358,11 +340,11 @@
             gap: 12px;
         }
         .ctrl-box {
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border: 2px solid #5a5a3a;
-            padding: 10px 14px;
+            background: rgba(10, 14, 22, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            padding: 12px 16px;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -371,19 +353,20 @@
         }
         
         #status-text {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 900;
-            color: #ffaa44;
+            background: linear-gradient(135deg, #ffd700, #ffcc44);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             text-align: center;
             cursor: pointer;
-            letter-spacing: 1px;
-            font-family: 'Courier New', monospace;
-            text-shadow: 0 0 5px rgba(255,170,68,0.5);
+            letter-spacing: 1.5px;
         }
         .status-hint {
-            font-size: 8px;
-            color: #6a6a4a;
-            margin-top: 3px;
+            font-size: 9px;
+            color: rgba(255, 215, 0, 0.3);
+            margin-top: 4px;
             text-align: center;
         }
 
@@ -394,88 +377,83 @@
             margin-top: 6px;
         }
         .bet-btn {
-            width: 38px;
-            height: 38px;
-            background: #2a2a1a;
-            color: #ffaa44;
-            border: 2px solid #5a5a3a;
-            border-radius: 8px;
-            font-size: 22px;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: #151b2a;
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            font-size: 24px;
             font-weight: bold;
             cursor: pointer;
-            font-family: monospace;
         }
         .bet-btn:active { transform: scale(0.95); }
         .bet-input {
-            background: #1a1a0a;
-            color: #ffaa44;
-            border: 2px solid #5a5a3a;
-            border-radius: 8px;
-            font-size: 24px;
+            background: #0a0e18;
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 14px;
+            font-size: 26px;
             font-weight: 900;
             text-align: center;
-            width: 100px;
-            height: 38px;
+            width: 110px;
+            height: 42px;
             outline: none;
-            font-family: monospace;
         }
 
         .toggle-btn {
-            background: #2a2a1a;
-            color: #8a8a6a;
-            border: 2px solid #5a5a3a;
-            border-radius: 8px;
+            background: #151b2a;
+            color: #8a8a9a;
+            border: 1px solid #2a2a3a;
+            border-radius: 14px;
             width: 100%;
-            padding: 7px;
-            font-size: 12px;
+            padding: 8px;
+            font-size: 13px;
             font-weight: 800;
             cursor: pointer;
-            margin-bottom: 4px;
-            font-family: monospace;
+            margin-bottom: 5px;
         }
         .toggle-btn.active {
-            background: #1a3a1a;
-            color: #44ffaa;
-            border-color: #44ffaa;
+            background: rgba(0, 255, 157, 0.15);
+            color: #00ff88;
+            border-color: #00ff88;
         }
 
         .spin-btn {
-            background: linear-gradient(135deg, #44aa44, #228822);
-            color: #0a2a0a;
+            background: linear-gradient(135deg, #00ff88, #00aa55);
+            color: #0a1a0a;
             border: none;
-            border-radius: 12px;
+            border-radius: 18px;
             width: 100%;
-            height: 65px;
-            font-size: 24px;
+            height: 68px;
+            font-size: 26px;
             font-weight: 900;
             cursor: pointer;
-            box-shadow: 0 5px 0 #0a4a0a;
-            margin-bottom: 4px;
-            font-family: 'Rubik', sans-serif;
+            box-shadow: 0 5px 0 #006633;
+            margin-bottom: 5px;
             letter-spacing: 3px;
         }
         .spin-btn:active:not(:disabled) { transform: translateY(5px); box-shadow: none; }
         .spin-btn:disabled {
-            background: #3a3a2a;
-            color: #6a6a4a;
-            box-shadow: 0 5px 0 #2a2a1a;
+            background: #2a2a3a;
+            color: #5a5a6a;
+            box-shadow: 0 5px 0 #1a1a2a;
             cursor: not-allowed;
         }
 
         .buy-bonus-btn {
-            background: #2a1a3a;
-            border: 2px solid #aa44ff;
-            color: #aa44ff;
-            border-radius: 8px;
+            background: rgba(155, 48, 255, 0.1);
+            border: 1px solid #9b30ff;
+            color: #9b30ff;
+            border-radius: 14px;
             width: 100%;
-            padding: 7px;
-            font-size: 12px;
+            padding: 8px;
+            font-size: 13px;
             font-weight: 800;
             cursor: pointer;
-            font-family: monospace;
         }
         .buy-bonus-btn:hover:not(:disabled) {
-            background: #aa44ff;
+            background: #9b30ff;
             color: white;
         }
 
@@ -483,27 +461,25 @@
         .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 9999;
         }
         
-        .auto-menu, .bonus-menu {
-            background: #1a1a0f;
-            border: 3px solid #ffaa44;
+        .auto-menu {
+            background: #0f1422;
+            border: 1px solid #00ff88;
             padding: 25px 30px;
-            border-radius: 20px;
+            border-radius: 35px;
             text-align: center;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
-        .auto-menu h2, .bonus-title {
-            color: #ffaa44;
+        .auto-menu h2 {
+            color: #00ff88;
             margin-bottom: 15px;
-            font-size: 24px;
-            font-family: 'Rubik', sans-serif;
+            font-size: 26px;
         }
         .auto-grid {
             display: grid;
@@ -511,83 +487,107 @@
             gap: 10px;
         }
         .auto-opt {
-            background: #2a2a1a;
-            border: 2px solid #5a5a3a;
-            color: #ffaa44;
+            background: #111622;
+            border: 1px solid #2a2a3a;
+            color: #ddd;
             padding: 10px 15px;
             font-size: 18px;
             font-weight: 800;
-            border-radius: 10px;
+            border-radius: 14px;
             cursor: pointer;
-            font-family: monospace;
         }
         .auto-opt:hover {
-            border-color: #44ffaa;
-            color: #44ffaa;
+            border-color: #00ff88;
+            color: #00ff88;
         }
 
+        .bonus-menu {
+            background: linear-gradient(135deg, #1a0f2a, #0a0515);
+            border: 2px solid #9b30ff;
+            padding: 35px;
+            border-radius: 45px;
+            text-align: center;
+            max-width: 900px;
+        }
+        .bonus-title {
+            font-size: 38px;
+            background: linear-gradient(135deg, #9b30ff, #cc66ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        .bonus-subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 25px;
+        }
         .bonus-cards {
             display: flex;
             gap: 20px;
-            margin-top: 10px;
         }
         .b-card {
             flex: 1;
-            background: #0a0a05;
-            border: 2px solid #5a5a3a;
-            border-radius: 16px;
-            padding: 20px 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #444;
+            border-radius: 25px;
+            padding: 25px 15px;
             cursor: pointer;
             transition: 0.2s;
         }
         .b-card:hover { transform: translateY(-5px); }
-        .b-card.sticky:hover { border-color: #ff6633; background: rgba(255,102,51,0.1); }
-        .b-card.sticky h3 { color: #ff6633; font-size: 22px; }
-        .b-card.raining:hover { border-color: #33aaff; background: rgba(51,170,255,0.1); }
-        .b-card.raining h3 { color: #33aaff; font-size: 22px; }
+        .b-card.sticky:hover { border-color: #ff4433; background: rgba(255, 68, 51, 0.1); }
+        .b-card.sticky h3 { color: #ff4433; font-size: 24px; }
+        .b-card.raining:hover { border-color: #00f2ff; background: rgba(0, 242, 255, 0.1); }
+        .b-card.raining h3 { color: #00f2ff; font-size: 24px; }
         .b-spins {
-            background: #2a2a1a;
+            background: #1a1a2a;
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #ffaa44;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #ffd700;
         }
-        .b-card p { font-size: 11px; color: #aaa; }
+        .b-card p { font-size: 12px; color: #bbb; }
 
-        /* HISTORY */
+        /* HISTORY - нижня частина */
         .win-history {
-            position: fixed;
-            right: 15px;
-            bottom: 15px;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border-left: 3px solid #44ffaa;
-            padding: 8px 12px;
-            min-width: 200px;
-            z-index: 50;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            border-top: 2px solid #00ff88;
+            padding: 8px 16px;
+            margin-top: 15px;
+            width: 600px;
         }
         .win-history h4 {
-            color: #44ffaa;
-            font-size: 10px;
+            color: #00ff88;
+            font-size: 11px;
             margin-bottom: 5px;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            text-align: center;
         }
         .history-list {
-            max-height: 110px;
+            max-height: 80px;
             overflow-y: auto;
-            font-size: 9px;
+            font-size: 10px;
             font-family: monospace;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
         }
         .history-list div {
-            padding: 3px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 3px 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            display: inline-block;
         }
-        .history-list .win { color: #44ffaa; }
-        .history-list .big-win { color: #ffaa44; font-weight: bold; }
-        .history-list .bonus { color: #aa44ff; }
+        .history-list .win { color: #00ff88; }
+        .history-list .big-win { color: #ffd700; font-weight: bold; }
+        .history-list .bonus { color: #9b30ff; }
     </style>
 </head>
 <body>
@@ -626,7 +626,7 @@
                 </div>
 
                 <div class="ctrl-box" style="flex: 0.8;">
-                    <div style="color: #ffaa44; font-size: 11px; letter-spacing: 1px;">✦ СТАВКА ✦</div>
+                    <div style="color: #ffd700; font-size: 12px; letter-spacing: 2px;">✦ СТАВКА ✦</div>
                     <div class="bet-input-row">
                         <button class="bet-btn" onclick="updateBet(-10)">−</button>
                         <input type="number" id="bet-input" class="bet-input" value="10" min="10" max="50000" onchange="manualBetChange()">
@@ -639,13 +639,14 @@
                     <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">✨ КУПИТИ БОНУС 1000</button>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="win-history">
-        <h4>📜 ІСТОРІЯ ВИГРАШІВ</h4>
-        <div class="history-list" id="history-list">
-            <div style="color:#555;">─ немає записів ─</div>
+            <!-- Історія виграшів внизу під кнопками -->
+            <div class="win-history">
+                <h4>📜 ІСТОРІЯ ВИГРАШІВ</h4>
+                <div class="history-list" id="history-list">
+                    <div style="color:#555;">─ немає записів ─</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -667,7 +668,7 @@
     <div id="bonus-modal" class="overlay">
         <div class="bonus-menu">
             <h2 class="bonus-title">✦ ЗНАЙДЕНО ПОРТАЛ! ✦</h2>
-            <p style="color:#aaa; margin-bottom:20px;">Оберіть свій шлях до могутності</p>
+            <p class="bonus-subtitle">Оберіть свій шлях до могутності</p>
             <div class="bonus-cards">
                 <div class="b-card sticky" onclick="selectBonus('sticky')">
                     <h3>🔥 НЕЗЕР-РЕАКТОР</h3>
@@ -684,7 +685,7 @@
     </div>
 
     <script>
-        // ========== AUDIO SYSTEM (Web Audio API - no external files) ==========
+        // ========== AUDIO ==========
         let audioContext = null;
         
         function initAudio() {
@@ -695,14 +696,10 @@
         function playSound(type) {
             try {
                 initAudio();
-                if (audioContext.state === 'suspended') {
-                    audioContext.resume();
-                }
-                
+                if (audioContext.state === 'suspended') audioContext.resume();
                 const now = audioContext.currentTime;
                 const gainNode = audioContext.createGain();
                 gainNode.connect(audioContext.destination);
-                
                 if (type === 'spin') {
                     const osc = audioContext.createOscillator();
                     osc.type = 'sine';
@@ -747,14 +744,6 @@
                     osc.connect(gainNode);
                     osc.start();
                     osc.stop(now + 0.4);
-                } else if (type === 'reel') {
-                    const osc = audioContext.createOscillator();
-                    osc.type = 'sawtooth';
-                    osc.frequency.value = 200;
-                    gainNode.gain.value = 0.05;
-                    osc.connect(gainNode);
-                    osc.start();
-                    osc.stop(now + 0.05);
                 }
             } catch(e) { console.log('Audio error:', e); }
         }
@@ -835,7 +824,7 @@
             const time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             newEntry.innerHTML = `[${time}] ${message}`;
             historyDiv.prepend(newEntry);
-            while (historyDiv.children.length > 15) historyDiv.removeChild(historyDiv.lastChild);
+            while (historyDiv.children.length > 12) historyDiv.removeChild(historyDiv.lastChild);
             if (historyDiv.children.length && historyDiv.children[historyDiv.children.length-1]?.innerText.includes('немає записів')) {
                 historyDiv.removeChild(historyDiv.lastChild);
             }
@@ -1015,7 +1004,6 @@
                 const strip = document.getElementById(`strip-${x}`);
                 strip.style.transition = `transform ${animDuration}s cubic-bezier(0.2, 0.95, 0.4, 1.05)`;
                 strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * 138}px)`;
-                if (isTurbo) playSound('reel');
             }
             
             setTimeout(async () => {
@@ -1031,7 +1019,7 @@
                 const winAmount = winResult.totalWin;
                 const winPositions = winResult.winPositions;
                 
-                // Анімація ТІЛЬКИ на виграшних блоках
+                // Анімація ТІЛЬКИ на виграшних блоках (3D обертання)
                 if (winAmount > 0) {
                     if (winAmount >= currentBet * 20) playSound('bigwin');
                     else playSound('win');
@@ -1041,7 +1029,7 @@
                         const block = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${parseInt(y)+1}) .minecraft-block`);
                         if (block) {
                             block.classList.add('winning-block');
-                            setTimeout(() => block.classList.remove('winning-block'), 700);
+                            setTimeout(() => block.classList.remove('winning-block'), 600);
                         }
                     }
                 }
@@ -1152,11 +1140,8 @@
         }
         initGame();
         
-        // Initialize audio on first user interaction
         document.body.addEventListener('click', function initAudioOnClick() {
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
+            if (audioContext && audioContext.state === 'suspended') audioContext.resume();
         }, { once: true });
     </script>
 </body>

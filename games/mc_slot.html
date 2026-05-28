@@ -87,10 +87,67 @@
             position: relative;
             z-index: 1;
         }
+        
+        .game-container {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* HISTORY - зліва від слотів */
+        .win-history {
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border-right: 3px solid #00ff88;
+            padding: 15px 20px;
+            width: 260px;
+            height: 470px;
+            display: flex;
+            flex-direction: column;
+        }
+        .win-history h4 {
+            color: #00ff88;
+            font-size: 14px;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+        }
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            font-size: 11px;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .history-list div {
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            border-left: 2px solid;
+            transition: 0.2s;
+        }
+        .history-list .win { 
+            color: #00ff88; 
+            border-left-color: #00ff88;
+        }
+        .history-list .big-win { 
+            color: #ffd700; 
+            border-left-color: #ffd700;
+            font-weight: bold;
+            background: rgba(255, 215, 0, 0.1);
+        }
+        .history-list .bonus { 
+            color: #9b30ff; 
+            border-left-color: #9b30ff;
+        }
+
         #game-scene {
-            width: 1400px;
-            height: 850px;
-            transform-origin: center;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -307,35 +364,40 @@
             z-index: 20;
         }
 
-        /* 3D WINNING ANIMATION - block rotates in 3D space */
-        @keyframes win3DRotate {
+        /* ========== РЕАЛЬНА 3D АНІМАЦІЯ ОБЕРТАННЯ БЛОКУ ========== */
+        @keyframes real3DRotate {
             0% {
                 transform: rotateX(-20deg) rotateY(-35deg) scale(1);
             }
-            25% {
-                transform: rotateX(-200deg) rotateY(-35deg) scale(1.1);
+            20% {
+                transform: rotateX(-20deg) rotateY(325deg) scale(1.1);
+                filter: drop-shadow(0 0 15px #ffd700);
+            }
+            40% {
+                transform: rotateX(340deg) rotateY(325deg) scale(1.15);
+                filter: drop-shadow(0 0 25px #ffd700);
+            }
+            60% {
+                transform: rotateX(340deg) rotateY(-35deg) scale(1.1);
                 filter: drop-shadow(0 0 20px #ffd700);
             }
-            50% {
-                transform: rotateX(-20deg) rotateY(-215deg) scale(1.2);
-                filter: drop-shadow(0 0 30px #ffd700);
-            }
-            75% {
-                transform: rotateX(-200deg) rotateY(-35deg) scale(1.1);
-                filter: drop-shadow(0 0 20px #ffd700);
+            80% {
+                transform: rotateX(-20deg) rotateY(-35deg) scale(1.05);
+                filter: drop-shadow(0 0 10px #ffd700);
             }
             100% {
                 transform: rotateX(-20deg) rotateY(-35deg) scale(1);
+                filter: drop-shadow(0 0 0px #ffd700);
             }
         }
         
         .winning-block {
-            animation: win3DRotate 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+            animation: real3DRotate 0.8s cubic-bezier(0.34, 1.2, 0.64, 1) forwards !important;
         }
 
         /* CONTROL PANEL */
         .control-panel {
-            width: 1300px;
+            width: 1100px;
             display: flex;
             gap: 12px;
         }
@@ -551,43 +613,6 @@
             color: #ffd700;
         }
         .b-card p { font-size: 12px; color: #bbb; }
-
-        /* HISTORY - нижня частина */
-        .win-history {
-            background: rgba(8, 12, 20, 0.85);
-            backdrop-filter: blur(15px);
-            border-radius: 16px;
-            border-top: 2px solid #00ff88;
-            padding: 8px 16px;
-            margin-top: 15px;
-            width: 600px;
-        }
-        .win-history h4 {
-            color: #00ff88;
-            font-size: 11px;
-            margin-bottom: 5px;
-            letter-spacing: 2px;
-            text-align: center;
-        }
-        .history-list {
-            max-height: 80px;
-            overflow-y: auto;
-            font-size: 10px;
-            font-family: monospace;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-        }
-        .history-list div {
-            padding: 3px 8px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            display: inline-block;
-        }
-        .history-list .win { color: #00ff88; }
-        .history-list .big-win { color: #ffd700; font-weight: bold; }
-        .history-list .bonus { color: #9b30ff; }
     </style>
 </head>
 <body>
@@ -598,53 +623,55 @@
     </div>
 
     <div id="game-wrapper">
-        <div id="game-scene">
-            <div class="slot-machine">
-                <div class="machine-neon"></div>
-                <div class="slot-title">
-                    <span class="main">MINECRAFT</span> <span class="accent">ROYALE</span>
-                </div>
-                <div class="slot-subtitle">✦ НЕЗЕР СЛОТ | ДІАМАНТОВА ЛИХОМАНКА ✦</div>
-                <div class="reels-window">
-                    <div class="reel"><div class="reel-strip" id="strip-0"></div></div>
-                    <div class="reel"><div class="reel-strip" id="strip-1"></div></div>
-                    <div class="reel"><div class="reel-strip" id="strip-2"></div></div>
-                    <div class="reel"><div class="reel-strip" id="strip-3"></div></div>
-                    <div class="reel"><div class="reel-strip" id="strip-4"></div></div>
-                </div>
-            </div>
-
-            <div class="control-panel">
-                <div class="ctrl-box" style="flex: 1;">
-                    <div id="status-text" onclick="stopAutoGame()">✨ ГОТОВИЙ ДО ГРИ</div>
-                    <div class="status-hint">▼ КЛІК ЩОБ ЗУПИНИТИ АВТО ▼</div>
-                </div>
-                
-                <div class="ctrl-box" style="flex: 0.7;">
-                    <button class="toggle-btn" id="turbo-btn" onclick="toggleTurbo()">⚡ ТУРБО: ВИМК</button>
-                    <button class="toggle-btn" id="auto-btn" onclick="openAutoModal()">🔄 АВТОГРА</button>
-                </div>
-
-                <div class="ctrl-box" style="flex: 0.8;">
-                    <div style="color: #ffd700; font-size: 12px; letter-spacing: 2px;">✦ СТАВКА ✦</div>
-                    <div class="bet-input-row">
-                        <button class="bet-btn" onclick="updateBet(-10)">−</button>
-                        <input type="number" id="bet-input" class="bet-input" value="10" min="10" max="50000" onchange="manualBetChange()">
-                        <button class="bet-btn" onclick="updateBet(10)">+</button>
-                    </div>
-                </div>
-                
-                <div class="ctrl-box" style="background: transparent; border: none; padding: 0; flex: 1.1;">
-                    <button class="spin-btn" id="spin-btn" onclick="spin()">🎲 КРУТИТИ</button>
-                    <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">✨ КУПИТИ БОНУС 1000</button>
-                </div>
-            </div>
-
-            <!-- Історія виграшів внизу під кнопками -->
+        <div class="game-container">
+            <!-- Історія виграшів ЗЛІВА -->
             <div class="win-history">
                 <h4>📜 ІСТОРІЯ ВИГРАШІВ</h4>
                 <div class="history-list" id="history-list">
-                    <div style="color:#555;">─ немає записів ─</div>
+                    <div style="color:#555; text-align:center;">─ немає записів ─</div>
+                </div>
+            </div>
+
+            <div id="game-scene">
+                <div class="slot-machine">
+                    <div class="machine-neon"></div>
+                    <div class="slot-title">
+                        <span class="main">MINECRAFT</span> <span class="accent">ROYALE</span>
+                    </div>
+                    <div class="slot-subtitle">✦ НЕЗЕР СЛОТ | ДІАМАНТОВА ЛИХОМАНКА ✦</div>
+                    <div class="reels-window">
+                        <div class="reel"><div class="reel-strip" id="strip-0"></div></div>
+                        <div class="reel"><div class="reel-strip" id="strip-1"></div></div>
+                        <div class="reel"><div class="reel-strip" id="strip-2"></div></div>
+                        <div class="reel"><div class="reel-strip" id="strip-3"></div></div>
+                        <div class="reel"><div class="reel-strip" id="strip-4"></div></div>
+                    </div>
+                </div>
+
+                <div class="control-panel">
+                    <div class="ctrl-box" style="flex: 1;">
+                        <div id="status-text" onclick="stopAutoGame()">✨ ГОТОВИЙ ДО ГРИ</div>
+                        <div class="status-hint">▼ КЛІК ЩОБ ЗУПИНИТИ АВТО ▼</div>
+                    </div>
+                    
+                    <div class="ctrl-box" style="flex: 0.7;">
+                        <button class="toggle-btn" id="turbo-btn" onclick="toggleTurbo()">⚡ ТУРБО: ВИМК</button>
+                        <button class="toggle-btn" id="auto-btn" onclick="openAutoModal()">🔄 АВТОГРА</button>
+                    </div>
+
+                    <div class="ctrl-box" style="flex: 0.8;">
+                        <div style="color: #ffd700; font-size: 12px; letter-spacing: 2px;">✦ СТАВКА ✦</div>
+                        <div class="bet-input-row">
+                            <button class="bet-btn" onclick="updateBet(-10)">−</button>
+                            <input type="number" id="bet-input" class="bet-input" value="10" min="10" max="50000" onchange="manualBetChange()">
+                            <button class="bet-btn" onclick="updateBet(10)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ctrl-box" style="background: transparent; border: none; padding: 0; flex: 1.1;">
+                        <button class="spin-btn" id="spin-btn" onclick="spin()">🎲 КРУТИТИ</button>
+                        <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">✨ КУПИТИ БОНУС 1000</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -752,7 +779,7 @@
         function resizeGame() {
             const wrapper = document.getElementById('game-wrapper');
             const scene = document.getElementById('game-scene');
-            const scale = Math.min(wrapper.clientWidth / 1400, wrapper.clientHeight / 850);
+            const scale = Math.min(wrapper.clientWidth / 1300, wrapper.clientHeight / 850);
             scene.style.transform = `scale(${scale})`;
         }
         window.addEventListener('resize', resizeGame);
@@ -824,7 +851,7 @@
             const time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             newEntry.innerHTML = `[${time}] ${message}`;
             historyDiv.prepend(newEntry);
-            while (historyDiv.children.length > 12) historyDiv.removeChild(historyDiv.lastChild);
+            while (historyDiv.children.length > 15) historyDiv.removeChild(historyDiv.lastChild);
             if (historyDiv.children.length && historyDiv.children[historyDiv.children.length-1]?.innerText.includes('немає записів')) {
                 historyDiv.removeChild(historyDiv.lastChild);
             }
@@ -1019,7 +1046,7 @@
                 const winAmount = winResult.totalWin;
                 const winPositions = winResult.winPositions;
                 
-                // Анімація ТІЛЬКИ на виграшних блоках (3D обертання)
+                // Анімація ТІЛЬКИ на виграшних блоках - реальне 3D обертання
                 if (winAmount > 0) {
                     if (winAmount >= currentBet * 20) playSound('bigwin');
                     else playSound('win');
@@ -1029,7 +1056,7 @@
                         const block = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${parseInt(y)+1}) .minecraft-block`);
                         if (block) {
                             block.classList.add('winning-block');
-                            setTimeout(() => block.classList.remove('winning-block'), 600);
+                            setTimeout(() => block.classList.remove('winning-block'), 800);
                         }
                     }
                 }

@@ -125,7 +125,6 @@
             margin-top: 4px;
         }
 
-        /* DICE AREA */
         .dice-area {
             flex: 1;
             display: flex;
@@ -449,6 +448,109 @@
     </div>
 
     <script>
+        // ========== AUDIO ==========
+        let audioContext = null;
+        
+        function initAudio() {
+            if (audioContext) return;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        function playDiceSound() {
+            try {
+                initAudio();
+                if (audioContext.state === 'suspended') audioContext.resume();
+                
+                const now = audioContext.currentTime;
+                const gainNode = audioContext.createGain();
+                gainNode.connect(audioContext.destination);
+                gainNode.gain.value = 0.08; // Не гучно
+                
+                // Короткий "стукіт" кубика
+                const osc = audioContext.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.value = 380;
+                osc.connect(gainNode);
+                osc.start();
+                osc.stop(now + 0.08);
+                
+                // Невеликий "дзвін" в кінці
+                const osc2 = audioContext.createOscillator();
+                osc2.type = 'sine';
+                osc2.frequency.value = 880;
+                const gainNode2 = audioContext.createGain();
+                gainNode2.gain.value = 0.04;
+                osc2.connect(gainNode2);
+                gainNode2.connect(audioContext.destination);
+                osc2.start();
+                osc2.stop(now + 0.12);
+            } catch(e) { console.log('Audio error:', e); }
+        }
+        
+        function playWinSound() {
+            try {
+                initAudio();
+                if (audioContext.state === 'suspended') audioContext.resume();
+                
+                const now = audioContext.currentTime;
+                const notes = [523.25, 659.25, 783.99];
+                notes.forEach((freq, i) => {
+                    const osc = audioContext.createOscillator();
+                    const g = audioContext.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    g.gain.value = 0.07;
+                    osc.connect(g);
+                    g.connect(audioContext.destination);
+                    osc.start();
+                    osc.stop(now + 0.15 + i * 0.12);
+                    g.gain.exponentialRampToValueAtTime(0.00001, now + 0.18 + i * 0.12);
+                });
+            } catch(e) {}
+        }
+        
+        function playLoseSound() {
+            try {
+                initAudio();
+                if (audioContext.state === 'suspended') audioContext.resume();
+                
+                const now = audioContext.currentTime;
+                const osc = audioContext.createOscillator();
+                const g = audioContext.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 440;
+                g.gain.value = 0.06;
+                osc.connect(g);
+                g.connect(audioContext.destination);
+                osc.start();
+                osc.stop(now + 0.25);
+                g.gain.exponentialRampToValueAtTime(0.00001, now + 0.25);
+            } catch(e) {}
+        }
+        
+        function playBigWinSound() {
+            try {
+                initAudio();
+                if (audioContext.state === 'suspended') audioContext.resume();
+                
+                const now = audioContext.currentTime;
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, i) => {
+                    const osc = audioContext.createOscillator();
+                    const g = audioContext.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    g.gain.value = 0.08;
+                    osc.connect(g);
+                    g.connect(audioContext.destination);
+                    osc.start();
+                    osc.stop(now + 0.1 + i * 0.1);
+                    g.gain.exponentialRampToValueAtTime(0.00001, now + 0.15 + i * 0.1);
+                });
+            } catch(e) {}
+        }
+
+        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -589,6 +691,9 @@
                     dice2El.classList.add('rolling');
                     rolls++;
                     
+                    // Звук при кожному "перекиданні"
+                    if (rolls % 2 === 0) playDiceSound();
+                    
                     if (rolls >= maxRolls) {
                         clearInterval(interval);
                         setTimeout(() => {
@@ -618,10 +723,12 @@
             if (isRolling) return;
             if (selectedBet === null) {
                 showResult('❌ ОБЕРІТЬ СТАВКУ!', 'lose');
+                playLoseSound();
                 return;
             }
             if (currentBet > currentBalance) {
                 showResult(`❌ НЕДОСТАТНЬО КОШТІВ! ПОТРІБНО ${currentBet}, Є ${currentBalance}`, 'lose');
+                playLoseSound();
                 return;
             }
             
@@ -657,20 +764,28 @@
                 await updateBalance(winAmount);
                 addToHistory(`🎲 +${winAmount} 🪙 (${betName}, сума ${sum}, ставка ${currentBet})`, 
                             winAmount >= currentBet * 8 ? 'big-win' : 'win');
+                if (winAmount >= currentBet * 8) {
+                    playBigWinSound();
+                } else {
+                    playWinSound();
+                }
             } else if (selectedBet === 'exact8' && sum !== 8) {
                 resultType = 'lose';
                 resultMessage = `😔 НЕ ВГАДАЛИ! СУМА ${sum}, А ВИ СТАВИЛИ НА РІВНО 8. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 addToHistory(`🎲 -${currentBet} 🪙 (РІВНО 8, випало ${sum})`, 'lose');
+                playLoseSound();
             } else if (selectedBet === 'over8' && sum <= 8) {
                 if (sum === 8) {
                     resultType = 'push';
                     resultMessage = `🤝 НІЧИЯ! СУМА 8, СТАВКУ ПОВЕРНЕНО ${currentBet} 🪙`;
                     await updateBalance(currentBet);
                     addToHistory(`🔄 +${currentBet} 🪙 (НІЧИЯ, сума 8)`, 'push');
+                    playWinSound();
                 } else {
                     resultType = 'lose';
                     resultMessage = `😔 ВИПАЛО ${sum}. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                     addToHistory(`🎲 -${currentBet} 🪙 (БІЛЬШЕ 8, випало ${sum})`, 'lose');
+                    playLoseSound();
                 }
             } else if (selectedBet === 'under8' && sum >= 8) {
                 if (sum === 8) {
@@ -678,19 +793,23 @@
                     resultMessage = `🤝 НІЧИЯ! СУМА 8, СТАВКУ ПОВЕРНЕНО ${currentBet} 🪙`;
                     await updateBalance(currentBet);
                     addToHistory(`🔄 +${currentBet} 🪙 (НІЧИЯ, сума 8)`, 'push');
+                    playWinSound();
                 } else {
                     resultType = 'lose';
                     resultMessage = `😔 ВИПАЛО ${sum}. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                     addToHistory(`🎲 -${currentBet} 🪙 (МЕНШЕ 8, випало ${sum})`, 'lose');
+                    playLoseSound();
                 }
             } else if (selectedBet === 'even' && sum % 2 === 1) {
                 resultType = 'lose';
                 resultMessage = `😔 ВИПАЛО ${sum} (НЕПАРНЕ). ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 addToHistory(`🎲 -${currentBet} 🪙 (ПАРНЕ, випало ${sum})`, 'lose');
+                playLoseSound();
             } else if (selectedBet === 'odd' && sum % 2 === 0) {
                 resultType = 'lose';
                 resultMessage = `😔 ВИПАЛО ${sum} (ПАРНЕ). ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 addToHistory(`🎲 -${currentBet} 🪙 (НЕПАРНЕ, випало ${sum})`, 'lose');
+                playLoseSound();
             }
             
             showResult(resultMessage, resultType);
@@ -711,11 +830,11 @@
         
         updateBetUI();
         
-        let audioContext = null;
+        // Ініціалізація аудіо при першому кліку
         document.body.addEventListener('click', () => {
-            if (audioContext) return;
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            audioContext.resume();
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
         }, { once: true });
     </script>
 </body>

@@ -7,92 +7,108 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         :root {
-            --neon: #00ff9d; --gold: #d4af37; --bg-dark: #070913;
-            --holo-red: #ff3366; --holo-blue: #00e5ff;
+            --neon: #00ff9d; --gold: #d4af37; --bg-dark: #05070f;
+            --holo-red: #ff2a5f; --holo-blue: #00e5ff;
         }
         
         body { margin: 0; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; user-select: none; background: var(--bg-dark);}
 
         /* НАВІГАЦІЯ */
         .nav-bar { position: absolute; top: 15px; left: 20px; z-index: 100;}
-        .back-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 4px; cursor: pointer; backdrop-filter: blur(5px); font-weight: bold; text-transform: uppercase; transition: 0.3s;}
-        .back-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--neon); color: var(--neon); box-shadow: 0 0 10px rgba(0,255,157,0.3);}
+        .back-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 6px; cursor: pointer; backdrop-filter: blur(5px); font-weight: bold; text-transform: uppercase; transition: 0.3s;}
+        .back-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--neon); color: var(--neon); box-shadow: 0 0 15px rgba(0,255,157,0.4);}
 
         /* =========================================
-           ФОН ТА ПОЛЕ (PURE CSS)
+           ФОН ТА ПОЛЕ
         ========================================= */
         .game-screen {
             flex: 1; position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-            background: radial-gradient(circle at 50% 30%, #1a1c2e 0%, var(--bg-dark) 80%);
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
-            perspective: 1000px;
+            background: radial-gradient(circle at 50% 30%, #151828 0%, var(--bg-dark) 80%);
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
+            perspective: 1200px;
         }
 
-        /* Прожектори */
         .game-screen::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(ellipse at 30% -20%, rgba(0,229,255,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% -20%, rgba(0,255,157,0.1) 0%, transparent 50%);
+            background: radial-gradient(ellipse at 25% -20%, rgba(0,229,255,0.1) 0%, transparent 60%), radial-gradient(ellipse at 75% -20%, rgba(0,255,157,0.1) 0%, transparent 60%);
             pointer-events: none;
         }
 
-        /* 3D Трава */
         .pitch { 
             position: absolute; bottom: 0; left: -50%; width: 200%; height: 40%; 
-            background: repeating-linear-gradient(90deg, #0d381e 0px, #0d381e 100px, #114a27 100px, #114a27 200px);
+            background: repeating-linear-gradient(90deg, #092e18 0px, #092e18 120px, #0d3b20 120px, #0d3b20 240px);
             transform: rotateX(75deg); transform-origin: top;
-            border-top: 4px solid rgba(255,255,255,0.3); z-index: 1;
-            box-shadow: inset 0 50px 100px rgba(0,0,0,0.9);
+            border-top: 5px solid rgba(255,255,255,0.4); z-index: 1;
+            box-shadow: inset 0 80px 150px rgba(0,0,0,0.9);
         }
 
         /* =========================================
            ВЕРХНЯ ПАНЕЛЬ МНОЖНИКІВ
         ========================================= */
-        .top-bar { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: rgba(10, 15, 25, 0.8); padding: 5px 20px; border-radius: 40px; border: 1px solid rgba(0,229,255,0.3); z-index: 10; backdrop-filter: blur(10px); width: 650px; justify-content: space-between; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,229,255,0.1);}
+        .top-bar { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: rgba(10, 15, 25, 0.85); padding: 8px 30px; border-radius: 50px; border: 1px solid rgba(0,229,255,0.3); z-index: 10; backdrop-filter: blur(12px); width: 700px; justify-content: space-between; box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 25px rgba(0,229,255,0.1);}
         .multiplier-track { display: flex; align-items: center; justify-content: space-between; flex: 1; margin: 0 20px; position: relative;}
-        .multiplier-track::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.1); transform: translateY(-50%); z-index: -1; border-radius: 2px;}
+        .multiplier-track::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.15); transform: translateY(-50%); z-index: -1; border-radius: 2px;}
         
-        .step { display: flex; flex-direction: column; align-items: center; position: relative;}
-        .dot { width: 12px; height: 12px; background: #333; border-radius: 50%; margin-bottom: 5px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid #111;}
-        .step-text { color: #666; font-size: 13px; font-weight: bold; transition: 0.3s;}
+        .step { display: flex; flex-direction: column; align-items: center; position: relative; gap: 6px;}
+        .dot { width: 14px; height: 14px; background: #222; border-radius: 50%; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid #111;}
+        .step-text { color: #666; font-size: 14px; font-weight: 900; transition: 0.3s;}
         
         .step.passed .dot { background: var(--neon); box-shadow: 0 0 15px var(--neon); border-color: #fff;}
-        .step.passed .step-text { color: var(--neon); text-shadow: 0 0 5px var(--neon);}
+        .step.passed .step-text { color: var(--neon); text-shadow: 0 0 8px var(--neon);}
         
         .step.active .dot { background: #fff; box-shadow: 0 0 25px #fff, 0 0 15px var(--neon); border-color: var(--neon); transform: scale(1.6);}
-        .step.active .step-text { color: white; text-shadow: 0 0 10px white; transform: scale(1.1);}
+        .step.active .step-text { color: white; text-shadow: 0 0 10px white; transform: scale(1.15);}
 
         /* =========================================
-           НЕОНОВІ ВОРОТА
+           ІСТОРІЯ ІГОР (НОВА ПАНЕЛЬ ЗЛІВА)
         ========================================= */
-        .goal-container { position: absolute; bottom: 22%; left: 50%; transform: translateX(-50%); width: 65%; max-width: 900px; height: 380px; 
-            border: 10px solid #fff; border-bottom: none; border-radius: 8px 8px 0 0; 
-            box-shadow: 0 0 20px rgba(255,255,255,0.5), inset 0 0 20px rgba(255,255,255,0.5), 0 20px 50px rgba(0,0,0,0.8); 
+        .history-panel { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); background: rgba(10, 15, 25, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 10; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
+        .history-title { font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; writing-mode: vertical-rl; transform: rotate(180deg);}
+        .history-item { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); opacity: 0; animation: popIn 0.4s forwards;}
+        .hist-win { background: rgba(0,255,157,0.1); border: 2px solid var(--neon); color: var(--neon); box-shadow: 0 0 15px rgba(0,255,157,0.3);}
+        .hist-loss { background: rgba(255,42,95,0.1); border: 2px solid var(--holo-red); color: var(--holo-red); box-shadow: 0 0 15px rgba(255,42,95,0.3);}
+
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* =========================================
+           ВОРОТА (З АНІМАЦІЄЮ ВЛУЧАННЯ)
+        ========================================= */
+        .goal-container { position: absolute; bottom: 25%; left: 50%; transform: translateX(-50%); width: 70%; max-width: 950px; height: 420px; 
+            border: 12px solid #e2e8f0; border-bottom: none; border-radius: 10px 10px 0 0; 
+            box-shadow: 0 0 25px rgba(255,255,255,0.4), inset 0 0 30px rgba(255,255,255,0.3), 0 30px 60px rgba(0,0,0,0.9); 
             display: flex; align-items: flex-end; justify-content: center; z-index: 2;
-            /* Ідеальна CSS Сітка */
             background-image: 
-                linear-gradient(45deg, rgba(255,255,255,0.15) 2px, transparent 2px),
-                linear-gradient(-45deg, rgba(255,255,255,0.15) 2px, transparent 2px);
-            background-size: 30px 30px;
+                linear-gradient(45deg, rgba(255,255,255,0.2) 2px, transparent 2px),
+                linear-gradient(-45deg, rgba(255,255,255,0.2) 2px, transparent 2px);
+            background-size: 35px 35px;
+            transition: transform 0.1s ease-out;
         }
 
+        /* Анімація коли м'яч влітає в сітку */
+        @keyframes net-impact {
+            0% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.02) translateY(-10px); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+        .goal-hit { animation: net-impact 0.4s ease-out; }
+
         /* =========================================
-           ГОЛОГРАФІЧНИЙ ВОРОТАР (PURE CSS)
+           ПЕРЕМАЛЬОВАНИЙ ГОЛОГРАФІЧНИЙ ВОРОТАР
         ========================================= */
         .goalkeeper { 
-            position: absolute; bottom: 0; left: 50%; width: 140px; height: 190px; margin-left: -70px;
+            position: absolute; bottom: 0; left: 50%; width: 160px; height: 210px; margin-left: -80px;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            z-index: 3; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            filter: drop-shadow(0 0 15px var(--holo-red));
+            z-index: 3; transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1); /* Стрибок з відтяжкою */
+            filter: drop-shadow(0 0 20px var(--holo-red));
         }
-        /* Голова */
-        .gk-head { width: 35px; height: 35px; background: rgba(255,51,102,0.8); border: 2px solid #fff; border-radius: 50%; margin-bottom: 5px; box-shadow: 0 0 20px var(--holo-red); }
-        /* Тіло */
-        .gk-body { width: 70px; height: 80px; background: rgba(255,51,102,0.5); border: 2px solid #fff; border-radius: 15px; position: relative; box-shadow: inset 0 0 15px var(--holo-red);}
-        /* Руки (розмах) */
-        .gk-arms { position: absolute; top: 10px; left: -45px; right: -45px; height: 20px; background: rgba(255,51,102,0.7); border: 2px solid #fff; border-radius: 10px; box-shadow: 0 0 15px var(--holo-red);}
-        /* Ноги */
-        .gk-legs { display: flex; justify-content: space-between; width: 60px; margin-top: 5px; }
-        .gk-leg { width: 20px; height: 65px; background: rgba(255,51,102,0.6); border: 2px solid #fff; border-radius: 10px; box-shadow: 0 0 10px var(--holo-red);}
+        .gk-head { width: 45px; height: 50px; background: rgba(255,42,95,0.9); border: 2px solid #fff; border-radius: 40% 40% 50% 50%; margin-bottom: -5px; z-index: 2; box-shadow: inset 0 0 10px #fff;}
+        .gk-torso { width: 85px; height: 95px; background: rgba(255,42,95,0.7); border: 2px solid #fff; border-radius: 30% 30% 20% 20%; position: relative; box-shadow: inset 0 0 20px var(--holo-red);}
+        .gk-arms-wrap { position: absolute; top: 10px; left: -55px; right: -55px; height: 25px; display: flex; justify-content: space-between;}
+        .gk-arm { width: 65px; height: 22px; background: rgba(255,42,95,0.8); border: 2px solid #fff; border-radius: 15px; box-shadow: 0 0 15px var(--holo-red);}
+        .gk-arm.left { transform: rotate(-20deg); transform-origin: right center;}
+        .gk-arm.right { transform: rotate(20deg); transform-origin: left center;}
+        .gk-legs { display: flex; justify-content: space-between; width: 75px; margin-top: -10px; z-index: 1;}
+        .gk-leg { width: 28px; height: 80px; background: rgba(255,42,95,0.7); border: 2px solid #fff; border-radius: 10px; box-shadow: 0 0 15px var(--holo-red);}
 
         /* =========================================
            ЗОНИ ДЛЯ УДАРУ ТА ПРИЦІЛИ
@@ -100,67 +116,66 @@
         .target-zones { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
         .target-zones.active { pointer-events: auto; }
         .zone { position: absolute; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;}
-        .zone-tl { top: 0; left: 0; width: 30%; height: 45%; }
-        .zone-tc { top: 0; left: 30%; width: 40%; height: 85%; }
-        .zone-tr { top: 0; left: 70%; width: 30%; height: 45%; }
-        .zone-bl { top: 45%; left: 0; width: 30%; height: 55%; }
-        .zone-br { top: 45%; left: 70%; width: 30%; height: 55%; }
+        .zone-tl { top: 0; left: 0; width: 33%; height: 50%; }
+        .zone-tc { top: 0; left: 33%; width: 34%; height: 90%; }
+        .zone-tr { top: 0; left: 66%; width: 33%; height: 50%; }
+        .zone-bl { top: 50%; left: 0; width: 33%; height: 50%; }
+        .zone-br { top: 50%; left: 66%; width: 33%; height: 50%; }
         
-        /* Неоновий приціл */
-        .target-icon { width: 60px; height: 60px; border: 2px dashed rgba(0,255,157,0.5); border-radius: 50%; opacity: 0; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; justify-content: center; transform: scale(0.3); background: rgba(0,0,0,0.3);}
-        .target-icon::after { content: '+'; font-size: 30px; color: var(--neon); text-shadow: 0 0 10px var(--neon);}
-        .target-zones.active .zone:hover .target-icon { opacity: 1; transform: scale(1); border: 3px solid var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.4), inset 0 0 20px rgba(0,255,157,0.4); background: rgba(0,255,157,0.1);}
+        .target-icon { width: 65px; height: 65px; border: 3px dashed rgba(0,255,157,0.7); border-radius: 50%; opacity: 0; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; justify-content: center; transform: scale(0.3); background: rgba(0,255,157,0.1); backdrop-filter: blur(2px);}
+        .target-icon::after { content: '🎯'; font-size: 30px; text-shadow: 0 0 15px var(--neon);}
+        .target-zones.active .zone:hover .target-icon { opacity: 1; transform: scale(1); border: 3px solid var(--neon); box-shadow: 0 0 25px rgba(0,255,157,0.6), inset 0 0 20px rgba(0,255,157,0.4); background: rgba(0,255,157,0.2);}
 
         /* =========================================
-           3D М'ЯЧ (PURE CSS)
+           3D М'ЯЧ (КРАЩА БАЛІСТИКА)
         ========================================= */
         .ball { 
-            width: 80px; height: 80px; border-radius: 50%; position: absolute; bottom: 5%; left: 50%; margin-left: -40px; z-index: 10;
-            background: radial-gradient(circle at 35% 35%, #fff 0%, #ddd 40%, #777 80%, #333 100%);
-            box-shadow: -15px 20px 25px rgba(0,0,0,0.8), inset -5px -5px 15px rgba(0,0,0,0.6);
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
+            width: 90px; height: 90px; border-radius: 50%; position: absolute; bottom: 5%; left: 50%; margin-left: -45px; z-index: 10;
+            background: radial-gradient(circle at 35% 35%, #fff 0%, #ddd 40%, #555 80%, #222 100%);
+            box-shadow: -15px 25px 30px rgba(0,0,0,0.8), inset -5px -5px 15px rgba(0,0,0,0.7);
+            /* Нова анімація: Різкий старт, повільне приземлення в сітці */
+            transition: transform 0.45s cubic-bezier(0.1, 0.9, 0.2, 1); pointer-events: none;
         }
-        /* Патерн м'яча */
         .ball::after {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,20 65,35 60,55 40,55 35,35' fill='%23111'/%3E%3Cpolygon points='15,30 25,15 45,25 35,45 20,45' fill='none' stroke='%23111' stroke-width='3'/%3E%3Cpolygon points='85,30 75,15 55,25 65,45 80,45' fill='none' stroke='%23111' stroke-width='3'/%3E%3Cpolygon points='25,75 40,85 60,85 75,75 50,60' fill='none' stroke='%23111' stroke-width='3'/%3E%3C/svg%3E");
-            opacity: 0.9;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,20 65,35 60,55 40,55 35,35' fill='%23111'/%3E%3Cpolygon points='15,30 25,15 45,25 35,45 20,45' fill='none' stroke='%23111' stroke-width='4'/%3E%3Cpolygon points='85,30 75,15 55,25 65,45 80,45' fill='none' stroke='%23111' stroke-width='4'/%3E%3Cpolygon points='25,75 40,85 60,85 75,75 50,60' fill='none' stroke='%23111' stroke-width='4'/%3E%3C/svg%3E");
+            opacity: 0.85;
         }
 
         /* =========================================
            НИЖНЯ ПАНЕЛЬ КЕРУВАННЯ
         ========================================= */
-        .controls-bar { background: rgba(10, 15, 25, 0.95); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,229,255,0.2); z-index: 100; height: 90px; box-shadow: 0 -10px 30px rgba(0,0,0,0.8);}
+        .controls-bar { background: rgba(10, 15, 25, 0.98); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,229,255,0.2); z-index: 100; height: 100px; box-shadow: 0 -15px 40px rgba(0,0,0,0.8);}
         
         .panel-block { display: flex; align-items: center; gap: 30px; flex: 1;}
         .panel-block.right { justify-content: flex-end;}
 
         /* СТАВКА */
-        .label { color: #888; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; text-align: center; letter-spacing: 1px;}
-        .bet-controls { display: flex; align-items: center; background: rgba(0,0,0,0.8); border-radius: 30px; padding: 5px 15px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 0 15px rgba(0,0,0,0.8);}
-        .bet-btn { background: transparent; color: #aaa; border: none; font-size: 24px; cursor: pointer; transition: 0.2s; padding: 0 10px;}
-        .bet-btn:hover { color: white; transform: scale(1.2);}
-        .bet-input { background: transparent; color: white; border: none; font-size: 22px; font-weight: bold; width: 100px; text-align: center; outline: none;}
+        .label { color: #888; font-size: 12px; font-weight: 900; margin-bottom: 8px; text-transform: uppercase; text-align: center; letter-spacing: 1.5px;}
+        .bet-controls { display: flex; align-items: center; background: rgba(0,0,0,0.9); border-radius: 40px; padding: 8px 20px; border: 1px solid rgba(255,255,255,0.15); box-shadow: inset 0 0 20px rgba(0,0,0,0.9);}
+        .bet-btn { background: transparent; color: #aaa; border: none; font-size: 26px; cursor: pointer; transition: 0.2s; padding: 0 15px;}
+        .bet-btn:hover { color: white; transform: scale(1.2) translateY(-2px);}
+        .bet-input { background: transparent; color: white; border: none; font-size: 26px; font-weight: 900; width: 110px; text-align: center; outline: none;}
 
         /* КНОПКА PLAY */
-        .play-btn { background: #fff; border: none; width: 110px; height: 110px; border-radius: 25px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 -5px 0 rgba(0,0,0,0.2); transform: translateY(-25px); position: absolute; left: 50%; margin-left: -55px; border: 4px solid var(--neon);}
-        .play-btn:hover { transform: translateY(-30px) scale(1.05); box-shadow: 0 15px 35px rgba(0,255,157,0.4);}
-        .play-btn:disabled { background: #333; border-color: #555; cursor: not-allowed; transform: translateY(-25px) scale(1); box-shadow: none;}
-        .play-icon { width: 0; height: 0; border-top: 18px solid transparent; border-bottom: 18px solid transparent; border-left: 28px solid #16a34a; margin-bottom: 5px; margin-left: 8px;}
-        .play-text { color: #16a34a; font-weight: 900; font-size: 16px; letter-spacing: 1px;}
+        .play-btn { background: #fff; border: none; width: 120px; height: 120px; border-radius: 30px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 -6px 0 rgba(0,0,0,0.2); transform: translateY(-30px); position: absolute; left: 50%; margin-left: -60px; border: 5px solid var(--neon);}
+        .play-btn:hover { transform: translateY(-35px) scale(1.05); box-shadow: 0 20px 45px rgba(0,255,157,0.5);}
+        .play-btn:disabled { background: #222; border-color: #444; cursor: not-allowed; transform: translateY(-30px) scale(1); box-shadow: none;}
+        .play-icon { width: 0; height: 0; border-top: 20px solid transparent; border-bottom: 20px solid transparent; border-left: 32px solid #16a34a; margin-bottom: 8px; margin-left: 10px;}
+        .play-text { color: #16a34a; font-weight: 900; font-size: 18px; letter-spacing: 1px;}
 
         /* КНОПКА COLLECT */
-        .collect-btn { background: linear-gradient(to bottom, #fde047, #d4af37); border: none; height: 110px; padding: 0 40px; border-radius: 25px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4), inset 0 -5px 0 rgba(0,0,0,0.2); transform: translateY(-25px); position: absolute; left: 50%; margin-left: -85px; display: none; border: 4px solid #fff;}
-        .collect-btn:hover { transform: translateY(-30px) scale(1.05); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);}
-        .collect-text { color: #000; font-weight: 900; font-size: 18px; margin-top: 5px;}
+        .collect-btn { background: linear-gradient(to bottom, #fde047, #d4af37); border: none; height: 120px; padding: 0 45px; border-radius: 30px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 15px 35px rgba(212, 175, 55, 0.5), inset 0 -6px 0 rgba(0,0,0,0.2); transform: translateY(-30px); position: absolute; left: 50%; margin-left: -100px; display: none; border: 5px solid #fff;}
+        .collect-btn:hover { transform: translateY(-35px) scale(1.05); box-shadow: 0 20px 50px rgba(212, 175, 55, 0.7);}
+        .collect-text { color: #000; font-weight: 900; font-size: 20px; margin-top: 6px; letter-spacing: 1px;}
 
         /* БАЛАНС ТА ВИГРАШ */
-        .stat-box { display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.7); padding: 10px 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); min-width: 140px; box-shadow: inset 0 0 15px rgba(0,0,0,0.5);}
-        .stat-value { font-size: 22px; font-weight: bold; color: white;}
-        .stat-value.win { color: var(--gold); text-shadow: 0 0 10px rgba(212,175,55,0.5);}
+        .stat-box { display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.8); padding: 12px 35px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); min-width: 150px; box-shadow: inset 0 0 20px rgba(0,0,0,0.7);}
+        .stat-value { font-size: 26px; font-weight: 900; color: white;}
+        .stat-value.win { color: var(--gold); text-shadow: 0 0 15px rgba(212,175,55,0.6);}
 
         /* СТАТУС ПОВІДОМЛЕННЯ */
-        #status-msg { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) scale(0.5); font-size: 90px; font-weight: 900; text-transform: uppercase; opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50; text-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 30px currentColor; pointer-events: none;}
+        #status-msg { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) scale(0.5); font-size: 110px; font-weight: 900; text-transform: uppercase; opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50; text-shadow: 0 25px 50px rgba(0,0,0,0.9), 0 0 40px currentColor; pointer-events: none;}
         .msg-goal { color: var(--neon); }
         .msg-save { color: var(--holo-red); }
         .msg-win { color: var(--gold); }
@@ -177,18 +192,26 @@
         <button onclick="window.location.href='../index.html'" style="padding: 15px 40px; margin-top: 30px; background: var(--gold); color: black; border:none; cursor:pointer; font-weight:bold; border-radius:8px; font-size:18px;">В Лобі</button>
     </div>
 
-    <!-- ВБУДОВАНІ ЗВУКИ ВИСОКОЇ ЯКОСТІ (Прямі лінки) -->
+    <!-- ВБУДОВАНІ ЗВУКИ -->
     <audio id="sound-kick" src="https://cdn.freesound.org/previews/346/346049_5121236-lq.mp3" preload="auto"></audio>
     <audio id="sound-win" src="https://cdn.freesound.org/previews/270/270404_5123851-lq.mp3" preload="auto"></audio>
     <audio id="sound-lose" src="https://cdn.freesound.org/previews/131/131657_2398403-lq.mp3" preload="auto"></audio>
     <audio id="sound-collect" src="https://cdn.freesound.org/previews/201/201159_255853-lq.mp3" preload="auto"></audio>
 
     <div class="nav-bar">
-        <button class="back-btn" onclick="window.location.href='../index.html'">⬅ Назад</button>
+        <button class="back-btn" onclick="window.location.href='../index.html'">⬅ Назад у лобі</button>
     </div>
 
     <div class="game-screen">
         
+        <!-- ІСТОРІЯ УДАРІВ -->
+        <div class="history-panel">
+            <div class="history-title">ІСТОРІЯ</div>
+            <div id="history-list" style="display: flex; flex-direction: column; gap: 8px;">
+                <!-- Сюди будуть додаватися кружечки -->
+            </div>
+        </div>
+
         <!-- БАР МНОЖНИКІВ -->
         <div class="top-bar">
             <div class="multiplier-track">
@@ -203,7 +226,7 @@
         <div id="status-msg">GOAL!</div>
 
         <!-- ВОРОТА ТА ПЕРСОНАЖІ -->
-        <div class="goal-container">
+        <div class="goal-container" id="goal-net">
             
             <div class="target-zones" id="target-zones">
                 <div class="zone zone-tl" onclick="shoot('tl')"><div class="target-icon"></div></div>
@@ -213,10 +236,15 @@
                 <div class="zone zone-br" onclick="shoot('br')"><div class="target-icon"></div></div>
             </div>
             
-            <!-- Голографічний воротар на CSS -->
+            <!-- Покращений кібер-воротар -->
             <div class="goalkeeper" id="goalkeeper">
                 <div class="gk-head"></div>
-                <div class="gk-body"><div class="gk-arms"></div></div>
+                <div class="gk-torso">
+                    <div class="gk-arms-wrap">
+                        <div class="gk-arm left"></div>
+                        <div class="gk-arm right"></div>
+                    </div>
+                </div>
                 <div class="gk-legs">
                     <div class="gk-leg"></div><div class="gk-leg"></div>
                 </div>
@@ -248,7 +276,7 @@
         </button>
         
         <button class="collect-btn" id="collect-btn" onclick="collectWinnings()">
-            <div style="font-size: 28px; color: black;">💰</div>
+            <div style="font-size: 32px; color: black;">💰</div>
             <div class="collect-text">COLLECT</div>
         </button>
 
@@ -294,12 +322,13 @@
         // ІГРОВА ЛОГІКА ТА ЖОРСТКИЙ БАЛАНС (50%)
         // ==========================================
         const multipliers = [1.92, 3.84, 7.68, 15.36, 30.72];
-        const WIN_CHANCE = 0.50; // РІВНО 50% НА КОЖЕН УДАР. Це дає 4% House Edge.
+        const WIN_CHANCE = 0.50; // Ідеально для казино
 
         let currentStep = -1; 
         let currentBet = 10;
         let potentialWin = 0;
         let isAnimating = false;
+        let sessionHistory = []; // Локальна історія ударів
 
         const playBtn = document.getElementById('play-btn');
         const collectBtn = document.getElementById('collect-btn');
@@ -307,6 +336,8 @@
         const targetZones = document.getElementById('target-zones');
         const msgBox = document.getElementById('status-msg');
         const winDisplay = document.getElementById('win-display');
+        const goalNet = document.getElementById('goal-net');
+        const historyList = document.getElementById('history-list');
 
         function changeBet(amount) {
             if (currentStep !== -1) return;
@@ -355,6 +386,18 @@
             setTimeout(() => { msgBox.classList.remove('show'); }, 1500);
         }
 
+        function addHistory(isWin) {
+            const item = document.createElement('div');
+            item.className = `history-item ${isWin ? 'hist-win' : 'hist-loss'}`;
+            item.innerHTML = isWin ? '⚽' : '❌';
+            historyList.prepend(item);
+            
+            // Зберігаємо не більше 8 елементів
+            if (historyList.children.length > 8) {
+                historyList.removeChild(historyList.lastChild);
+            }
+        }
+
         function shoot(target) {
             if (currentStep === -1 || isAnimating) return;
             isAnimating = true;
@@ -368,24 +411,25 @@
             const ball = document.getElementById('ball');
             const goalie = document.getElementById('goalkeeper');
 
-            // 3D АНІМАЦІЯ ПОЛЬОТУ
+            // ІДЕАЛЬНА 3D БАЛІСТИКА
             const targets = {
-                'tl': { x: '-320px', y: '-280px', s: 0.35 },
-                'tc': { x: '0px',    y: '-300px', s: 0.35 },
-                'tr': { x: '320px',  y: '-280px', s: 0.35 },
-                'bl': { x: '-350px', y: '-100px', s: 0.45 },
-                'br': { x: '350px',  y: '-100px', s: 0.45 }
+                // Дев'ятки летять високо і далеко (scale 0.35)
+                'tl': { x: '-380px', y: '-330px', s: 0.35 },
+                'tc': { x: '0px',    y: '-320px', s: 0.35 },
+                'tr': { x: '380px',  y: '-330px', s: 0.35 },
+                // Нижні кути летять нижче, але здаються ближче (scale 0.45)
+                'bl': { x: '-400px', y: '-100px', s: 0.45 },
+                'br': { x: '400px',  y: '-100px', s: 0.45 }
             };
 
             const dives = [
-                { id: 'tl', t: 'translate(-200px, -100px) rotate(-55deg)' },
-                { id: 'tc', t: 'translate(0, -140px) scale(1.1)' },
-                { id: 'tr', t: 'translate(200px, -100px) rotate(55deg)' },
-                { id: 'bl', t: 'translate(-220px, 10px) rotate(-75deg)' },
-                { id: 'br', t: 'translate(220px, 10px) rotate(75deg)' }
+                { id: 'tl', t: 'translate(-250px, -150px) rotate(-60deg) scale(1.1)' },
+                { id: 'tc', t: 'translate(0, -180px) scale(1.2)' },
+                { id: 'tr', t: 'translate(250px, -150px) rotate(60deg) scale(1.1)' },
+                { id: 'bl', t: 'translate(-280px, -20px) rotate(-85deg) scale(1.1)' },
+                { id: 'br', t: 'translate(280px, -20px) rotate(85deg) scale(1.1)' }
             ];
 
-            // МАТЕМАТИКА
             const isGoal = Math.random() < WIN_CHANCE;
 
             let goalieDive;
@@ -396,14 +440,22 @@
             }
 
             const pos = targets[target];
+            // М'яч летить різко, крутиться
             ball.style.transform = `translateX(calc(-50% + ${pos.x})) translateY(${pos.y}) scale(${pos.s}) rotate(${Math.random() * 1080}deg)`;
             
-            setTimeout(() => { goalie.style.transform = goalieDive; }, 100);
+            // Воротар стрибає з мікрозатримкою
+            setTimeout(() => { goalie.style.transform = goalieDive; }, 80);
 
+            // Оцінка удару (через 400мс, коли м'яч долетів)
             setTimeout(() => {
                 if (isGoal) {
+                    // Анімація сітки ворот
+                    goalNet.classList.add('goal-hit');
+                    setTimeout(() => goalNet.classList.remove('goal-hit'), 400);
+
                     potentialWin = Math.floor(currentBet * multipliers[currentStep]);
                     currentStep++;
+                    addHistory(true);
                     showMsg("ГОЛ!", "msg-goal");
                     document.getElementById('sound-win').currentTime = 0;
                     document.getElementById('sound-win').play().catch(()=>{});
@@ -411,13 +463,14 @@
                     if (currentStep >= 5) setTimeout(() => collectWinnings(), 1500); 
                     else setTimeout(() => resetPitch(), 1500); 
                 } else {
+                    addHistory(false);
                     showMsg("СЕЙВ!", "msg-save");
                     document.getElementById('sound-lose').currentTime = 0;
                     document.getElementById('sound-lose').play().catch(()=>{});
                     currentStep = -1; potentialWin = 0;
                     setTimeout(() => resetPitch(), 2000);
                 }
-            }, 600);
+            }, 400); // Синхронізовано з часом польоту м'яча
         }
 
         async function collectWinnings() {
@@ -441,11 +494,12 @@
             
             ball.style.transition = 'none'; goalie.style.transition = 'none';
             ball.style.transform = 'translateX(-50%) translateY(0) scale(1) rotate(0deg)';
-            goalie.style.transform = 'translateX(-50%) translateY(0) rotate(0deg)';
+            goalie.style.transform = 'translateX(-50%) translateY(0) rotate(0deg) scale(1)';
             
             setTimeout(() => {
-                ball.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
-                goalie.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                // Відновлюємо плавні переходи
+                ball.style.transition = 'transform 0.45s cubic-bezier(0.1, 0.9, 0.2, 1)';
+                goalie.style.transition = 'transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1)';
                 isAnimating = false; updateUI();
             }, 50);
         }

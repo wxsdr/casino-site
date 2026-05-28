@@ -111,11 +111,12 @@
         
         .block-text { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            font-size: 30px; font-weight: 900; z-index: 10; text-align: center; pointer-events: none;
+            font-size: 28px; font-weight: 900; z-index: 10; text-align: center; pointer-events: none;
             text-shadow: 0 0 5px black, 0 0 5px black;
+            white-space: nowrap;
         }
-        .text-wild { color: var(--neon-gold); text-shadow: 0 0 15px var(--neon-gold), 0 0 5px black; font-size: 34px;}
-        .text-scatter { color: var(--neon-purple); text-shadow: 0 0 15px var(--neon-purple), 0 0 5px black; font-size: 26px;}
+        .text-wild { color: var(--neon-gold); text-shadow: 0 0 15px var(--neon-gold), 0 0 5px black; font-size: 28px;}
+        .text-scatter { color: var(--neon-purple); text-shadow: 0 0 15px var(--neon-purple), 0 0 5px black; font-size: 22px;}
 
         .sticky-mult {
             position: absolute; bottom: 15px; right: 15px; background: var(--neon-green); color: black; 
@@ -167,6 +168,43 @@
         .b-card.raining h3 { color: #00ffff; font-size: 30px; margin-bottom: 15px; text-shadow: 0 0 10px #00ffff; }
         .b-spins { background: #222; display: inline-block; padding: 10px 20px; border-radius: 10px; font-size: 24px; font-weight: 900; margin-bottom: 20px; color: white; }
         .b-card p { font-size: 16px; color: #ccc; line-height: 1.5; font-weight: bold; }
+
+        /* Історія виграшів */
+        .win-history {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border-left: 4px solid var(--neon-green);
+            padding: 12px 20px;
+            min-width: 220px;
+            z-index: 50;
+            pointer-events: none;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .win-history h4 {
+            color: var(--neon-green);
+            font-size: 14px;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+        .history-list {
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 13px;
+            font-weight: bold;
+            pointer-events: auto;
+        }
+        .history-list div {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #ddd;
+        }
+        .history-list .win { color: var(--neon-green); }
+        .history-list .big-win { color: var(--neon-gold); text-shadow: 0 0 5px rgba(255,223,0,0.5); }
+        .history-list .bonus { color: var(--neon-purple); }
     </style>
 </head>
 <body>
@@ -212,6 +250,14 @@
                     <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">КУПИТИ БОНУС <span id="bonus-price">1000</span></button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Історія виграшів -->
+    <div class="win-history">
+        <h4>📜 ІСТОРІЯ ВИГРАШІВ</h4>
+        <div class="history-list" id="history-list">
+            <div style="color:#666;">─ немає записів ─</div>
         </div>
     </div>
 
@@ -286,11 +332,12 @@
         let isBonusGame = false;
         let activeBonusType = null;
         let freeSpinsLeft = 0;
-        let stickyWilds = {};  // Зберігає позиції sticky wilds
-        let stickyMultipliers = {}; // Множники для sticky wilds
+        let stickyWilds = {};
+        let stickyMultipliers = {};
         let isTurbo = false;
         let autoSpinsLeft = 0;
         let currentBet = 10;
+        let stopAuto = false;
         
         const betInput = document.getElementById('bet-input');
         
@@ -317,7 +364,27 @@
             statusDiv.style.color = color;
         }
         
-        // ========== 4. КЕРУВАННЯ ТУРБО ТА АВТОГРОЮ ==========
+        // ========== 4. ІСТОРІЯ ВИГРАШІВ ==========
+        function addToHistory(message, type = 'win') {
+            const historyDiv = document.getElementById('history-list');
+            const newEntry = document.createElement('div');
+            newEntry.className = type;
+            const time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            newEntry.innerHTML = `[${time}] ${message}`;
+            historyDiv.prepend(newEntry);
+            
+            // Обмежуємо до 15 записів
+            while (historyDiv.children.length > 15) {
+                historyDiv.removeChild(historyDiv.lastChild);
+            }
+            
+            // Видаляємо заглушку якщо вона є
+            if (historyDiv.children.length > 0 && historyDiv.children[historyDiv.children.length-1]?.innerText.includes('немає записів')) {
+                historyDiv.removeChild(historyDiv.lastChild);
+            }
+        }
+        
+        // ========== 5. КЕРУВАННЯ ТУРБО ТА АВТОГРОЮ ==========
         function toggleTurbo() {
             isTurbo = !isTurbo;
             const btn = document.getElementById('turbo-btn');
@@ -333,56 +400,56 @@
         function startAuto(count) {
             if (isSpinning) return;
             autoSpinsLeft = count;
+            stopAuto = false;
             document.getElementById('auto-modal').style.display = 'none';
+            addToHistory(`🎰 АВТОГРА: ${count} спінів`, 'bonus');
             setStatus(`АВТО: ${autoSpinsLeft} СПІНІВ`, '#00ff9d');
             spin();
         }
         
-        // ========== 5. РЕНДЕР СИМВОЛІВ (ПОВНІСТЮ ПРАЦЮЄ) ==========
+        function stopAutoGame() {
+            if (autoSpinsLeft > 0) {
+                addToHistory(`⏹ Автогру зупинено (${autoSpinsLeft} спінів залишилось)`, 'win');
+                autoSpinsLeft = 0;
+                stopAuto = true;
+                setStatus("ГОТОВИЙ", "#ffdf00");
+            }
+        }
+        
+        // ========== 6. РЕНДЕР СИМВОЛІВ (БЕЗ ТЕКСТУ ДЛЯ ЗВИЧАЙНИХ) ==========
         const STRIP_LENGTH = 16;
         
         function getSymbolDisplay(sym, hasStickyMult = false, multValue = 1) {
             let isWild = (sym === wildSymbol);
             let isScatter = (sym === scatterSymbol);
             let blockClass = sym;
-            let textContent = '';
-            let textClass = '';
+            let textHtml = '';
             
+            // Тільки для WILD та SCATTER залишаємо текст
             if (isWild) {
-                textContent = '⚡WILD⚡';
-                textClass = 'text-wild';
+                textHtml = `<div class="block-text text-wild">⚡WILD⚡</div>`;
             } else if (isScatter) {
-                textContent = '✨SCATTER✨';
-                textClass = 'text-scatter';
-            } else {
-                switch(sym) {
-                    case 'tex-dirt': textContent = '🪨 ЗЕМЛЯ'; break;
-                    case 'tex-wood': textContent = '🪵 ДЕРЕВО'; break;
-                    case 'tex-gold': textContent = '💰 ЗОЛОТО'; break;
-                    case 'tex-diamond': textContent = '💎 ДІАМАНТ'; break;
-                    case 'tex-emerald': textContent = '🟢 СМАРАГД'; break;
-                    default: textContent = '???';
-                }
+                textHtml = `<div class="block-text text-scatter">✨SCATTER✨</div>`;
             }
+            // Для звичайних блоків тексту НЕМАЄ
             
             let multHtml = '';
             if (hasStickyMult && multValue > 1) {
                 multHtml = `<div class="sticky-mult">x${multValue}</div>`;
             }
             
-            return `<div class="symbol-cell ${isWild || isScatter ? 'win-pop' : ''}">
+            return `<div class="symbol-cell ${(isWild || isScatter) && !hasStickyMult ? 'win-pop' : ''}">
                         <div class="iso-block ${blockClass}">
                             <div class="iso-face face-top"></div>
                             <div class="iso-face face-front"></div>
                             <div class="iso-face face-right"></div>
                         </div>
-                        <div class="block-text ${textClass}">${textContent}</div>
+                        ${textHtml}
                         ${multHtml}
                     </div>`;
         }
         
         function buildReels(matrix) {
-            // matrix: 3 рядки x 5 колонок
             for (let x = 0; x < 5; x++) {
                 let stripDiv = document.getElementById(`strip-${x}`);
                 if (!stripDiv) continue;
@@ -397,7 +464,7 @@
                     }
                     cellsHtml += getSymbolDisplay(sym, hasMult, multVal);
                 }
-                // Додаємо додаткові символи для плавного скролу
+                // Додаткові символи для прокрутки
                 for (let i = 0; i < STRIP_LENGTH - 3; i++) {
                     let fakeSym = symbols[Math.floor(Math.random() * symbols.length)];
                     cellsHtml += getSymbolDisplay(fakeSym);
@@ -413,25 +480,20 @@
             
             for (let y = 0; y < 3; y++) {
                 for (let x = 0; x < 5; x++) {
-                    // Sticky wilds зберігаються
                     if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) {
                         matrix[y][x] = wildSymbol;
                         continue;
                     }
                     
-                    // Примусовий scatter для тесту бонусу
                     if (forceBonus && y === 1 && [0, 2, 4].includes(x)) {
                         matrix[y][x] = scatterSymbol;
                         continue;
                     }
                     
-                    // Бонус дощ
                     if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.35) {
                         matrix[y][x] = wildSymbol;
                         rainingWilds--;
-                    } 
-                    // Звичайна гра або інші
-                    else {
+                    } else {
                         let r = Math.random();
                         if (!isBonusGame && r < 0.1) {
                             matrix[y][x] = wildSymbol;
@@ -454,7 +516,7 @@
             return count;
         }
         
-        // ========== 6. РОЗРАХУНОК ВИГРАШІВ ==========
+        // ========== 7. РОЗРАХУНОК ВИГРАШІВ ==========
         const payTable = {
             'tex-dirt': { 3: 10, 4: 25, 5: 60 },
             'tex-wood': { 3: 15, 4: 35, 5: 80 },
@@ -467,7 +529,6 @@
             let totalWin = 0;
             let winLines = [];
             
-            // 3 лінії: верх, центр, низ
             const lines = [
                 { name: "Верхня", indices: [[0,0],[0,1],[0,2],[0,3],[0,4]] },
                 { name: "Центральна", indices: [[1,0],[1,1],[1,2],[1,3],[1,4]] },
@@ -476,7 +537,7 @@
             
             for (let line of lines) {
                 let firstSym = matrix[line.indices[0][0]][line.indices[0][1]];
-                if (firstSym === wildSymbol) continue; // Wild сам по собі не дає виграш, тільки замінює
+                if (firstSym === wildSymbol) continue;
                 let count = 1;
                 for (let i = 1; i < 5; i++) {
                     let sym = matrix[line.indices[i][0]][line.indices[i][1]];
@@ -489,18 +550,23 @@
                 if (count >= 3 && payTable[firstSym] && payTable[firstSym][count]) {
                     let winAmount = payTable[firstSym][count] * bet;
                     totalWin += winAmount;
-                    winLines.push(`${line.name} x${count} = ${winAmount}`);
+                    winLines.push(`${line.name} x${count}`);
                 }
             }
             
             return { totalWin, winLines };
         }
         
-        // ========== 7. ОСНОВНА ЛОГІКА СПІНУ ==========
+        // ========== 8. ОСНОВНА ЛОГІКА СПІНУ ==========
         async function spin() {
             if (isSpinning) return;
+            
+            // Перевірка балансу
             if (!isBonusGame && currentBalance < currentBet) {
-                autoSpinsLeft = 0;
+                if (autoSpinsLeft > 0) {
+                    addToHistory(`⛔ Автогра зупинена: недостатньо коштів!`, 'win');
+                    autoSpinsLeft = 0;
+                }
                 setStatus("НЕДОСТАТНЬО ФІШОК!", "#ff4444");
                 return;
             }
@@ -512,6 +578,7 @@
             
             setStatus("КРУТИМО...", "#ffffff");
             
+            // Списуємо ставку
             if (!isBonusGame) {
                 await userRef.update({ chips: currentBalance - currentBet });
             } else {
@@ -524,10 +591,10 @@
             
             let targetMatrix = generateMatrix(false);
             
-            // Анімація
+            // Анімація обертання
             for (let x = 0; x < 5; x++) {
                 let strip = document.getElementById(`strip-${x}`);
-                let duration = isTurbo ? 0.5 : 1.5;
+                let duration = isTurbo ? 0.3 : 1.2;
                 strip.style.transition = `transform ${duration}s cubic-bezier(0.2, 0.9, 0.4, 1.1)`;
                 strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * 160}px)`;
             }
@@ -540,7 +607,7 @@
                     strip.style.transform = 'translateY(0px)';
                 }
                 processResult(targetMatrix);
-            }, isTurbo ? 500 : 1500);
+            }, isTurbo ? 350 : 1300);
         }
         
         async function processResult(matrix) {
@@ -556,42 +623,62 @@
                 }
             }
             
+            // Обробка виграшу
             if (winAmount > 0) {
+                let winMessage = `+${winAmount} 🪙 (${winResult.winLines.join(', ')})`;
+                addToHistory(winMessage, winAmount >= currentBet * 20 ? 'big-win' : 'win');
                 setStatus(`ВИГРАШ: ${winAmount}`, "#00ff9d");
+                
                 if (!isBonusGame) {
                     await userRef.update({ chips: currentBalance + winAmount });
                 }
             } else if (scatters >= 3) {
+                addToHistory(`✨ АКТИВАЦІЯ БОНУСУ! ✨`, 'bonus');
                 setStatus("БОНУС АКТИВОВАНО!", "#b500ff");
                 startBonusGame();
                 return;
             } else {
-                setStatus("СПРОБУЙ ЩЕ!", "#aaaaaa");
+                if (autoSpinsLeft === 0 || isBonusGame) {
+                    setStatus("СПРОБУЙ ЩЕ!", "#aaaaaa");
+                }
             }
             
             // Продовження автогри або фріспінів
             if (isBonusGame && freeSpinsLeft > 0) {
-                setTimeout(() => spin(), isTurbo ? 300 : 800);
+                if (freeSpinsLeft > 0) {
+                    setStatus(`БОНУС: ${freeSpinsLeft} СПІНІВ`, "#b500ff");
+                    setTimeout(() => spin(), isTurbo ? 200 : 600);
+                }
             } else if (autoSpinsLeft > 0 && !isBonusGame) {
                 autoSpinsLeft--;
-                setStatus(`АВТО: ${autoSpinsLeft} СПІНІВ`, "#00ff9d");
-                setTimeout(() => spin(), isTurbo ? 300 : 800);
+                if (autoSpinsLeft > 0) {
+                    setStatus(`АВТО: ${autoSpinsLeft} СПІНІВ`, "#00ff9d");
+                    setTimeout(() => spin(), isTurbo ? 200 : 600);
+                } else {
+                    // Автогра завершена
+                    addToHistory(`✅ Автогра завершена!`, 'win');
+                    setStatus("ГОТОВИЙ", "#ffdf00");
+                    isSpinning = false;
+                    document.getElementById('spin-btn').disabled = false;
+                    document.getElementById('buy-bonus-btn').disabled = false;
+                    betInput.disabled = false;
+                }
             } else {
                 isSpinning = false;
                 document.getElementById('spin-btn').disabled = false;
                 document.getElementById('buy-bonus-btn').disabled = false;
                 betInput.disabled = false;
-                if (autoSpinsLeft === 0) setStatus("ГОТОВИЙ ДО ГРИ", "#ffdf00");
-                autoSpinsLeft = 0;
+                if (autoSpinsLeft === 0) setStatus("ГОТОВИЙ", "#ffdf00");
             }
         }
         
-        // ========== 8. БОНУСНА СИСТЕМА ==========
+        // ========== 9. БОНУСНА СИСТЕМА ==========
         async function buyBonus() {
             if (isSpinning) return;
             let bonusCost = 1000;
             if (currentBalance >= bonusCost) {
                 await userRef.update({ chips: currentBalance - bonusCost });
+                addToHistory(`🎁 Куплено бонус за ${bonusCost} 🪙`, 'bonus');
                 document.getElementById('bonus-modal').style.display = 'flex';
             } else {
                 setStatus("НЕ ВИСТАЧАЄ ФІШОК ДЛЯ БОНУСУ!", "#ff4444");
@@ -608,8 +695,10 @@
             if (activeBonusType === 'sticky') {
                 stickyWilds = {};
                 stickyMultipliers = {};
+                addToHistory(`🔥 ЛИПКИЙ БОНУС! ${freeSpinsLeft} фріспінів`, 'bonus');
                 setStatus(`ЛИПКИЙ БОНУС! ${freeSpinsLeft} ФРІСПІНІВ`, "#ff3300");
             } else {
+                addToHistory(`🌧 МЕТЕОРИТНИЙ ДОЩ! ${freeSpinsLeft} фріспінів`, 'bonus');
                 setStatus(`МЕТЕОРИТНИЙ ДОЩ! ${freeSpinsLeft} ФРІСПІНІВ`, "#00ffff");
             }
             spin();
@@ -622,6 +711,7 @@
             stickyWilds = {};
             stickyMultipliers = {};
             document.body.className = '';
+            addToHistory(`🏁 Бонус завершено`, 'win');
             setStatus("ГОТОВИЙ ДО ГРИ", "#ffdf00");
         }
         
@@ -637,16 +727,10 @@
                 stickyMultipliers = {};
             }
             
+            addToHistory(`${type === 'sticky' ? '🔥' : '🌧'} Вибрано бонус: ${type === 'sticky' ? 'ЛИПКІ ВЕРСТАКИ' : 'МЕТЕОРИТНИЙ ДОЩ'} (${freeSpinsLeft} спінів)`, 'bonus');
             setStatus(`БОНУС АКТИВОВАНО! ${freeSpinsLeft} БЕЗКОШТОВНИХ СПІНІВ`, "#b500ff");
             spin();
         };
-        
-        // ========== 9. ДОДАТКОВІ ФУНКЦІЇ ==========
-        function lockButtons(lock) {
-            document.getElementById('spin-btn').disabled = lock;
-            document.getElementById('buy-bonus-btn').disabled = lock;
-            betInput.disabled = lock;
-        }
         
         // Ініціалізація стартової матриці
         function initGame() {
@@ -659,10 +743,10 @@
         }
         initGame();
         
-        // Виправлення Firebase для guest
-        if (!username) {
-            console.warn("Користувач не знайдений, використовується гостьовий режим");
-        }
+        // Додаємо можливість зупинити автогру по кліку на статус
+        document.getElementById('status-text').addEventListener('dblclick', () => {
+            if (autoSpinsLeft > 0) stopAutoGame();
+        });
     </script>
 </body>
 </html>

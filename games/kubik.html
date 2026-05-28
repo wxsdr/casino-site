@@ -31,7 +31,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 35px;
+            padding: 10px 25px;
             background: rgba(8, 12, 20, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 215, 0, 0.25);
@@ -41,32 +41,30 @@
             background: rgba(255, 255, 255, 0.03);
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 10px 28px;
+            padding: 8px 24px;
             border-radius: 40px;
             font-weight: 800;
             cursor: pointer;
-            font-size: 13px;
-            transition: 0.2s;
+            font-size: 12px;
         }
         .btn-exit:hover {
             background: #ff4433;
             border-color: #ff4433;
-            box-shadow: 0 0 20px rgba(255, 68, 51, 0.4);
         }
         
         .balance-badge {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 900;
             background: rgba(0, 255, 157, 0.1);
-            padding: 10px 32px;
+            padding: 8px 25px;
             border-radius: 40px;
             border: 1px solid rgba(0, 255, 157, 0.35);
             color: #00ff9d;
         }
         .balance-badge span {
             color: #00ff88;
-            font-size: 28px;
-            margin-left: 10px;
+            font-size: 24px;
+            margin-left: 8px;
         }
 
         #game-wrapper {
@@ -74,18 +72,20 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
             position: relative;
         }
 
         .game-table {
             background: linear-gradient(145deg, #0a5a3a, #064a2a);
-            border-radius: 80px;
-            border: 4px solid #d4af37;
-            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5);
-            padding: 40px 50px;
-            width: 1100px;
-            height: 650px;
+            border-radius: 50px;
+            border: 3px solid #d4af37;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            padding: 25px 35px;
+            width: 950px;
+            max-width: 95vw;
+            height: auto;
+            min-height: 580px;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -93,36 +93,36 @@
         
         .table-neon {
             position: absolute;
-            inset: -4px;
-            border-radius: 82px;
+            inset: -3px;
+            border-radius: 52px;
             z-index: -1;
-            filter: blur(20px);
+            filter: blur(15px);
             opacity: 0.4;
             background: linear-gradient(45deg, #d4af37, #00ff88, #00f2ff);
             animation: tableGlow 3s infinite alternate;
         }
         
         @keyframes tableGlow {
-            0% { opacity: 0.2; filter: blur(15px); }
-            100% { opacity: 0.5; filter: blur(25px); }
+            0% { opacity: 0.2; filter: blur(12px); }
+            100% { opacity: 0.5; filter: blur(20px); }
         }
 
         .table-title {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .table-title h1 {
             font-family: 'Rubik', sans-serif;
-            font-size: 32px;
+            font-size: 24px;
             background: linear-gradient(135deg, #d4af37, #ffd700);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
         .table-title p {
-            font-size: 12px;
+            font-size: 10px;
             color: rgba(255, 215, 0, 0.5);
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         /* DICE AREA */
@@ -132,21 +132,19 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 30px;
+            gap: 20px;
         }
         
         .dice-container {
             display: flex;
-            gap: 60px;
+            gap: 40px;
             justify-content: center;
             align-items: center;
-            flex-wrap: wrap;
         }
         
         .dice {
-            font-size: 120px;
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
-            transition: all 0.1s ease;
+            font-size: 80px;
+            filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3));
         }
         
         .dice.rolling {
@@ -162,35 +160,34 @@
         }
         
         .sum-display {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 900;
             color: #d4af37;
-            margin-top: 10px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-            min-height: 60px;
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+            min-height: 45px;
         }
         
         .bet-options {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
         .bet-option {
             background: linear-gradient(135deg, #1a1a2a, #0f0f1a);
             border: 2px solid #d4af37;
-            border-radius: 20px;
-            padding: 10px 20px;
+            border-radius: 16px;
+            padding: 8px 16px;
             color: #d4af37;
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 800;
             cursor: pointer;
             transition: 0.2s;
             text-align: center;
-            min-width: 110px;
+            min-width: 90px;
         }
         
         .bet-option:hover:not(:disabled) {
@@ -202,37 +199,31 @@
         .bet-option.selected {
             background: #d4af37;
             color: #0a0e18;
-            box-shadow: 0 0 20px #d4af37;
+            box-shadow: 0 0 15px #d4af37;
         }
         
         .bet-option .multiplier {
-            font-size: 11px;
+            font-size: 10px;
             opacity: 0.8;
-            margin-top: 4px;
+            margin-top: 3px;
         }
         
-        .bet-option:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        
-        /* ФІКСОВАНА ВИСОТА ДЛЯ РЕЗУЛЬТАТУ, ЩОБ КНОПКА НЕ СТРИБАЛА */
         .result-area {
             text-align: center;
-            margin: 15px 0;
-            padding: 12px;
+            margin: 12px 0;
+            padding: 10px;
             background: rgba(0, 0, 0, 0.6);
-            border-radius: 50px;
+            border-radius: 40px;
             backdrop-filter: blur(10px);
-            min-height: 70px;
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            width: 100%;
         }
         
         .result-text {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 900;
         }
         
@@ -244,22 +235,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             background: rgba(0, 0, 0, 0.5);
-            padding: 12px 25px;
-            border-radius: 60px;
+            padding: 10px 20px;
+            border-radius: 50px;
             margin-top: 10px;
         }
         
         .bet-label {
             color: #d4af37;
             font-weight: 800;
-            font-size: 14px;
+            font-size: 13px;
         }
         
         .chip-btn {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #d4af37, #aa8833);
             border: 2px solid #ffd700;
@@ -275,19 +266,19 @@
             color: #d4af37;
             border: 2px solid #d4af37;
             border-radius: 12px;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 900;
             text-align: center;
-            width: 120px;
-            height: 48px;
+            width: 100px;
+            height: 40px;
             outline: none;
         }
         
         .action-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
-            margin-top: 15px;
+            margin-top: 12px;
         }
         
         .action-btn {
@@ -295,8 +286,8 @@
             border: 2px solid #d4af37;
             color: #d4af37;
             border-radius: 40px;
-            padding: 10px 35px;
-            font-size: 18px;
+            padding: 10px 30px;
+            font-size: 16px;
             font-weight: 800;
             cursor: pointer;
             transition: 0.2s;
@@ -319,43 +310,72 @@
 
         .history-panel {
             position: absolute;
-            right: 20px;
+            right: -240px;
             top: 50%;
             transform: translateY(-50%);
-            width: 260px;
+            width: 220px;
             background: rgba(8, 12, 20, 0.95);
             backdrop-filter: blur(15px);
-            border-radius: 20px;
+            border-radius: 16px;
             border-left: 3px solid #00ff88;
-            padding: 15px;
+            padding: 12px;
             pointer-events: auto;
         }
         .history-panel h4 {
             color: #00ff88;
-            font-size: 14px;
-            margin-bottom: 12px;
+            font-size: 12px;
+            margin-bottom: 10px;
             text-align: center;
             letter-spacing: 2px;
         }
         .history-list {
-            max-height: 400px;
+            max-height: 350px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
         .history-list div {
-            padding: 6px 10px;
+            padding: 5px 8px;
             background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
+            border-radius: 8px;
             border-left: 2px solid;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 600;
         }
         .history-list .win { color: #00ff88; border-left-color: #00ff88; }
         .history-list .lose { color: #ff4433; border-left-color: #ff4433; }
         .history-list .big-win { color: #ffd700; border-left-color: #ffd700; font-weight: 900; background: rgba(255, 215, 0, 0.1); }
         .history-list .push { color: #d4af37; border-left-color: #d4af37; }
+        
+        @media (max-width: 1200px) {
+            .history-panel {
+                position: static;
+                transform: none;
+                width: 100%;
+                margin-top: 15px;
+                order: 1;
+            }
+            .game-table {
+                width: 90vw;
+                padding: 20px;
+            }
+            .dice {
+                font-size: 60px;
+            }
+            .bet-option {
+                min-width: 75px;
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+            .result-text {
+                font-size: 14px;
+            }
+            .action-btn {
+                padding: 8px 20px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -403,7 +423,6 @@
                     </div>
                 </div>
                 
-                <!-- result-area завжди видимий, але з прозорим текстом коли немає результату -->
                 <div class="result-area" id="result-area">
                     <div class="result-text" id="result-text" style="opacity: 0;">&nbsp;</div>
                 </div>
@@ -430,7 +449,6 @@
     </div>
 
     <script>
-        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -447,17 +465,14 @@
         let selectedBet = null;
         let isRolling = false;
         
-        // DOM елементи
         const betInput = document.getElementById('bet-input');
         const dice1El = document.getElementById('dice1');
         const dice2El = document.getElementById('dice2');
         const sumDisplay = document.getElementById('sum-display');
-        const resultArea = document.getElementById('result-area');
         const resultText = document.getElementById('result-text');
         const rollBtn = document.getElementById('roll-btn');
         const betOptions = document.querySelectorAll('.bet-option');
         
-        // Емодзі кубиків (1-6)
         const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
         
         function updateBalanceDisplay() {
@@ -561,11 +576,10 @@
             resultText.innerHTML = '&nbsp;';
         }
         
-        // Анімація кубиків
         async function animateDice(finalValue1, finalValue2) {
             return new Promise((resolve) => {
                 let rolls = 0;
-                const maxRolls = 12;
+                const maxRolls = 10;
                 const interval = setInterval(() => {
                     const random1 = Math.floor(Math.random() * 6);
                     const random2 = Math.floor(Math.random() * 6);
@@ -615,25 +629,19 @@
             rollBtn.disabled = true;
             betOptions.forEach(opt => opt.style.pointerEvents = 'none');
             
-            // Очищаємо старий результат (але блок залишається на місці)
             clearResult();
             sumDisplay.innerHTML = '';
             
-            // Знімаємо ставку
             await updateBalance(-currentBet);
             
-            // Генеруємо результат
             const dice1 = Math.floor(Math.random() * 6) + 1;
             const dice2 = Math.floor(Math.random() * 6) + 1;
             const sum = dice1 + dice2;
             
-            // Анімація
             await animateDice(dice1, dice2);
             
-            // Показуємо суму
             sumDisplay.innerHTML = `СУМА: ${sum}`;
             
-            // Перевірка виграшу
             const isWin = checkWin(selectedBet, sum);
             const multiplier = getBetMultiplier(selectedBet);
             const betName = getBetName(selectedBet);
@@ -692,21 +700,17 @@
             betOptions.forEach(opt => opt.style.pointerEvents = 'auto');
         }
         
-        // Кнопки
         document.getElementById('bet-minus').onclick = () => updateBet(-10);
         document.getElementById('bet-plus').onclick = () => updateBet(10);
         betInput.onchange = manualBetChange;
         rollBtn.onclick = rollDice;
         
-        // Вибір ставки
         betOptions.forEach(option => {
             option.onclick = () => selectBet(option.dataset.bet);
         });
         
-        // Початковий стан
         updateBetUI();
         
-        // Аудіо
         let audioContext = null;
         document.body.addEventListener('click', () => {
             if (audioContext) return;

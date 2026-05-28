@@ -130,7 +130,7 @@
         .control-panel { width: 1400px; display: flex; justify-content: space-between; align-items: stretch; gap: 15px; }
         .ctrl-box { background: rgba(15,15,20,0.8); backdrop-filter: blur(20px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.9); flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        #status-text { font-size: 24px; font-weight: 900; color: var(--neon-gold); text-transform: uppercase; text-shadow: 0 0 15px rgba(255,223,0,0.4); text-align: center; }
+        #status-text { font-size: 24px; font-weight: 900; color: var(--neon-gold); text-transform: uppercase; text-shadow: 0 0 15px rgba(255,223,0,0.4); text-align: center; cursor: pointer; }
 
         .bet-input-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
         .bet-btn { width: 50px; height: 50px; border-radius: 10px; background: #1a1a1a; color: white; border: 1px solid #333; font-size: 26px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 0 #0a0a0a; }
@@ -169,7 +169,6 @@
         .b-spins { background: #222; display: inline-block; padding: 10px 20px; border-radius: 10px; font-size: 24px; font-weight: 900; margin-bottom: 20px; color: white; }
         .b-card p { font-size: 16px; color: #ccc; line-height: 1.5; font-weight: bold; }
 
-        /* Історія виграшів */
         .win-history {
             position: fixed;
             right: 20px;
@@ -229,7 +228,7 @@
             </div>
 
             <div class="control-panel">
-                <div class="ctrl-box" style="flex: 1;"><div id="status-text">ОЧІКУВАННЯ СТАВКИ</div></div>
+                <div class="ctrl-box" style="flex: 1;"><div id="status-text" onclick="stopAutoGame()">ОЧІКУВАННЯ СТАВКИ<br><span style="font-size:12px; color:#888;">(клік для зупинки авто)</span></div></div>
                 
                 <div class="ctrl-box" style="flex: 0.8;">
                     <button class="toggle-btn" id="turbo-btn" onclick="toggleTurbo()">⚡ ТУРБО: ВИМК</button>
@@ -253,7 +252,6 @@
         </div>
     </div>
 
-    <!-- Історія виграшів -->
     <div class="win-history">
         <h4>📜 ІСТОРІЯ ВИГРАШІВ</h4>
         <div class="history-list" id="history-list">
@@ -269,6 +267,7 @@
                 <button class="auto-opt" onclick="startAuto(25)">25</button>
                 <button class="auto-opt" onclick="startAuto(50)">50</button>
                 <button class="auto-opt" onclick="startAuto(100)">100</button>
+                <button class="auto-opt" onclick="startAuto(999)">♾ НЕСКІНЧЕННО</button>
             </div>
             <button class="toggle-btn" style="margin-top:20px;" onclick="document.getElementById('auto-modal').style.display='none'">СКАСУВАТИ</button>
         </div>
@@ -337,11 +336,12 @@
         let isTurbo = false;
         let autoSpinsLeft = 0;
         let currentBet = 10;
-        let stopAuto = false;
+        let autoSpinScheduled = false; // Запобігання подвійному виклику
         
         const betInput = document.getElementById('bet-input');
         
         function updateBet(delta) {
+            if (isSpinning) return;
             let newVal = currentBet + delta;
             if (newVal >= 10 && newVal <= 50000) {
                 currentBet = newVal;
@@ -350,6 +350,7 @@
         }
         
         function manualBetChange() {
+            if (isSpinning) return;
             let val = parseInt(betInput.value);
             if (isNaN(val)) val = 10;
             if (val < 10) val = 10;
@@ -360,8 +361,13 @@
         
         function setStatus(text, color = '#ffdf00') {
             const statusDiv = document.getElementById('status-text');
-            statusDiv.innerText = text;
-            statusDiv.style.color = color;
+            if (autoSpinsLeft > 0 && !isBonusGame && text !== "КРУТИМО...") {
+                statusDiv.innerHTML = `АВТО: ${autoSpinsLeft} СПІНІВ<br><span style="font-size:12px; color:#888;">(клік для зупинки)</span>`;
+                statusDiv.style.color = '#00ff9d';
+            } else {
+                statusDiv.innerHTML = text + (autoSpinsLeft === 0 ? '<br><span style="font-size:12px; color:#888;">&nbsp;</span>' : '<br><span style="font-size:12px; color:#888;">(клік для зупинки)</span>');
+                statusDiv.style.color = color;
+            }
         }
         
         // ========== 4. ІСТОРІЯ ВИГРАШІВ ==========
@@ -373,12 +379,10 @@
             newEntry.innerHTML = `[${time}] ${message}`;
             historyDiv.prepend(newEntry);
             
-            // Обмежуємо до 15 записів
-            while (historyDiv.children.length > 15) {
+            while (historyDiv.children.length > 20) {
                 historyDiv.removeChild(historyDiv.lastChild);
             }
             
-            // Видаляємо заглушку якщо вона є
             if (historyDiv.children.length > 0 && historyDiv.children[historyDiv.children.length-1]?.innerText.includes('немає записів')) {
                 historyDiv.removeChild(historyDiv.lastChild);
             }
@@ -400,23 +404,22 @@
         function startAuto(count) {
             if (isSpinning) return;
             autoSpinsLeft = count;
-            stopAuto = false;
             document.getElementById('auto-modal').style.display = 'none';
-            addToHistory(`🎰 АВТОГРА: ${count} спінів`, 'bonus');
+            addToHistory(`🎰 АВТОГРА: ${count === 999 ? 'НЕСКІНЧЕННА' : count + ' спінів'}`, 'bonus');
             setStatus(`АВТО: ${autoSpinsLeft} СПІНІВ`, '#00ff9d');
-            spin();
+            // Запускаємо спін з невеликою затримкою
+            setTimeout(() => spin(), 100);
         }
         
         function stopAutoGame() {
-            if (autoSpinsLeft > 0) {
-                addToHistory(`⏹ Автогру зупинено (${autoSpinsLeft} спінів залишилось)`, 'win');
+            if (autoSpinsLeft > 0 && !isBonusGame) {
+                addToHistory(`⏹ Автогру зупинено (залишилось: ${autoSpinsLeft} спінів)`, 'win');
                 autoSpinsLeft = 0;
-                stopAuto = true;
                 setStatus("ГОТОВИЙ", "#ffdf00");
             }
         }
         
-        // ========== 6. РЕНДЕР СИМВОЛІВ (БЕЗ ТЕКСТУ ДЛЯ ЗВИЧАЙНИХ) ==========
+        // ========== 6. РЕНДЕР СИМВОЛІВ ==========
         const STRIP_LENGTH = 16;
         
         function getSymbolDisplay(sym, hasStickyMult = false, multValue = 1) {
@@ -425,13 +428,11 @@
             let blockClass = sym;
             let textHtml = '';
             
-            // Тільки для WILD та SCATTER залишаємо текст
             if (isWild) {
                 textHtml = `<div class="block-text text-wild">⚡WILD⚡</div>`;
             } else if (isScatter) {
                 textHtml = `<div class="block-text text-scatter">✨SCATTER✨</div>`;
             }
-            // Для звичайних блоків тексту НЕМАЄ
             
             let multHtml = '';
             if (hasStickyMult && multValue > 1) {
@@ -464,7 +465,6 @@
                     }
                     cellsHtml += getSymbolDisplay(sym, hasMult, multVal);
                 }
-                // Додаткові символи для прокрутки
                 for (let i = 0; i < STRIP_LENGTH - 3; i++) {
                     let fakeSym = symbols[Math.floor(Math.random() * symbols.length)];
                     cellsHtml += getSymbolDisplay(fakeSym);
@@ -553,7 +553,6 @@
                     winLines.push(`${line.name} x${count}`);
                 }
             }
-            
             return { totalWin, winLines };
         }
         
@@ -572,6 +571,7 @@
             }
             
             isSpinning = true;
+            autoSpinScheduled = false;
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('buy-bonus-btn').disabled = true;
             betInput.disabled = true;
@@ -592,10 +592,10 @@
             let targetMatrix = generateMatrix(false);
             
             // Анімація обертання
+            let animDuration = isTurbo ? 0.25 : 1.0;
             for (let x = 0; x < 5; x++) {
                 let strip = document.getElementById(`strip-${x}`);
-                let duration = isTurbo ? 0.3 : 1.2;
-                strip.style.transition = `transform ${duration}s cubic-bezier(0.2, 0.9, 0.4, 1.1)`;
+                strip.style.transition = `transform ${animDuration}s cubic-bezier(0.2, 0.9, 0.4, 1.1)`;
                 strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * 160}px)`;
             }
             
@@ -607,7 +607,7 @@
                     strip.style.transform = 'translateY(0px)';
                 }
                 processResult(targetMatrix);
-            }, isTurbo ? 350 : 1300);
+            }, animDuration * 1000 + 50);
         }
         
         async function processResult(matrix) {
@@ -616,10 +616,12 @@
             let winAmount = winResult.totalWin;
             
             // Анімація виграшних комірок
-            for (let y = 0; y < 3; y++) {
-                for (let x = 0; x < 5; x++) {
-                    let cell = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${y+1})`);
-                    if (cell && winAmount > 0) cell.classList.add('win-pop');
+            if (winAmount > 0) {
+                for (let y = 0; y < 3; y++) {
+                    for (let x = 0; x < 5; x++) {
+                        let cell = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${y+1})`);
+                        if (cell) cell.classList.add('win-pop');
+                    }
                 }
             }
             
@@ -638,22 +640,25 @@
                 startBonusGame();
                 return;
             } else {
-                if (autoSpinsLeft === 0 || isBonusGame) {
-                    setStatus("СПРОБУЙ ЩЕ!", "#aaaaaa");
+                if (autoSpinsLeft === 0 && !isBonusGame) {
+                    setStatus("ГОТОВИЙ", "#ffdf00");
+                } else if (autoSpinsLeft > 0 && !isBonusGame) {
+                    setStatus(`АВТО: ${autoSpinsLeft} СПІНІВ`, '#00ff9d');
                 }
             }
             
-            // Продовження автогри або фріспінів
+            // ВАЖЛИВО: правильна логіка продовження автогри та бонусів
             if (isBonusGame && freeSpinsLeft > 0) {
-                if (freeSpinsLeft > 0) {
-                    setStatus(`БОНУС: ${freeSpinsLeft} СПІНІВ`, "#b500ff");
-                    setTimeout(() => spin(), isTurbo ? 200 : 600);
-                }
+                // Бонус триває
+                setTimeout(() => spin(), isTurbo ? 200 : 500);
             } else if (autoSpinsLeft > 0 && !isBonusGame) {
+                // Автогра триває - зменшуємо лічильник
                 autoSpinsLeft--;
+                
                 if (autoSpinsLeft > 0) {
-                    setStatus(`АВТО: ${autoSpinsLeft} СПІНІВ`, "#00ff9d");
-                    setTimeout(() => spin(), isTurbo ? 200 : 600);
+                    // Ще є спіни - продовжуємо
+                    setStatus(`АВТО: ${autoSpinsLeft} СПІНІВ`, '#00ff9d');
+                    setTimeout(() => spin(), isTurbo ? 200 : 500);
                 } else {
                     // Автогра завершена
                     addToHistory(`✅ Автогра завершена!`, 'win');
@@ -664,11 +669,14 @@
                     betInput.disabled = false;
                 }
             } else {
+                // Звичайний стан - розблоковуємо
                 isSpinning = false;
                 document.getElementById('spin-btn').disabled = false;
                 document.getElementById('buy-bonus-btn').disabled = false;
                 betInput.disabled = false;
-                if (autoSpinsLeft === 0) setStatus("ГОТОВИЙ", "#ffdf00");
+                if (autoSpinsLeft === 0 && !isBonusGame) {
+                    setStatus("ГОТОВИЙ", "#ffdf00");
+                }
             }
         }
         
@@ -742,11 +750,6 @@
             buildReels(initMatrix);
         }
         initGame();
-        
-        // Додаємо можливість зупинити автогру по кліку на статус
-        document.getElementById('status-text').addEventListener('dblclick', () => {
-            if (autoSpinsLeft > 0) stopAutoGame();
-        });
     </script>
 </body>
 </html>

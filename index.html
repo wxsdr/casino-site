@@ -7,25 +7,173 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        :root { --neon: #00ff9d; --neon-red: #ff003c; --bg: #0a0a0c; --glass: rgba(20, 20, 25, 0.8); }
-        body { margin: 0; background: radial-gradient(circle at center, #1a1a24 0%, var(--bg) 100%); color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+        :root { 
+            --neon-green: #00ff9d; 
+            --neon-red: #ff3366; 
+            --gold: #f9d976;
+            --gold-glow: rgba(249, 217, 118, 0.4);
+            --bg: #09090b; 
+            --glass: rgba(18, 18, 24, 0.65); 
+        }
+        
+        body { 
+            margin: 0; 
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(30, 30, 45, 0.8) 0%, transparent 70%),
+                url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.02)"/></svg>');
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            min-height: 100vh; 
+        }
+
         #auth-section { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        .auth-box { background: var(--glass); padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); box-shadow: 0 0 30px rgba(0, 255, 157, 0.1); text-align: center; width: 350px; }
-        .auth-box h1 { margin-top: 0; color: var(--neon); text-shadow: 0 0 10px var(--neon); }
-        input { width: 90%; padding: 15px; margin: 10px 0; background: rgba(0,0,0,0.5); border: 1px solid #333; color: white; border-radius: 8px; outline: none; font-size: 16px; transition: 0.3s; box-sizing: border-box;}
-        input:focus { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,157,0.3); }
-        button { width: 100%; padding: 15px; background: var(--neon); color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
-        button:hover { box-shadow: 0 0 20px var(--neon); transform: translateY(-2px); }
-        button:disabled { background: #555; color: #888; cursor: not-allowed; }
+        
+        .auth-box { 
+            background: var(--glass); 
+            padding: 50px 40px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.1); 
+            text-align: center; 
+            width: 380px; 
+        }
+        
+        .auth-box h1 { 
+            margin-top: 0; 
+            font-size: 32px;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--gold), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px var(--gold-glow); 
+        }
+        
+        input { 
+            width: 100%; 
+            padding: 16px; 
+            margin: 12px 0; 
+            background: rgba(0,0,0,0.4); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: white; 
+            border-radius: 12px; 
+            outline: none; 
+            font-size: 16px; 
+            transition: all 0.3s ease; 
+            box-sizing: border-box;
+        }
+        
+        input:focus { 
+            border-color: var(--gold); 
+            box-shadow: 0 0 15px var(--gold-glow); 
+            background: rgba(0,0,0,0.6);
+        }
+        
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(135deg, #d4af37, #f9d976); 
+            color: #000; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            font-size: 16px; 
+            letter-spacing: 1px;
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            margin-top: 20px; 
+            text-transform: uppercase;
+        }
+        
+        button:hover { 
+            box-shadow: 0 0 25px var(--gold-glow); 
+            transform: translateY(-2px); 
+        }
+        
+        button:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+        
         #lobby-section { display: none; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background: rgba(0,0,0,0.5); border-bottom: 1px solid #333; }
-        .balance-badge { background: rgba(0, 255, 157, 0.1); border: 1px solid var(--neon); padding: 10px 20px; border-radius: 30px; font-weight: bold; color: var(--neon); }
-        .content { padding: 40px 50px; max-width: 1400px; margin: 0 auto;}
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; margin-top: 30px; }
-        .game-card { background: var(--glass); padding: 30px 20px; border-radius: 15px; border: 1px solid #333; text-align: center; cursor: pointer; transition: 0.4s; }
-        .game-card:hover { transform: translateY(-10px); border-color: var(--neon); box-shadow: 0 10px 30px rgba(0,255,157,0.2); }
-        .game-card h3 { font-size: 24px; margin: 0 0 10px 0; color: var(--neon); }
-        .game-card p { color: #888; margin: 0; font-size: 14px; }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 20px 50px; 
+            background: rgba(10, 10, 15, 0.8); 
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 10px rgba(0, 255, 157, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 157, 0.6); }
+            100% { box-shadow: 0 0 10px rgba(0, 255, 157, 0.2); }
+        }
+
+        .balance-badge { 
+            background: rgba(0, 255, 157, 0.05); 
+            border: 1px solid var(--neon-green); 
+            padding: 10px 25px; 
+            border-radius: 30px; 
+            font-weight: bold; 
+            font-size: 18px;
+            color: var(--neon-green); 
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .content { padding: 50px; max-width: 1400px; margin: 0 auto;}
+        
+        .game-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 30px; 
+            margin-top: 40px; 
+        }
+        
+        .game-card { 
+            background: linear-gradient(145deg, rgba(30,30,40,0.6), rgba(15,15,20,0.8)); 
+            padding: 40px 20px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg);
+            transition: 0.5s;
+        }
+        
+        .game-card:hover::before { left: 150%; }
+        
+        .game-card:hover { 
+            transform: translateY(-10px); 
+            border-color: var(--neon-green); 
+            box-shadow: 0 15px 35px rgba(0,255,157,0.15); 
+            background: linear-gradient(145deg, rgba(35,35,45,0.8), rgba(20,20,25,0.9));
+        }
+        
+        .game-card h3 { font-size: 28px; margin: 0 0 10px 0; color: white; transition: 0.3s; }
+        .game-card:hover h3 { color: var(--neon-green); }
+        
+        .game-card p { color: #888; margin: 0; font-size: 15px; text-transform: uppercase; letter-spacing: 1px;}
+
+        .game-card.vip { border-color: rgba(249, 217, 118, 0.3); }
+        .game-card.vip:hover { 
+            border-color: var(--gold); 
+            box-shadow: 0 15px 35px var(--gold-glow); 
+        }
+        .game-card.vip:hover h3 { color: var(--gold); }
     </style>
 </head>
 <body>
@@ -49,22 +197,31 @@
 
     <div id="lobby-section">
         <div class="header">
-            <h2 style="margin: 0;">🎰 Лобі Казино</h2>
+            <h2 style="margin: 0; color: white;">🎰 Лобі Казино</h2>
             <div style="display: flex; gap: 20px; align-items: center;">
-                <span id="player-name">Гравець</span>
+                <span id="player-name" style="font-weight: bold;">Гравець</span>
                 <div class="balance-badge"><span id="chips-balance">0</span> 🪙</div>
                 <button onclick="logout()" style="width: auto; padding: 10px 20px; margin: 0; background: var(--neon-red); box-shadow: none; color: white;">Вихід</button>
             </div>
         </div>
 
         <div class="content">
-            <h1 style="border-left: 4px solid var(--neon); padding-left: 15px;">Рулетка (Мультиплеєр)</h1>
-            <p style="color: #aaa;">Оберіть стіл. Гра почнеться, коли всі гравці зроблять ставки.</p>
+            <h1 style="border-left: 4px solid var(--gold); padding-left: 20px; font-size: 36px; text-shadow: 0 0 20px var(--gold-glow);">Мультиплеєр Рулетка</h1>
+            <p style="color: #aaa; font-size: 18px;">Оберіть стіл для гри. Ставки приймаються у фішках казино.</p>
+            
             <div class="game-grid">
-                <div class="game-card" onclick="window.location.href='games/roulette.html?table=1'"><h3>Стіл #1</h3><p>VIP Рулетка</p></div>
-                <div class="game-card" onclick="window.location.href='games/roulette.html?table=2'"><h3>Стіл #2</h3><p>VIP Рулетка</p></div>
-                <div class="game-card" onclick="window.location.href='games/roulette.html?table=3'"><h3>Стіл #3</h3><p>VIP Рулетка</p></div>
-                <div class="game-card" onclick="window.location.href='games/roulette.html?table=4'"><h3>Стіл #4</h3><p>VIP Рулетка</p></div>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=1'">
+                    <h3>Стіл #1</h3><p>Класична Рулетка</p>
+                </div>
+                <div class="game-card" onclick="window.location.href='games/roulette.html?table=2'">
+                    <h3>Стіл #2</h3><p>Класична Рулетка</p>
+                </div>
+                <div class="game-card vip" onclick="window.location.href='games/roulette.html?table=3'">
+                    <h3>Стіл #3 (VIP)</h3><p>Високі Ставки</p>
+                </div>
+                <div class="game-card vip" onclick="window.location.href='games/roulette.html?table=4'">
+                    <h3>Стіл #4 (VIP)</h3><p>Високі Ставки</p>
+                </div>
             </div>
         </div>
     </div>

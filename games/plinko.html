@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Plinko | Kurahivka RP Casino</title>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #09090b;
+  --sidebar: #111116;
+  --panel: #18181f;
+  --btn-dark: #1e1e28;
+  --neon-green: #00ff9d;
+  --gold: #f9d976;
+  --gold-glow: rgba(249,217,118,0.4);
+  --neon-red: #ff3366;
+  --text: #ffffff;
+  --text-muted: #8891a9;
+  --border: rgba(255,255,255,0.07);
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── TOP HEADER (matches index.html) ─────────── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 30px;
+  background: rgba(10, 10, 15, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+  z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.back-btn {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  transition: 0.2s;
+}
+.back-btn:hover { background: var(--gold); color: #000; }
+.header-title { font-size: 20px; font-weight: 900; letter-spacing: 3px; color: #fff; }
+
+@keyframes pulse-glow {
+  0%   { box-shadow: 0 0 10px rgba(0,255,157,0.2); }
+  50%  { box-shadow: 0 0 25px rgba(0,255,157,0.6); }
+  100% { box-shadow: 0 0 10px rgba(0,255,157,0.2); }
+}
+.balance-badge {
+  background: rgba(0,255,157,0.05);
+  border: 1px solid var(--neon-green);
+  padding: 8px 22px;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--neon-green);
+  animation: pulse-glow 2s infinite;
+}
+.player-name { font-weight: bold; font-size: 15px; }
+
+/* ── BLOCKED OVERLAY ──────────────────────────── */
+#out-of-casino-overlay {
+  display: none;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(10,10,12,0.97);
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  backdrop-filter: blur(15px);
+}
+
+/* ── MAIN LAYOUT ──────────────────────────────── */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ──────────────────────────────────── */
+#sidebar {
+  width: 260px; min-width: 260px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb { background: #2e3250; border-radius: 2px; }
+
+.tab-row {
+  display: flex; margin: 12px 12px 0;
+  background: var(--btn-dark); border-radius: 24px; padding: 3px;
+}
+.tab-btn {
+  flex: 1; padding: 8px 0; border: none; border-radius: 20px;
+  background: transparent; color: var(--text-muted);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
+}
+.tab-btn.active { background: var(--neon-green); color: #000; }
+
+.section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  color: var(--text-muted); text-transform: uppercase;
+  padding: 14px 14px 6px;
+}
+.risk-row, .rows-row, .rounds-row {
+  display: flex; gap: 6px; padding: 0 12px 10px; flex-wrap: wrap;
+}
+.risk-btn, .rows-btn, .rounds-btn {
+  background: var(--btn-dark); border: 1px solid #2e3250;
+  color: var(--text-muted); border-radius: 20px;
+  padding: 6px 14px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: 0.15s;
+}
+.risk-btn.active, .rows-btn.active, .rounds-btn.active {
+  background: var(--neon-green); border-color: var(--neon-green); color: #000;
+}
+.rows-btn { width: 38px; padding: 6px 0; text-align: center; }
+.rounds-btn { padding: 7px 16px; }
+
+.limit-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.limit-btn {
+  background: var(--btn-dark); border: 1px solid #2e3250;
+  color: var(--text-muted); border-radius: 20px;
+  padding: 6px 12px; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: 0.15s;
+}
+.limit-btn.active { background: var(--neon-green); border-color: var(--neon-green); color: #000; }
+
+.auto-section-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;
+}
+.show-more-btn {
+  background: transparent; border: none; color: var(--neon-green);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  padding: 4px 0; display: flex; align-items: center; gap: 4px;
+}
+.sidebar-spacer { flex: 1; }
+
+/* ── BALANCE & BET SECTION ────────────────────── */
+.balance-section {
+  padding: 10px 14px 6px; border-top: 1px solid var(--border);
+}
+.balance-label { font-size: 10px; color: var(--text-muted); text-align: center; letter-spacing: 1px; }
+.balance-val {
+  font-size: 18px; font-weight: 700; text-align: center;
+  margin-bottom: 8px; color: var(--neon-green);
+}
+
+.recent-wins {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  margin-bottom: 8px; min-height: 22px;
+}
+.rw-chip {
+  background: var(--btn-dark); border-radius: 12px;
+  padding: 3px 8px; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); border: 1px solid #2e3250;
+  animation: popIn 0.2s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.bet-control {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.bet-slider {
+  flex: 1; -webkit-appearance: none; height: 4px;
+  background: linear-gradient(to right, var(--neon-green) var(--pct, 2%), #2e3250 var(--pct, 2%));
+  border-radius: 2px; outline: none; cursor: pointer;
+}
+.bet-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px;
+  background: var(--neon-green); border-radius: 50%;
+}
+.bet-val { font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+.bet-row {
+  display: flex; align-items: center; gap: 8px; padding-bottom: 10px;
+}
+.bet-arrow {
+  background: var(--btn-dark); border: 1px solid #2e3250;
+  color: var(--text); width: 36px; height: 44px;
+  border-radius: 8px; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: 0.15s; flex-shrink: 0;
+}
+.bet-arrow:hover { background: #2e3250; }
+.bet-btn {
+  flex: 1; height: 44px;
+  background: linear-gradient(135deg, #d4af37, #f9d976);
+  border: none; border-radius: 22px; color: #000;
+  font-size: 15px; font-weight: 800; cursor: pointer;
+  letter-spacing: 1px; transition: 0.15s;
+  text-transform: uppercase;
+}
+.bet-btn:hover { box-shadow: 0 0 20px var(--gold-glow); transform: translateY(-1px); }
+.bet-btn:active { transform: scale(0.97); }
+.bet-btn.stop { background: var(--neon-red); color: #fff; box-shadow: none; }
+.bet-btn:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; transform: none; }
+
+/* ── BOTTOM ICONS ─────────────────────────────── */
+.bottom-icons {
+  display: flex; justify-content: space-around;
+  padding: 10px 0; border-top: 1px solid var(--border);
+}
+.icon-btn {
+  background: transparent; border: none; color: var(--text-muted);
+  font-size: 10px; cursor: pointer; display: flex;
+  flex-direction: column; align-items: center; gap: 3px;
+  transition: 0.15s; padding: 4px 8px;
+}
+.icon-btn:hover { color: var(--text); }
+.icon-btn.muted-btn { color: var(--neon-red); }
+.icon-btn svg { width: 22px; height: 22px; }
+
+/* ── GAME AREA ────────────────────────────────── */
+#game-area {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; padding: 16px 20px 8px;
+  overflow: hidden; position: relative;
+  background: radial-gradient(circle at 50% 0%, rgba(30,30,45,0.5) 0%, transparent 70%);
+}
+#game-title {
+  font-size: clamp(24px, 3vw, 44px);
+  font-weight: 900; letter-spacing: 6px;
+  background: linear-gradient(45deg, var(--gold), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+#canvas-wrap {
+  flex: 1; width: 100%; position: relative;
+  display: flex; flex-direction: column; align-items: center;
+}
+#plinkoCanvas { display: block; }
+#buckets-row {
+  display: flex; width: 100%; justify-content: center;
+  gap: 2px; padding: 0 0 4px;
+}
+.bucket {
+  flex: 1; max-width: 80px; text-align: center;
+  padding: 7px 2px; border-radius: 6px;
+  font-size: 11px; font-weight: 800; cursor: default;
+  transition: transform 0.15s;
+}
+.bucket.flash { animation: bucketFlash 0.45s ease; }
+@keyframes bucketFlash {
+  0%,100% { transform: scaleY(1);   filter: brightness(1); }
+  30%     { transform: scaleY(1.25); filter: brightness(2.2); }
+}
+
+/* ── WIN POPUP ────────────────────────────────── */
+.win-popup {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) scale(0);
+  background: rgba(18,18,24,0.95);
+  border: 2px solid var(--gold);
+  border-radius: 16px; padding: 22px 44px;
+  text-align: center; z-index: 999; pointer-events: none;
+  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 0 40px var(--gold-glow);
+}
+.win-popup.show { transform: translate(-50%,-50%) scale(1); }
+.win-popup .win-amt { font-size: 32px; font-weight: 900; color: var(--gold); }
+.win-popup .win-lbl { font-size: 12px; color: var(--text-muted); letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<!-- ── BLOCKED OVERLAY ── -->
+<div id="out-of-casino-overlay">
+  <h1 style="color: var(--neon-red); font-size: 48px; margin: 0; text-shadow: 0 0 20px var(--neon-red);">🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
+  <p style="color: #aaa; font-size: 22px; margin-top: 15px;">Ви покинули територію казино.</p>
+  <p style="color: white; font-size: 16px;">Поверніться до будівлі казино в Minecraft, щоб грати.</p>
+  <button onclick="goBack()" style="width: auto; padding: 14px 36px; margin-top: 28px; background: #333; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 15px;">← Повернутись до лобі</button>
+</div>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <div class="header-left">
+    <button class="back-btn" onclick="goBack()">⬅ Лобі</button>
+    <div class="header-title">PLINKO</div>
+  </div>
+  <div style="display: flex; gap: 16px; align-items: center;">
+    <span class="player-name" id="player-name-display">—</span>
+    <div class="balance-badge"><span id="chips-balance-display">0</span> 🪙</div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-manual" onclick="setTab('manual')">Manual</button>
+      <button class="tab-btn" id="tab-auto" onclick="setTab('auto')">Auto</button>
+    </div>
+
+    <div class="section-label">Ризик</div>
+    <div class="risk-row">
+      <button class="risk-btn" id="risk-low" onclick="setRisk('low')">Low</button>
+      <button class="risk-btn active" id="risk-medium" onclick="setRisk('medium')">Medium</button>
+      <button class="risk-btn" id="risk-high" onclick="setRisk('high')">High</button>
+    </div>
+
+    <div class="section-label">Кількість рядів</div>
+    <div class="rows-row" id="rows-row"></div>
+
+    <div id="auto-content" style="display:none">
+      <div class="section-label">Кількість раундів</div>
+      <div class="rounds-row" id="rounds-row">
+        <button class="rounds-btn active" onclick="setRounds(10,this)">10</button>
+        <button class="rounds-btn" onclick="setRounds(25,this)">25</button>
+        <button class="rounds-btn" onclick="setRounds(50,this)">50</button>
+        <button class="rounds-btn" onclick="setRounds(75,this)">75</button>
+        <button class="rounds-btn" onclick="setRounds(100,this)">100</button>
+        <button class="rounds-btn" onclick="setRounds(500,this)">500</button>
+      </div>
+      <div style="padding:0 12px 8px;">
+        <button class="show-more-btn" id="show-more-btn" onclick="toggleShowMore()">
+          Більше опцій
+          <svg id="arrow-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;transition:transform 0.2s">
+            <path d="M3 6l5 5 5-5"/>
+          </svg>
+        </button>
+      </div>
+      <div id="extra-opts" style="display:none;padding:0 12px 8px;">
+        <div class="auto-section-title">Ліміт програшу</div>
+        <div class="limit-row">
+          <button class="limit-btn" onclick="setLimit('loss','5x',this)">5x Ставка</button>
+          <button class="limit-btn" onclick="setLimit('loss','20x',this)">20x Ставка</button>
+          <button class="limit-btn active" onclick="setLimit('loss','none',this)">Без ліміту</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="balance-section">
+      <div class="balance-label">БАЛАНС</div>
+      <div class="balance-val" id="balance-display">0 🪙</div>
+      <div class="recent-wins" id="recent-wins"></div>
+      <div class="bet-control">
+        <input type="range" class="bet-slider" id="bet-slider" min="1" max="500" step="1" value="10"
+          oninput="updateBetSlider(this.value)">
+      </div>
+      <div class="bet-val" id="bet-val">10 🪙</div>
+      <div class="bet-row">
+        <button class="bet-arrow" onclick="adjustBet(-1)">▼</button>
+        <button class="bet-btn" id="bet-btn" onclick="onBetClick()">ПОСТАВИТИ</button>
+        <button class="bet-arrow" onclick="adjustBet(1)">▲</button>
+      </div>
+    </div>
+
+    <div class="bottom-icons">
+      <button class="icon-btn" id="sound-btn" onclick="toggleSound()">
+        <svg id="snd-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+        </svg>
+        ЗВУК
+      </button>
+      <button class="icon-btn" id="turbo-btn" onclick="toggleTurbo()">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z"/>
+        </svg>
+        ТУРБО
+      </button>
+      <button class="icon-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/>
+        </svg>
+        ЛОБІ
+      </button>
+    </div>
+  </div>
+
+  <!-- GAME CANVAS -->
+  <div id="game-area">
+    <div id="game-title">PLINKO</div>
+    <div id="canvas-wrap">
+      <canvas id="plinkoCanvas"></canvas>
+      <div id="buckets-row"></div>
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<div class="win-popup" id="win-popup">
+  <div class="win-lbl">ВИГРАШ</div>
+  <div class="win-amt" id="win-amt">0 🪙</div>
+</div>
+
+<script>
+// ── FIREBASE ─────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
+  authDomain: "kurahivka-casino.firebaseapp.com",
+  databaseURL: "https://kurahivka-casino-default-rtdb.europe-west1.firebasedatabase.app/",
+  projectId: "kurahivka-casino"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+const username = localStorage.getItem('casino_user');
+if (!username) window.location.href = '../index.html';
+
+let currentChips = 0;
+const userRef = database.ref('users_by_name/' + username.toLowerCase());
+
+// Listen for chips & in_casino changes
+userRef.on('value', snap => {
+  const data = snap.val();
+  if (data && data.in_casino === false) {
+    document.getElementById('out-of-casino-overlay').style.display = 'flex';
+  } else {
+    document.getElementById('out-of-casino-overlay').style.display = 'none';
+  }
+  currentChips = data ? (data.chips || 0) : 0;
+  updateBalanceDisplay();
+});
+
+document.getElementById('player-name-display').innerText = username.toUpperCase();
+
+function updateBalanceDisplay() {
+  document.getElementById('balance-display').textContent = currentChips + ' 🪙';
+  document.getElementById('chips-balance-display').textContent = currentChips;
+}
+
+function goBack() {
+  window.location.href = '../index.html';
+}
+
+// ── STATE ─────────────────────────────────────────────────
+let betAmount = 10;
+let currentRisk = 'medium';
+let currentRows = 16;
+let currentTab = 'manual';
+let soundOn = true;
+let turboOn = false;
+let autoPlaying = false;
+let autoRoundsLeft = 0;
+let autoRoundsTotal = 10;
+let showMore = false;
+
+// ── MULTIPLIERS ───────────────────────────────────────────
+const MULTS = {
+  low: {
+    8:  [5.6,2.1,1.1,1.0,0.5,1.0,1.1,2.1,5.6],
+    9:  [5.6,2.0,1.6,1.0,0.7,0.7,1.0,1.6,2.0,5.6],
+    10: [8.9,3.0,1.4,1.1,1.0,0.5,1.0,1.1,1.4,3.0,8.9],
+    11: [8.4,2.0,1.7,1.4,1.1,0.6,0.6,1.1,1.4,1.7,2.0,8.4],
+    12: [10.0,3.0,1.6,1.4,1.1,1.0,0.5,1.0,1.1,1.4,1.6,3.0,10.0],
+    13: [8.1,4.0,3.0,1.9,1.2,0.9,0.7,0.7,0.9,1.2,1.9,3.0,4.0,8.1],
+    14: [7.1,4.0,1.9,1.4,1.3,1.1,1.0,0.5,1.0,1.1,1.3,1.4,1.9,4.0,7.1],
+    15: [15.0,8.0,3.0,2.0,1.5,1.1,1.0,0.7,0.7,1.0,1.1,1.5,2.0,3.0,8.0,15.0],
+    16: [16.0,9.0,2.0,1.4,1.4,1.2,1.1,1.0,0.5,1.0,1.1,1.2,1.4,1.4,2.0,9.0,16.0],
+  },
+  medium: {
+    8:  [13.0,3.0,1.3,0.7,0.4,0.7,1.3,3.0,13.0],
+    9:  [18.0,4.0,1.7,0.9,0.5,0.5,0.9,1.7,4.0,18.0],
+    10: [22.0,5.0,2.0,1.4,0.6,0.4,0.6,1.4,2.0,5.0,22.0],
+    11: [24.0,6.0,3.0,1.8,0.7,0.5,0.5,0.7,1.8,3.0,6.0,24.0],
+    12: [33.0,11.0,4.0,2.0,1.1,0.6,0.3,0.6,1.1,2.0,4.0,11.0,33.0],
+    13: [43.0,13.0,6.0,3.0,1.3,0.7,0.4,0.4,0.7,1.3,3.0,6.0,13.0,43.0],
+    14: [58.0,15.0,7.0,4.0,1.9,1.0,0.5,0.2,0.5,1.0,1.9,4.0,7.0,15.0,58.0],
+    15: [88.0,18.0,11.0,5.0,3.1,1.5,0.8,0.7,0.7,0.8,1.5,3.1,5.0,11.0,18.0,88.0],
+    16: [100.0,15.0,3.1,1.5,1.5,0.9,0.8,0.7,0.7,0.7,0.8,0.9,1.5,1.5,3.1,15.0,100.0],
+  },
+  high: {
+    8:  [29.0,4.0,1.5,0.3,0.2,0.3,1.5,4.0,29.0],
+    9:  [43.0,7.0,2.0,0.6,0.2,0.2,0.6,2.0,7.0,43.0],
+    10: [76.0,10.0,3.0,0.9,0.3,0.2,0.3,0.9,3.0,10.0,76.0],
+    11: [120.0,14.0,5.2,1.4,0.4,0.2,0.2,0.4,1.4,5.2,14.0,120.0],
+    12: [170.0,24.0,8.1,2.0,0.7,0.2,0.2,0.2,0.7,2.0,8.1,24.0,170.0],
+    13: [260.0,37.0,11.0,4.0,1.0,0.2,0.2,0.2,0.2,1.0,4.0,11.0,37.0,260.0],
+    14: [420.0,56.0,18.0,5.0,1.9,0.3,0.2,0.2,0.3,1.9,5.0,18.0,56.0,420.0],
+    15: [620.0,83.0,27.0,8.0,3.0,0.5,0.2,0.2,0.2,0.5,3.0,8.0,27.0,83.0,620.0],
+    16: [1000.0,130.0,26.0,9.0,4.0,2.0,0.2,0.2,0.2,0.2,0.2,2.0,4.0,9.0,26.0,130.0,1000.0],
+  }
+};
+
+// ── CANVAS ────────────────────────────────────────────────
+const canvas = document.getElementById('plinkoCanvas');
+const ctx = canvas.getContext('2d');
+let pins = [];
+let balls = [];
+let raf = null;
+
+function getColSpacing() {
+  const maxCols = currentRows + 2;
+  return Math.min(58, (canvas.width * 0.88) / maxCols);
+}
+function getPinRadius() { return Math.max(3, Math.min(5, getColSpacing() * 0.09)); }
+
+function buildPins() {
+  pins = [];
+  const cs = getColSpacing();
+  const paddingTop = 36;
+  const usableH = canvas.height - paddingTop - 18;
+  const rowSpacing = usableH / currentRows;
+  for (let r = 0; r < currentRows; r++) {
+    const count = r + 3;
+    const totalW = (count - 1) * cs;
+    const startX = canvas.width / 2 - totalW / 2;
+    const y = paddingTop + r * rowSpacing;
+    for (let c = 0; c < count; c++) {
+      pins.push({ x: startX + c * cs, y });
+    }
+  }
+}
+
+function getBucketXs() {
+  const cs = getColSpacing();
+  const count = currentRows + 1;
+  const totalW = count * cs;
+  const startX = canvas.width / 2 - totalW / 2 + cs / 2;
+  return Array.from({ length: count }, (_, i) => startX + i * cs);
+}
+
+function bucketColor(i, total) {
+  const mid = (total - 1) / 2;
+  const d = Math.abs(i - mid) / mid;
+  if (d > 0.85) return '#c62828';
+  if (d > 0.65) return '#e64a19';
+  if (d > 0.45) return '#f9a825';
+  if (d > 0.22) return '#7cb342';
+  return '#2e7d32';
+}
+
+function renderBuckets() {
+  const mults = MULTS[currentRisk][currentRows];
+  const row = document.getElementById('buckets-row');
+  row.innerHTML = '';
+  row.style.width = canvas.width + 'px';
+  mults.forEach((m, i) => {
+    const d = document.createElement('div');
+    d.className = 'bucket';
+    d.id = 'b' + i;
+    const bg = bucketColor(i, mults.length);
+    d.style.background = bg;
+    d.style.color = (m < 5 && i !== 0 && i !== mults.length - 1) ? '#000' : '#fff';
+    d.textContent = (m >= 100 ? Math.round(m) : m.toFixed(1)) + 'x';
+    row.appendChild(d);
+  });
+}
+
+function resizeCanvas() {
+  const wrap = document.getElementById('canvas-wrap');
+  const W = wrap.offsetWidth;
+  const H = Math.max(200, wrap.offsetHeight - 44 - 4);
+  canvas.width = W;
+  canvas.height = H;
+  buildPins();
+  renderBuckets();
+  if (!raf) drawStatic();
+}
+
+// ── DRAW ──────────────────────────────────────────────────
+function drawStatic() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const pr = getPinRadius();
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  for (const p of pins) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, pr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawFrame() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const pr = getPinRadius();
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  for (const p of pins) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, pr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  for (const b of balls) {
+    ctx.save();
+    const g = ctx.createRadialGradient(b.x - 2, b.y - 2, 1, b.x, b.y, b.r);
+    g.addColorStop(0, '#fff');
+    g.addColorStop(1, b.col);
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+// ── PHYSICS ───────────────────────────────────────────────
+// Slower: reduced gravity, bounce, initial velocity
+const GRAVITY  = 0.13;   // was 0.22
+const BOUNCE   = 0.38;   // was 0.42
+const FRICTION = 0.68;   // was 0.7
+
+function spawnBall() {
+  if (currentChips < betAmount) {
+    stopAuto();
+    alert('Недостатньо фішок!');
+    return false;
+  }
+  // Deduct chips immediately (optimistic), then write to Firebase
+  const newChips = currentChips - betAmount;
+  userRef.update({ chips: newChips });
+  playSound('bet');
+
+  balls.push({
+    x: canvas.width / 2 + (Math.random() - 0.5) * 6,
+    y: 8,
+    vx: (Math.random() - 0.5) * 0.5,   // was 0.6
+    vy: 0.8,                             // was 1.2
+    r: Math.max(5, Math.min(8, getColSpacing() * 0.14)),
+    col: `hsl(${40 + Math.random() * 20}, 90%, 55%)`,  // gold tones
+    done: false,
+    lastTick: -1
+  });
+  if (!raf) loop();
+  return true;
+}
+
+function loop() {
+  const steps = turboOn ? 4 : 1;
+  for (let s = 0; s < steps; s++) stepPhysics();
+  drawFrame();
+  if (balls.length > 0) {
+    raf = requestAnimationFrame(loop);
+  } else {
+    raf = null;
+    drawStatic();
+    if (autoPlaying && autoRoundsLeft > 0) {
+      setTimeout(() => {
+        if (!autoPlaying) return;
+        autoRoundsLeft--;
+        if (autoRoundsLeft <= 0) { stopAuto(); return; }
+        spawnBall();
+      }, turboOn ? 80 : 300);
+    }
+  }
+}
+
+function stepPhysics() {
+  const cs = getColSpacing();
+  const pr = getPinRadius();
+  const bottomY = canvas.height - 4;
+
+  for (let i = balls.length - 1; i >= 0; i--) {
+    const b = balls[i];
+    if (b.done) { balls.splice(i, 1); continue; }
+
+    b.vy += GRAVITY;
+    b.x  += b.vx;
+    b.y  += b.vy;
+
+    // pin collisions
+    for (const p of pins) {
+      const dx = b.x - p.x, dy = b.y - p.y;
+      const dist2 = dx * dx + dy * dy;
+      const minD = b.r + pr + 1;
+      if (dist2 < minD * minD && dist2 > 0.01) {
+        const dist = Math.sqrt(dist2);
+        const nx = dx / dist, ny = dy / dist;
+        b.x = p.x + nx * minD;
+        b.y = p.y + ny * minD;
+        const dot = b.vx * nx + b.vy * ny;
+        b.vx = (b.vx - 2 * dot * nx) * FRICTION;
+        b.vy = (b.vy - 2 * dot * ny) * BOUNCE;
+        b.vx += (Math.random() - 0.5) * 1.4;  // was 1.8
+        if (p.x !== b.lastTick) { b.lastTick = p.x; playSound('tick'); }
+      }
+    }
+
+    // walls
+    if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx) * 0.6; }
+    if (b.x > canvas.width - b.r) { b.x = canvas.width - b.r; b.vx = -Math.abs(b.vx) * 0.6; }
+
+    if (b.y >= bottomY) {
+      b.done = true;
+      const xs = getBucketXs();
+      let minD = Infinity, idx = 0;
+      for (let k = 0; k < xs.length; k++) {
+        const d = Math.abs(b.x - xs[k]);
+        if (d < minD) { minD = d; idx = k; }
+      }
+      land(idx);
+    }
+  }
+}
+
+function land(idx) {
+  const mults = MULTS[currentRisk][currentRows];
+  const m = mults[idx];
+  const win = Math.floor(betAmount * m);
+  // Add winnings back via Firebase
+  userRef.once('value').then(snap => {
+    const chips = snap.val() ? (snap.val().chips || 0) : 0;
+    userRef.update({ chips: chips + win });
+  });
+  flashBucket(idx);
+  addRecentWin(win, betAmount);
+  playSound(win >= betAmount ? 'win' : 'lose');
+  showPopup(win, m);
+}
+
+function flashBucket(idx) {
+  const el = document.getElementById('b' + idx);
+  if (!el) return;
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+}
+
+function addRecentWin(amt, bet) {
+  const c = document.getElementById('recent-wins');
+  const d = document.createElement('div');
+  d.className = 'rw-chip';
+  const isWin = amt >= bet;
+  d.style.color = isWin ? 'var(--neon-green)' : 'var(--neon-red)';
+  d.textContent = (isWin ? '+' : '') + amt + ' 🪙';
+  c.insertBefore(d, c.firstChild);
+  while (c.children.length > 6) c.removeChild(c.lastChild);
+}
+
+function showPopup(amt, mult) {
+  const p = document.getElementById('win-popup');
+  p.style.borderColor = amt >= betAmount ? 'var(--gold)' : 'var(--neon-red)';
+  document.getElementById('win-amt').textContent = amt + ' 🪙  (' + (mult >= 100 ? Math.round(mult) : mult.toFixed(1)) + 'x)';
+  p.classList.add('show');
+  setTimeout(() => p.classList.remove('show'), 1200);
+}
+
+// ── SOUND ─────────────────────────────────────────────────
+let aCtx = null;
+function ac() {
+  if (!aCtx) aCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return aCtx;
+}
+function playSound(t) {
+  if (!soundOn) return;
+  try {
+    const c = ac();
+    if (t === 'tick') {
+      const o = c.createOscillator(), g = c.createGain();
+      o.frequency.value = 500 + Math.random() * 500;
+      g.gain.setValueAtTime(0.08, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.04);
+      o.connect(g); g.connect(c.destination);
+      o.start(); o.stop(c.currentTime + 0.05);
+    } else if (t === 'bet') {
+      const o = c.createOscillator(), g = c.createGain();
+      o.frequency.value = 520; o.type = 'sine';
+      g.gain.setValueAtTime(0.14, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.12);
+      o.connect(g); g.connect(c.destination);
+      o.start(); o.stop(c.currentTime + 0.14);
+    } else if (t === 'win') {
+      [523, 659, 784, 1047].forEach((f, i) => {
+        const o = c.createOscillator(), g = c.createGain();
+        o.frequency.value = f;
+        const tt = c.currentTime + i * 0.09;
+        g.gain.setValueAtTime(0.16, tt);
+        g.gain.exponentialRampToValueAtTime(0.001, tt + 0.28);
+        o.connect(g); g.connect(c.destination);
+        o.start(tt); o.stop(tt + 0.3);
+      });
+    } else if (t === 'lose') {
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = 'sawtooth'; o.frequency.value = 180;
+      g.gain.setValueAtTime(0.09, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.18);
+      o.connect(g); g.connect(c.destination);
+      o.start(); o.stop(c.currentTime + 0.2);
+    }
+  } catch (e) {}
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const btn = document.getElementById('sound-btn');
+  const icon = document.getElementById('snd-icon');
+  btn.classList.toggle('muted-btn', !soundOn);
+  icon.innerHTML = soundOn
+    ? '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>'
+    : '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+}
+
+function toggleTurbo() {
+  turboOn = !turboOn;
+  document.getElementById('turbo-btn').style.color = turboOn ? 'var(--gold)' : '';
+}
+
+// ── UI CONTROLS ───────────────────────────────────────────
+function setTab(t) {
+  currentTab = t;
+  document.getElementById('tab-manual').classList.toggle('active', t === 'manual');
+  document.getElementById('tab-auto').classList.toggle('active', t === 'auto');
+  document.getElementById('auto-content').style.display = t === 'auto' ? 'block' : 'none';
+  document.getElementById('bet-btn').textContent = t === 'auto' ? 'АВТОГРА' : 'ПОСТАВИТИ';
+}
+
+function setRisk(r) {
+  currentRisk = r;
+  document.querySelectorAll('.risk-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('risk-' + r).classList.add('active');
+  renderBuckets();
+}
+
+function buildRowBtns() {
+  const c = document.getElementById('rows-row');
+  c.innerHTML = '';
+  for (let r = 8; r <= 16; r++) {
+    const b = document.createElement('button');
+    b.className = 'rows-btn' + (r === currentRows ? ' active' : '');
+    b.textContent = r;
+    b.onclick = () => setRows(r);
+    c.appendChild(b);
+  }
+}
+
+function setRows(r) {
+  currentRows = r;
+  document.querySelectorAll('.rows-btn').forEach(b => b.classList.toggle('active', parseInt(b.textContent) === r));
+  buildPins(); renderBuckets(); if (!raf) drawStatic();
+}
+
+function setRounds(n, el) {
+  autoRoundsTotal = n;
+  document.querySelectorAll('.rounds-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setLimit(type, val, el) {
+  const row = el.closest('.limit-row');
+  row.querySelectorAll('.limit-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleShowMore() {
+  showMore = !showMore;
+  document.getElementById('extra-opts').style.display = showMore ? 'block' : 'none';
+  document.getElementById('arrow-icon').style.transform = showMore ? 'rotate(180deg)' : '';
+}
+
+function updateBetSlider(v) {
+  betAmount = parseInt(v);
+  document.getElementById('bet-val').textContent = betAmount + ' 🪙';
+  const s = document.getElementById('bet-slider');
+  const pct = ((v - s.min) / (s.max - s.min)) * 100;
+  s.style.setProperty('--pct', Math.min(100, pct) + '%');
+}
+
+function adjustBet(dir) {
+  const step = betAmount < 10 ? 1 : betAmount < 50 ? 5 : betAmount < 200 ? 10 : 25;
+  betAmount = Math.max(1, betAmount + dir * step);
+  document.getElementById('bet-val').textContent = betAmount + ' 🪙';
+  const s = document.getElementById('bet-slider');
+  s.value = Math.min(betAmount, parseInt(s.max));
+  const pct = ((betAmount - parseInt(s.min)) / (parseInt(s.max) - parseInt(s.min))) * 100;
+  s.style.setProperty('--pct', Math.min(100, pct) + '%');
+}
+
+function onBetClick() {
+  if (currentTab === 'manual') {
+    spawnBall();
+  } else {
+    autoPlaying ? stopAuto() : startAuto();
+  }
+}
+
+function startAuto() {
+  autoPlaying = true;
+  autoRoundsLeft = autoRoundsTotal;
+  const btn = document.getElementById('bet-btn');
+  btn.textContent = 'ЗУПИНИТИ';
+  btn.classList.add('stop');
+  spawnBall();
+  autoRoundsLeft--;
+}
+
+function stopAuto() {
+  autoPlaying = false;
+  autoRoundsLeft = 0;
+  const btn = document.getElementById('bet-btn');
+  btn.textContent = 'АВТОГРА';
+  btn.classList.remove('stop');
+}
+
+// ── INIT ──────────────────────────────────────────────────
+buildRowBtns();
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+updateBetSlider(10);
+</script>
+</body>
+</html>

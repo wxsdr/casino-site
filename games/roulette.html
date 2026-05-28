@@ -7,157 +7,182 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         :root { 
-            --gold: #d4af37;
-            --gold-light: #fdf5a9;
-            --red: #c62828; 
-            --black: #111; 
-            --green: #00b347; 
-            --neon: #00ff9d;
+            --gold: #d4af37; --gold-light: #fdf5a9; --gold-dark: #8a6d1c;
+            --red: #c62828; --black: #111; --green: #00b347; --neon: #00ff9d;
+            --table-felt: url('https://www.transparenttextures.com/patterns/black-felt.png'), radial-gradient(ellipse at center, #0a4226 0%, #03140b 100%);
         }
         
-        body { margin: 0; background: radial-gradient(circle at top, #16161e 0%, #050505 100%); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow-x: hidden; min-height: 100vh;}
+        body { margin: 0; background: radial-gradient(circle at top, #12121a 0%, #050505 100%); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column;}
         
-        /* ПРЕМІУМ НАВІГАЦІЯ */
-        .nav-bar { padding: 15px 40px; background: linear-gradient(to bottom, #111, #000); display: flex; justify-content: space-between; border-bottom: 2px solid var(--gold); align-items: center; box-shadow: 0 5px 25px rgba(0,0,0,0.9);}
-        .back-btn { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 10px 25px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;}
+        /* НАВІГАЦІЯ */
+        .nav-bar { padding: 10px 40px; background: linear-gradient(to bottom, #161616, #000); display: flex; justify-content: space-between; border-bottom: 2px solid var(--gold); align-items: center; box-shadow: 0 5px 25px rgba(0,0,0,0.9); z-index: 100;}
+        .back-btn { background: rgba(0,0,0,0.5); color: var(--gold); border: 1px solid var(--gold); padding: 8px 20px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; box-shadow: inset 0 0 10px rgba(212,175,55,0.2);}
         .back-btn:hover { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold);}
         
-        /* ЛЕЙАУТ */
-        .main-layout { display: flex; flex-direction: column; align-items: center; max-width: 1400px; margin: 0 auto; padding: 40px 20px; gap: 40px; }
-        .top-section { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; width: 100%;}
-        .wheel-panel { display: flex; flex-direction: column; align-items: center; gap: 20px;}
-        .info-panel { width: 360px; display: flex; flex-direction: column; gap: 25px;}
+        /* ШИРОКИЙ ЛЕЙАУТ (Головна зміна) */
+        .main-layout { display: flex; flex-direction: row; justify-content: center; align-items: stretch; width: 100%; max-width: 1800px; margin: 0 auto; padding: 20px; gap: 20px; flex: 1; box-sizing: border-box;}
+        
+        /* ПАНЕЛІ */
+        .panel { background: linear-gradient(135deg, rgba(25,25,25,0.95), rgba(10,10,10,0.95)); border-radius: 15px; border: 1px solid #333; box-shadow: 0 15px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative;}
+        .panel-title { width: 100%; margin: 0 0 15px 0; border-bottom: 1px solid #444; padding-bottom: 10px; text-align: center; color: var(--gold); font-size: 14px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(212,175,55,0.3);}
 
-        /* ПАНЕЛІ (Стиль GTA V Casino) */
-        .glass-panel { background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(5,5,5,0.95)); padding: 25px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
-        .panel-title { margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; text-align: center; color: var(--gold); font-size: 16px; text-transform: uppercase; letter-spacing: 2px; }
-
-        /* ІДЕАЛЬНЕ КОЛЕСО (Canvas) */
-        .canvas-container { position: relative; width: 420px; height: 420px; border-radius: 50%; box-shadow: 0 25px 50px rgba(0,0,0,0.9), 0 0 50px rgba(212,175,55,0.2); }
+        /* 1. ЛІВА ПАНЕЛЬ: РУЛЕТКА + ІСТОРІЯ */
+        .left-col { flex: 0 0 380px; gap: 20px; display: flex; flex-direction: column; justify-content: flex-start;}
+        
+        /* КОЛЕСО (Справжній 3D вигляд) */
+        .canvas-container { position: relative; width: 340px; height: 340px; border-radius: 50%; box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 40px rgba(212,175,55,0.15); border: 8px solid #2a1608; background: #111;}
+        .canvas-container::after { content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border-radius: 50%; border: 2px solid var(--gold); pointer-events: none;}
         canvas { display: block; width: 100%; height: 100%; border-radius: 50%; }
+        
+        /* ІСТОРІЯ */
+        .history-grid { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;}
+        .history-item { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); font-size: 16px; transition: 0.3s; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);}
+        .history-item.red { background: var(--red); } .history-item.black { background: var(--black); } .history-item.green { background: var(--green); }
+        .history-item.won { border: 2px solid var(--gold); box-shadow: 0 0 15px var(--gold), inset 0 0 10px rgba(212,175,55,0.5); transform: scale(1.1); z-index: 2;}
+        .history-item.lost { opacity: 0.5; }
 
-        /* ПРЕМІУМ СТІЛ (GTA Style) */
-        .table-wrapper { 
-            background: url('https://www.transparenttextures.com/patterns/black-felt.png'), radial-gradient(ellipse at center, #0a3a2a 0%, #021208 100%);
-            padding: 35px; border-radius: 20px; border: 12px solid #2a1608; width: fit-content; box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,1);
-        }
-        .betting-board { display: grid; grid-template-columns: 80px repeat(12, 55px); grid-template-rows: repeat(3, 55px); gap: 3px; border: 3px solid rgba(255,255,255,0.8); padding: 3px; border-radius: 4px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
-        .cell { display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; position: relative; user-select: none; transition: 0.2s; text-shadow: 1px 1px 3px black;}
-        .cell:hover { background-color: rgba(255,255,255,0.25); box-shadow: inset 0 0 15px rgba(255,255,255,0.9); z-index: 2;}
-        .cell-zero { grid-row: 1 / 4; grid-column: 1; background: var(--green); border-right: 2px solid white;}
+        /* 2. ЦЕНТРАЛЬНА ПАНЕЛЬ: СТІЛ + ФІШКИ */
+        .center-col { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 30px; background: #151515; border-radius: 20px; box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.8); border: 1px solid #222;}
+        
+        /* ОБ'ЄМНИЙ СТІЛ */
+        .table-wrapper { background: var(--table-felt); padding: 30px; border-radius: 120px 20px 20px 120px; border: 15px solid #1a0d05; box-shadow: 0 25px 50px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.9); position: relative; margin: 0 auto;}
+        .table-wrapper::before { content:''; position:absolute; top:-5px; left:-5px; right:-5px; bottom:-5px; border-radius: 110px 15px 15px 110px; border: 2px solid rgba(255,255,255,0.1); pointer-events: none;}
+        
+        .betting-board { display: grid; grid-template-columns: 80px repeat(12, 1fr); grid-template-rows: repeat(3, 60px); gap: 4px; border: 3px solid rgba(255,255,255,0.6); padding: 4px; border-radius: 5px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);}
+        .cell { display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 22px; border: 1px solid rgba(255,255,255,0.3); cursor: pointer; position: relative; user-select: none; transition: 0.2s; text-shadow: 1px 1px 3px black;}
+        .cell:hover { background-color: rgba(255,255,255,0.3); box-shadow: inset 0 0 20px rgba(255,255,255,0.9); z-index: 2;}
+        .cell-zero { grid-row: 1 / 4; grid-column: 1; background: var(--green); border-right: 2px solid white; border-radius: 80px 0 0 80px;}
         .row-1 { grid-row: 1; } .row-2 { grid-row: 2; } .row-3 { grid-row: 3; }
-        .bottom-bets { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; border: 3px solid white; margin-top: 5px; height: 50px;}
-        .cell-red-bet { background: var(--red); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; letter-spacing: 1px; font-size: 18px; text-shadow: 1px 1px 3px black;}
-        .cell-black-bet { background: var(--black); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; letter-spacing: 1px; font-size: 18px; text-shadow: 1px 1px 3px black;}
         
-        /* РЕАЛІСТИЧНІ ФІШКИ НА СТОЛІ */
-        .chip-on-table { position: absolute; width: 32px; height: 32px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; pointer-events: none; z-index: 10; box-shadow: 2px 5px 8px rgba(0,0,0,0.9), inset 0 0 5px rgba(0,0,0,0.5); text-shadow: 1px 1px 1px black; border: 3px dashed rgba(255,255,255,0.9); background-color: var(--chip-color);}
+        .bottom-bets { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; border: 3px solid white; margin-top: 6px; height: 60px;}
+        .cell-red-bet { background: var(--red); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 20px; text-shadow: 1px 1px 4px black;}
+        .cell-black-bet { background: var(--black); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 20px; text-shadow: 1px 1px 4px black;}
+        
+        /* 3D ФІШКИ НА СТОЛІ ТА В СЕЛЕКТОРІ */
+        .chip { 
+            width: 60px; height: 60px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; color: white; font-size: 16px; transition: 0.2s; text-shadow: 1px 1px 2px black;
+            border: 4px dashed rgba(255,255,255,0.7);
+            /* Справжній 3D ефект (Товщина фішки) */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 1px 0 #222, 0 2px 0 #222, 0 3px 0 #111, 0 4px 0 #000, 0 8px 15px rgba(0,0,0,0.8);
+        }
+        .chip.active { transform: translateY(-5px); box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 1px 0 var(--gold-dark), 0 2px 0 var(--gold-dark), 0 3px 0 var(--gold-dark), 0 4px 0 #000, 0 15px 25px var(--gold); border-color: var(--gold); }
+        
+        .c-10 { background-color: #7f8c8d; } .c-50 { background-color: #2980b9; } .c-100 { background-color: #27ae60; } .c-500 { background-color: #8e44ad; } .c-1000 { background-color: #f39c12; }
 
-        /* СЕЛЕКТОР ФІШОК */
-        .chip-selector { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;}
-        .chip { width: 55px; height: 55px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; transition: 0.3s; box-shadow: 0 6px 12px rgba(0,0,0,0.6); border: 4px dashed rgba(255,255,255,0.7); text-shadow: 1px 1px 2px black;}
-        .chip.active { transform: translateY(-8px) scale(1.15); box-shadow: 0 15px 25px var(--gold); border-color: var(--gold); }
+        .chip-on-table { 
+            position: absolute; width: 34px; height: 34px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; pointer-events: none; z-index: 10; text-shadow: 1px 1px 1px black; border: 3px dashed rgba(255,255,255,0.8); background-color: var(--chip-color);
+            /* Товщина фішки на столі */
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 1px 0 #111, 0 2px 0 #000, 2px 4px 6px rgba(0,0,0,0.9);
+        }
 
-        .btn-ready { padding: 18px; font-size: 18px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; transition: 0.3s; background: linear-gradient(to bottom, var(--gold-light), var(--gold)); color: black; width: 100%; box-shadow: 0 5px 15px rgba(212,175,55,0.4); text-transform: uppercase; letter-spacing: 1px;}
-        .btn-ready:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(212,175,55,0.6); }
-        .btn-ready:disabled { background: #444; color: #777; cursor: not-allowed; box-shadow: none; transform: none;}
-
-        /* СПИСОК ГРАВЦІВ */
-        .players-list { list-style: none; padding: 0; margin: 0; }
-        .players-list li { padding: 12px 15px; background: rgba(0,0,0,0.6); margin-bottom: 8px; border-radius: 6px; display: flex; align-items: center; border: 1px solid #222;}
-        .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #c62828; margin-right: 15px; transition: 0.3s; box-shadow: 0 0 5px #c62828;}
+        .controls-row { display: flex; justify-content: space-between; align-items: center; width: 100%; background: rgba(0,0,0,0.4); padding: 15px 30px; border-radius: 15px; border: 1px solid #333; box-sizing: border-box;}
+        .chip-selector { display: flex; gap: 15px;}
+        
+        /* 3. ПРАВА ПАНЕЛЬ: ГРАВЦІ ТА СТАТУС */
+        .right-col { flex: 0 0 320px; gap: 20px; display: flex; flex-direction: column;}
+        
+        .players-list { list-style: none; padding: 0; margin: 0; width: 100%; flex: 1; overflow-y: auto;}
+        .players-list li { padding: 12px 15px; background: rgba(0,0,0,0.6); margin-bottom: 8px; border-radius: 6px; display: flex; align-items: center; border: 1px solid #222; font-size: 15px;}
+        .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #c62828; margin-right: 15px; box-shadow: 0 0 5px #c62828;}
         .status-dot.ready { background: var(--neon); box-shadow: 0 0 15px var(--neon);}
-        
-        /* ІСТОРІЯ (АХУЄННА) */
-        .history-grid { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
-        .history-item { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); text-shadow: 1px 1px 2px black; font-size: 18px; transition: 0.3s;}
-        .history-item.red { background: var(--red); }
-        .history-item.black { background: var(--black); }
-        .history-item.green { background: var(--green); }
-        .history-item.won { border: 2px solid var(--gold); box-shadow: 0 0 15px var(--gold), inset 0 0 10px rgba(212,175,55,0.5); transform: scale(1.1); z-index: 2;} /* Світиться якщо підняв бабла */
-        .history-item.lost { opacity: 0.4; } /* Тускліє, якщо просрав */
 
-        #status-text { font-size: 28px; font-weight: bold; color: var(--gold); min-height: 35px; text-align: center; text-shadow: 0 0 15px rgba(212,175,55,0.6); margin-bottom: 10px;}
-        .payout-info { text-align: center; color: #888; font-size: 14px; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;}
+        .bet-info { text-align: center; width: 100%; background: rgba(0,0,0,0.5); padding: 15px 0; border-radius: 10px; border: 1px solid #333;}
+        
+        .btn-ready { padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; background: linear-gradient(to bottom, var(--gold-light), var(--gold)); color: black; width: 100%; box-shadow: 0 5px 15px rgba(212,175,55,0.4), inset 0 2px 0 rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px;}
+        .btn-ready:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(212,175,55,0.7); }
+        .btn-ready:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; transform: none;}
+
+        #status-text { font-size: 22px; font-weight: bold; color: var(--gold); text-align: center; width: 100%; text-shadow: 0 0 15px rgba(212,175,55,0.6); margin-bottom: 10px;}
     </style>
 </head>
 <body>
 
+    <!-- ЕКРАН БЛОКУВАННЯ -->
     <div id="out-of-casino-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,5,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(15px);">
         <h1 style="color: #ff003c; font-size: 50px; margin: 0; text-shadow: 0 0 30px #ff003c;">🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
         <p style="color: #aaa; font-size: 24px; margin-top: 15px;">Ви покинули територію Diamond Casino.</p>
         <button onclick="leaveTable()" style="padding: 15px 40px; margin-top: 30px; background: var(--gold); color: black; border:none; cursor:pointer; font-weight:bold; border-radius:8px; font-size: 18px;">Повернутися в лобі</button>
     </div>
 
+    <!-- ЗВУКИ -->
     <audio id="sound-spin" src="../sounds/spin.mp3" preload="auto"></audio>
     <audio id="sound-win" src="../sounds/win.mp3" preload="auto"></audio>
     <audio id="sound-lose" src="../sounds/lose.mp3" preload="auto"></audio>
 
     <div class="nav-bar">
-        <button class="back-btn" onclick="leaveTable()">Втекти зі столу</button>
-        <h2 id="table-title" style="margin: 0; color: var(--gold); text-shadow: 0 0 15px rgba(212,175,55,0.5); letter-spacing: 2px;">VIP TABLE #1</h2>
-        <div style="font-size: 18px; font-weight: bold;">БАЛАНС: <strong id="balance-display" style="color: var(--neon); font-size: 26px; margin-left: 10px;">0</strong> 🪙</div>
+        <button class="back-btn" onclick="leaveTable()">⬅ Втекти</button>
+        <h2 id="table-title" style="margin: 0; color: var(--gold); text-shadow: 0 0 15px rgba(212,175,55,0.5); letter-spacing: 3px;">DIAMOND TABLE #1</h2>
+        <div style="font-size: 18px; font-weight: bold;">БАЛАНС: <strong id="balance-display" style="color: var(--neon); font-size: 26px; margin-left: 10px; text-shadow: 0 0 10px var(--neon);">0</strong></div>
     </div>
 
+    <!-- ШИРОКИЙ ЛЕЙАУТ -->
     <div class="main-layout">
-        <div class="top-section">
-            <div class="wheel-panel">
-                <div id="status-text">Очікування гравців...</div>
+        
+        <!-- ЛІВА КОЛОНКА (Рулетка + Історія) -->
+        <div class="left-col">
+            <div class="panel" style="flex: 1; justify-content: center;">
+                <div id="status-text">ОЧІКУВАННЯ СТАВОК...</div>
                 <div class="canvas-container">
                     <canvas id="rouletteCanvas"></canvas>
                 </div>
             </div>
-
-            <div class="info-panel">
-                <div class="glass-panel" style="padding: 15px;">
-                    <h3 class="panel-title">Історія ігор</h3>
-                    <div class="history-grid" id="history-display">
-                        <div style="text-align: center; color: #777; font-size: 14px; width: 100%;">Немає даних</div>
-                    </div>
-                </div>
-
-                <div class="glass-panel" style="padding: 15px;">
-                    <h3 class="panel-title">За столом</h3>
-                    <ul class="players-list" id="players-ul"></ul>
-                </div>
-
-                <div class="glass-panel">
-                    <h3 class="panel-title">Ваша ставка</h3>
-                    <div class="chip-selector">
-                        <div class="chip c-10 active" onclick="selectChip(10, this, '#7f8c8d')">10</div>
-                        <div class="chip c-50" onclick="selectChip(50, this, '#2980b9')">50</div>
-                        <div class="chip c-100" onclick="selectChip(100, this, '#27ae60')">100</div>
-                        <div class="chip c-500" onclick="selectChip(500, this, '#8e44ad')">500</div>
-                        <div class="chip c-1000" onclick="selectChip(1000, this, '#f39c12')">1K</div>
-                    </div>
-                    
-                    <div style="text-align: center; margin: 25px 0;">
-                        <strong id="current-bet-display" style="color: white; font-size: 38px; text-shadow: 0 0 15px rgba(255,255,255,0.3);">0</strong>
-                    </div>
-
-                    <button class="btn-ready" id="ready-btn" onclick="toggleReady()">ПІДТВЕРДИТИ СТАВКУ</button>
-                    <div class="payout-info">Число: x30 | Колір: x1.8</div>
+            
+            <div class="panel">
+                <h3 class="panel-title">ІСТОРІЯ</h3>
+                <div class="history-grid" id="history-display">
+                    <div style="color: #777; font-size: 14px; width: 100%; text-align:center;">Немає даних</div>
                 </div>
             </div>
         </div>
 
-        <div class="table-wrapper">
-            <div class="betting-board" id="betting-board">
-                <div class="cell cell-zero" onclick="placeBet('0')">0</div>
+        <!-- ЦЕНТРАЛЬНА КОЛОНКА (Стіл + Фішки) -->
+        <div class="center-col">
+            <div style="display: flex; justify-content: center; align-items: center; flex: 1;">
+                <div class="table-wrapper">
+                    <div class="betting-board" id="betting-board">
+                        <div class="cell cell-zero" onclick="placeBet('0')">0</div>
+                    </div>
+                    <div class="bottom-bets">
+                        <div class="cell-red-bet" onclick="placeBet('red')">ЧЕРВОНЕ</div>
+                        <div class="cell-black-bet" onclick="placeBet('black')">ЧОРНЕ</div>
+                    </div>
+                </div>
             </div>
-            <div class="bottom-bets">
-                <div class="cell-red-bet" onclick="placeBet('red')">ЧЕРВОНЕ (x1.8)</div>
-                <div class="cell-black-bet" onclick="placeBet('black')">ЧОРНЕ (x1.8)</div>
-            </div>
-            <div style="text-align: center; margin-top: 15px;">
-                <button onclick="clearBets()" style="background: rgba(255,0,0,0.1); color: #ff5555; border: 1px solid #ff5555; padding: 10px 30px; border-radius: 6px; cursor:pointer; font-weight: bold; transition: 0.3s; text-transform: uppercase;">Очистити фішки зі столу</button>
+
+            <div class="controls-row">
+                <div class="chip-selector">
+                    <div class="chip c-10 active" onclick="selectChip(10, this, '#7f8c8d')">10</div>
+                    <div class="chip c-50" onclick="selectChip(50, this, '#2980b9')">50</div>
+                    <div class="chip c-100" onclick="selectChip(100, this, '#27ae60')">100</div>
+                    <div class="chip c-500" onclick="selectChip(500, this, '#8e44ad')">500</div>
+                    <div class="chip c-1000" onclick="selectChip(1000, this, '#f39c12')">1K</div>
+                </div>
+                <button onclick="clearBets()" style="background: transparent; color: #ff5555; border: 2px solid #ff5555; padding: 15px 30px; border-radius: 8px; cursor:pointer; font-weight: bold; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;">Очистити стіл</button>
             </div>
         </div>
+
+        <!-- ПРАВА КОЛОНКА (Гравці + Статус) -->
+        <div class="right-col">
+            <div class="panel" style="flex: 1; align-items: flex-start;">
+                <h3 class="panel-title">ГРАВЦІ</h3>
+                <ul class="players-list" id="players-ul"></ul>
+            </div>
+            
+            <div class="panel">
+                <div class="bet-info">
+                    <span style="color: #aaa; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Загальна ставка</span><br>
+                    <strong id="current-bet-display" style="color: white; font-size: 42px; text-shadow: 0 0 20px rgba(255,255,255,0.4);">0</strong>
+                </div>
+                <button class="btn-ready" id="ready-btn" onclick="toggleReady()" style="margin-top: 15px;">ПІДТВЕРДИТИ</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
         // ==========================================
-        // НАСТРОЙКИ ТА FIREBASE
+        // БАЗА ДАНИХ ТА СИНХРОНІЗАЦІЯ
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
@@ -170,7 +195,6 @@
 
         const username = localStorage.getItem('casino_user');
         if (!username) window.location.href = '../index.html';
-        
         const urlParams = new URLSearchParams(window.location.search);
         const tableId = urlParams.get('table') || '1';
         document.getElementById('table-title').innerText = `DIAMOND TABLE #${tableId}`;
@@ -188,7 +212,6 @@
             document.getElementById('balance-display').innerText = currentBalance;
         });
 
-        // МУЛЬТИПЛЕЄР
         const tableRef = database.ref(`tables/table_${tableId}`);
         const myPlayerRef = tableRef.child('players/' + username.toLowerCase());
         myPlayerRef.set({ ready: false }); 
@@ -199,11 +222,17 @@
         let localSpinId = null; 
         let mySessionHistory = {}; 
 
+        tableRef.once('value', snap => {
+            const data = snap.val();
+            if (!data || !data.players || Object.keys(data.players).length <= 1) {
+                tableRef.update({ status: 'betting', result: null, currentRot: 0 });
+            }
+        });
+
         tableRef.on('value', snap => {
             const data = snap.val() || { status: 'betting', players: {}, history: [] };
             const players = data.players || {};
             
-            // Гравці
             const ul = document.getElementById('players-ul');
             ul.innerHTML = '';
             let allReady = true; let playerCount = 0;
@@ -214,16 +243,13 @@
                 ul.innerHTML += `<li><span class="${dotClass}"></span>${name.toUpperCase()}</li>`;
             }
 
-            // Історія
             renderHistory(data.history || []);
 
-            // Запуск Хоста (ФІКС ПОДВІЙНИХ ЗАПУСКІВ)
             if (allReady && playerCount > 0 && data.status === 'betting') {
                 const sortedNames = Object.keys(players).sort();
                 if (username.toLowerCase() === sortedNames[0].toLowerCase() && !window.isGenerating) {
                     window.isGenerating = true; 
                     const resultIndex = Math.floor(Math.random() * 37);
-                    // Рандомний кут колеса, щоб воно не зупинялося в одному місці
                     const newTargetRot = (data.currentRot || 0) + (Math.PI * 2 * 4) + Math.random() * Math.PI * 2;
                     
                     tableRef.update({ 
@@ -233,7 +259,6 @@
                 }
             }
 
-            // Запуск Анімації
             if (data.status === 'spinning' && data.spinId !== localSpinId) {
                 localSpinId = data.spinId;
                 playSpinAnimation(data.result, data.currentRot, data.spinId);
@@ -254,7 +279,6 @@
                 let colorClass = (spin.num === 0) ? 'green' : (redNumbers.includes(spin.num) ? 'red' : 'black');
                 div.classList.add(colorClass);
 
-                // ПІДСВІТКА ПЕРЕМОГ
                 if (mySessionHistory[spin.id]) {
                     if (mySessionHistory[spin.id].won) div.classList.add('won');
                     else div.classList.add('lost');
@@ -272,11 +296,11 @@
 
             const btn = document.getElementById('ready-btn');
             if (isReady) {
-                btn.innerText = "✅ ОЧІКУВАННЯ...";
+                btn.innerText = "ОЧІКУВАННЯ...";
                 btn.style.background = "var(--green)";
                 btn.style.color = "white";
+                btn.style.boxShadow = "0 5px 20px rgba(0, 179, 71, 0.5)";
                 
-                // СОЛО РЕЖИМ
                 tableRef.once('value', snap => {
                     const data = snap.val() || {};
                     const players = data.players || {};
@@ -292,98 +316,16 @@
                 btn.innerText = "ПІДТВЕРДИТИ СТАВКУ";
                 btn.style.background = "linear-gradient(to bottom, var(--gold-light), var(--gold))";
                 btn.style.color = "black";
+                btn.style.boxShadow = "0 5px 15px rgba(212,175,55,0.4)";
             }
         }
 
         // ==========================================
-        // CANVAS ДВИЖОК (ІДЕАЛЬНА ГРАФІКА ТА ФІЗИКА)
+        // ІГРОВИЙ СТІЛ (3D Фішки)
         // ==========================================
-        const canvas = document.getElementById('rouletteCanvas');
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = 420 * dpr;
-        canvas.height = 420 * dpr;
-        ctx.scale(dpr, dpr);
-        
-        const cx = 210; const cy = 210; const wheelRadius = 175;
         const wheelOrder = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
         const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
-        const sliceAngle = (Math.PI * 2) / 37;
-
-        let currentWheelRot = 0;
-        let currentBallRot = 0;
-        let currentBallRadius = 145; // Радіус, на якому шарик лежить на цифрах
-
-        function drawAll() {
-            ctx.clearRect(0, 0, 420, 420);
-
-            // Колесо
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(currentWheelRot - Math.PI/2); // Щоб 0 був зверху
-
-            for(let i=0; i<37; i++) {
-                let num = wheelOrder[i];
-                let color = (num === 0) ? '#00b347' : (redNumbers.includes(num) ? '#c62828' : '#111');
-                
-                // Сектор
-                ctx.beginPath();
-                ctx.moveTo(0,0);
-                ctx.arc(0, 0, wheelRadius, i * sliceAngle, (i+1) * sliceAngle);
-                ctx.fillStyle = color;
-                ctx.fill();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = '#d4af37'; // Золоті розділювачі
-                ctx.stroke();
-
-                // Цифра (Ідеально по центру)
-                ctx.save();
-                ctx.rotate(i * sliceAngle + sliceAngle/2);
-                ctx.translate(wheelRadius - 22, 0);
-                ctx.rotate(Math.PI/2);
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 15px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(num.toString(), 0, 0);
-                ctx.restore();
-            }
-
-            // Золотий центр
-            ctx.beginPath();
-            ctx.arc(0, 0, 40, 0, Math.PI*2);
-            let grad = ctx.createRadialGradient(0,0,5, 0,0,40);
-            grad.addColorStop(0, '#fdf5a9');
-            grad.addColorStop(1, '#8a6d1c');
-            ctx.fillStyle = grad;
-            ctx.fill();
-            ctx.lineWidth = 4; ctx.strokeStyle = '#fff'; ctx.stroke();
-            ctx.restore();
-
-            // Дерев'яний трек для шарика
-            ctx.beginPath();
-            ctx.arc(cx, cy, 192, 0, Math.PI*2);
-            ctx.lineWidth = 20; ctx.strokeStyle = '#1f1108'; ctx.stroke();
-            ctx.lineWidth = 6; ctx.strokeStyle = '#d4af37'; ctx.stroke();
-
-            // Шарик
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(currentBallRot - Math.PI/2);
-            ctx.beginPath();
-            ctx.arc(currentBallRadius, 0, 7, 0, Math.PI*2);
-            let ballGrad = ctx.createRadialGradient(currentBallRadius-2, -2, 2, currentBallRadius, 0, 7);
-            ballGrad.addColorStop(0, '#ffffff'); ballGrad.addColorStop(1, '#777777');
-            ctx.fillStyle = ballGrad;
-            ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 6; ctx.shadowOffsetX = -3; ctx.shadowOffsetY = 3;
-            ctx.fill();
-            ctx.restore();
-        }
-        drawAll(); // Малюємо статичне колесо при загрузці
-
-        // ==========================================
-        // ІГРОВИЙ СТІЛ (HTML)
-        // ==========================================
+        
         const board = document.getElementById('betting-board');
         let col = 2;
         for (let i = 1; i <= 36; i += 3) {
@@ -422,6 +364,7 @@
                 chip.className = 'chip-on-table chip-temp';
                 chip.style.setProperty('--chip-color', selectedChipColor); 
                 chip.innerText = activeBets[target] >= 1000 ? (activeBets[target]/1000).toFixed(1)+'k' : activeBets[target];
+                // Рандомний зсув для ефекту стопки фішок
                 chip.style.transform = `translate(${Math.random() * 12 - 6}px, ${Math.random() * 12 - 6}px)`;
                 tElem.querySelectorAll('.chip-temp').forEach(c => c.remove());
                 tElem.appendChild(chip);
@@ -435,17 +378,92 @@
         }
 
         // ==========================================
-        // ІДЕАЛЬНА МАТЕМАТИКА АНІМАЦІЇ
+        // CANVAS ДВИЖОК ТА РЕАЛІСТИЧНА ФІЗИКА
         // ==========================================
+        const canvas = document.getElementById('rouletteCanvas');
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = 340 * dpr;
+        canvas.height = 340 * dpr;
+        ctx.scale(dpr, dpr);
+        
+        const cx = 170; const cy = 170; const wheelRadius = 145;
+        const sliceAngle = (Math.PI * 2) / 37;
+
+        let currentWheelRot = 0;
+        let currentBallRot = 0;
+        let currentBallRadius = 120; 
+
+        function drawAll() {
+            ctx.clearRect(0, 0, 340, 340);
+
+            // КОЛЕСО
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(currentWheelRot - Math.PI/2); 
+
+            for(let i=0; i<37; i++) {
+                let num = wheelOrder[i];
+                let color = (num === 0) ? '#00b347' : (redNumbers.includes(num) ? '#c62828' : '#111');
+                
+                // Сектор
+                ctx.beginPath();
+                ctx.moveTo(0,0);
+                ctx.arc(0, 0, wheelRadius, i * sliceAngle, (i+1) * sliceAngle);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.lineWidth = 1; ctx.strokeStyle = '#d4af37'; ctx.stroke();
+
+                // Цифра (ІДЕАЛЬНИЙ ЦЕНТР)
+                ctx.save();
+                ctx.rotate(i * sliceAngle + sliceAngle/2);
+                ctx.translate(wheelRadius - 18, 0);
+                ctx.rotate(Math.PI/2);
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 13px Tahoma';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(num.toString(), 0, 0);
+                ctx.restore();
+            }
+
+            // ЗОЛОТИЙ ЦЕНТР
+            ctx.beginPath();
+            ctx.arc(0, 0, 30, 0, Math.PI*2);
+            let grad = ctx.createRadialGradient(0,0,5, 0,0,30);
+            grad.addColorStop(0, '#fdf5a9'); grad.addColorStop(1, '#8a6d1c');
+            ctx.fillStyle = grad; ctx.fill();
+            ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+            ctx.restore();
+
+            // ДЕРЕВ'ЯНИЙ БОРТ
+            ctx.beginPath();
+            ctx.arc(cx, cy, 155, 0, Math.PI*2);
+            ctx.lineWidth = 18; ctx.strokeStyle = '#2a1608'; ctx.stroke();
+            ctx.lineWidth = 4; ctx.strokeStyle = '#d4af37'; ctx.stroke();
+
+            // ШАРИК З ТІННЮ
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(currentBallRot - Math.PI/2);
+            ctx.beginPath();
+            ctx.arc(currentBallRadius, 0, 6, 0, Math.PI*2);
+            let ballGrad = ctx.createRadialGradient(currentBallRadius-2, -2, 2, currentBallRadius, 0, 6);
+            ballGrad.addColorStop(0, '#ffffff'); ballGrad.addColorStop(1, '#999999');
+            ctx.fillStyle = ballGrad;
+            ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 5; ctx.shadowOffsetX = -2; ctx.shadowOffsetY = 2;
+            ctx.fill();
+            ctx.restore();
+        }
+        drawAll(); 
+
         let animationStart = null;
         let initialWheelRot = 0; let targetWheelRot = 0;
         let initialBallRot = 0; let targetBallRot = 0;
 
-        function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-
         async function playSpinAnimation(winningNumber, firebaseRot, spinId) {
             isSpinningLocal = true;
-            document.getElementById('status-text').innerText = "Ставки закриті. Шарик летить!";
+            document.getElementById('status-text').innerText = "ШАРИК ЛЕТИТЬ...";
             document.getElementById('status-text').style.color = "white";
             document.getElementById('ready-btn').disabled = true;
 
@@ -453,19 +471,16 @@
             if(spinAudio) spinAudio.play().catch(()=>{});
             if (totalBetAmount > 0) await userRef.update({ chips: currentBalance - totalBetAmount });
 
-            // МАТЕМАТИКА
             initialWheelRot = currentWheelRot;
             initialBallRot = currentBallRot;
-            targetWheelRot = firebaseRot; // Глобальний кут для всіх гравців
+            targetWheelRot = firebaseRot; 
             
             const winningIndex = wheelOrder.indexOf(winningNumber);
-            // Шарик має впасти ідеально по центру потрібного сектора
             const targetSectorWorldAngle = targetWheelRot + (winningIndex + 0.5) * sliceAngle;
 
-            // Кулька крутиться проти годинникової (мінус), робить мінімум 5 обертів
             let normalizedTarget = targetSectorWorldAngle % (Math.PI * 2);
             if(normalizedTarget < 0) normalizedTarget += Math.PI*2;
-            let k = Math.floor((initialBallRot - normalizedTarget) / (Math.PI * 2)) + 5;
+            let k = Math.floor((initialBallRot - normalizedTarget) / (Math.PI * 2)) + 6;
             targetBallRot = normalizedTarget - (k * Math.PI * 2);
 
             animationStart = null;
@@ -474,45 +489,59 @@
 
         function animateSpin(timestamp, winningNumber, spinId) {
             if (!animationStart) animationStart = timestamp;
-            let progress = (timestamp - animationStart) / 6000; // 6 секунд
+            let progress = (timestamp - animationStart) / 6000; 
             if (progress > 1) progress = 1;
 
-            let ease = easeOutCubic(progress);
-            currentWheelRot = initialWheelRot + (targetWheelRot - initialWheelRot) * ease;
-            currentBallRot = initialBallRot + (targetBallRot - initialBallRot) * ease;
+            let easeWheel = 1 - Math.pow(1 - progress, 3);
+            currentWheelRot = initialWheelRot + (targetWheelRot - initialWheelRot) * easeWheel;
 
-            // Шарик летить по краю (190) і різко падає в лузу (145) в самому кінці
-            currentBallRadius = 145 + 45 * (1 - Math.pow(progress, 6));
+            let easeBall = 1 - Math.pow(1 - progress, 4);
+            currentBallRot = initialBallRot + (targetBallRot - initialBallRot) * easeBall;
+
+            // ФІЗИКА ШАРИКА: Відскоки та тряска в кінці
+            if (progress > 0.75) {
+                let wobble = Math.sin((progress - 0.75) * 40) * 0.04 * (1 - progress);
+                currentBallRot += wobble;
+            }
+
+            if (progress < 0.8) {
+                currentBallRadius = 150; // Їде по борту
+            } else {
+                let dropProgress = (progress - 0.8) / 0.2;
+                let bounce = Math.abs(Math.cos(dropProgress * Math.PI * 3)) * (1 - dropProgress) * 10;
+                currentBallRadius = 150 - (30 * dropProgress) + bounce; // Падає в лузу
+            }
+
             drawAll();
 
             if (progress < 1) requestAnimationFrame((ts) => animateSpin(ts, winningNumber, spinId));
-            else setTimeout(() => evaluateLocalBets(winningNumber, spinId), 300); // Секунда на усвідомлення
+            else setTimeout(() => evaluateLocalBets(winningNumber, spinId), 500);
         }
 
         async function evaluateLocalBets(winningNumber, spinId) {
             let winAmount = 0;
             const winningColor = (winningNumber === 0) ? 'green' : (redNumbers.includes(winningNumber) ? 'red' : 'black');
 
+            // ВИПЛАТИ (Класичні шанси)
             for (const [target, amount] of Object.entries(activeBets)) {
-                if (target === winningNumber.toString()) winAmount += amount * 30;
-                else if (target === winningColor) winAmount += Math.floor(amount * 1.8);
+                if (target === winningNumber.toString()) winAmount += amount * 36;
+                else if (target === winningColor) winAmount += amount * 2;
             }
 
-            // Запис в історію
             if (totalBetAmount > 0) mySessionHistory[spinId] = { played: true, won: (winAmount > 0) };
 
             const statusText = document.getElementById('status-text');
             if (winAmount > 0) {
-                statusText.innerHTML = `Випало: <span style="color:var(--${winningColor})">${winningNumber}</span>. ВИГРАШ: +${winAmount} 🪙`;
+                statusText.innerHTML = `ВИПАЛО: <span style="color:var(--${winningColor})">${winningNumber}</span>. ВИГРАШ: +${winAmount} 🪙`;
                 statusText.style.color = "var(--neon)";
                 document.getElementById('sound-win').play().catch(()=>{});
                 await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + winAmount }); });
             } else if (totalBetAmount > 0) {
-                statusText.innerHTML = `Випало: <span style="color:var(--${winningColor})">${winningNumber}</span>. Ставки згоріли.`;
+                statusText.innerHTML = `ВИПАЛО: <span style="color:var(--${winningColor})">${winningNumber}</span>. СТАВКИ ЗГОРІЛИ.`;
                 statusText.style.color = "var(--red)";
                 document.getElementById('sound-lose').play().catch(()=>{});
             } else {
-                statusText.innerHTML = `Випало: <span style="color:var(--${winningColor})">${winningNumber}</span>.`;
+                statusText.innerHTML = `ВИПАЛО: <span style="color:var(--${winningColor})">${winningNumber}</span>.`;
                 statusText.style.color = "white";
             }
 
@@ -525,23 +554,23 @@
                 btn.disabled = false; btn.innerText = "ПІДТВЕРДИТИ СТАВКУ";
                 btn.style.background = "linear-gradient(to bottom, var(--gold-light), var(--gold))";
                 btn.style.color = "black";
+                btn.style.boxShadow = "0 5px 15px rgba(212,175,55,0.4)";
                 myPlayerRef.update({ ready: false });
 
-                // Хост оновлює історію
                 tableRef.once('value', s => {
                     const data = s.val() || {};
                     const sorted = Object.keys(data.players || {}).sort();
                     if (username.toLowerCase() === sorted[0].toLowerCase()) {
                         let newHistory = data.history || [];
                         newHistory.unshift({ num: winningNumber, id: spinId });
-                        if (newHistory.length > 10) newHistory.pop();
+                        if (newHistory.length > 15) newHistory.pop();
                         tableRef.update({ status: 'betting', result: null, history: newHistory });
                     }
                 });
                 
-                statusText.innerText = "Зробіть ваші ставки!";
+                statusText.innerText = "ОЧІКУВАННЯ СТАВОК...";
                 statusText.style.color = "var(--gold)";
-            }, 3000);
+            }, 4000);
         }
     </script>
 </body>

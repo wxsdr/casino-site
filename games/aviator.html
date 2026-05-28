@@ -99,6 +99,26 @@
         .btn-disabled { background: #2b2c2e; color: #555; cursor: not-allowed; box-shadow: none; border: 1px solid #333;}
         .cashout-amount { font-size: 18px; font-weight: 900; margin-top: 2px;}
         .btn-text-small { font-size: 14px; font-weight: normal; opacity: 0.9; text-transform: none; margin-top: 2px;}
+
+        /* AUTO TAB PANEL */
+        .auto-panel { display: none; flex: 1; flex-direction: column; gap: 8px; justify-content: space-between;}
+        .auto-panel.active { display: flex; }
+        .auto-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .auto-label { font-size: 12px; color: #888; flex: 1; }
+        .auto-toggle { position: relative; width: 38px; height: 20px; flex-shrink: 0; }
+        .auto-toggle input { opacity: 0; width: 0; height: 0; }
+        .auto-toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #333; border-radius: 20px; transition: 0.2s; border: 1px solid #444; }
+        .auto-toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px; background: #888; border-radius: 50%; transition: 0.2s; }
+        .auto-toggle input:checked + .auto-toggle-slider { background: rgba(40,167,69,0.3); border-color: #28a745; }
+        .auto-toggle input:checked + .auto-toggle-slider:before { transform: translateX(18px); background: #28a745; }
+        .auto-coeff-input { width: 55px; background: #000; border: 1px solid #444; border-radius: 8px; color: white; font-size: 14px; font-weight: bold; text-align: center; padding: 4px 6px; outline: none; }
+        .auto-coeff-input:focus { border-color: #28a745; }
+        .auto-coeff-input:disabled { opacity: 0.4; cursor: not-allowed; }
+        .auto-status-text { font-size: 10px; color: var(--aviator-green); text-align: center; min-height: 14px; font-weight: bold; letter-spacing: 0.5px; }
+        .bet-content { display: flex; flex-direction: column; flex: 1; }
+        .bet-tab-panes { flex: 1; display: flex; flex-direction: column; }
+        .manual-panel { display: flex; flex-direction: column; flex: 1; }
+        .manual-panel.hidden { display: none; }
     </style>
 </head>
 <body>
@@ -144,9 +164,13 @@
 
             <div class="controls-area">
                 <div class="bet-box" id="box-1">
-                    <div class="bet-tabs"><div class="bet-tab active">Ставка</div><div class="bet-tab">Авто</div></div>
+                    <div class="bet-tabs">
+                        <div class="bet-tab active" onclick="switchTab(1,'manual')">Ставка</div>
+                        <div class="bet-tab" onclick="switchTab(1,'auto')">Авто</div>
+                    </div>
                     <div class="bet-main-row">
-                        <div class="bet-inputs">
+                        <!-- MANUAL PANEL -->
+                        <div class="bet-inputs manual-panel" id="manual-panel-1">
                             <div class="amount-control">
                                 <button class="amt-btn" onclick="adjustBet(1, -10)">-</button>
                                 <input type="number" class="amt-input" id="input-1" value="10" min="10" step="10" readonly>
@@ -159,6 +183,25 @@
                                 <button class="q-btn" onclick="setBet(1, 1000)">1000</button>
                             </div>
                         </div>
+                        <!-- AUTO PANEL -->
+                        <div class="bet-inputs auto-panel" id="auto-panel-1">
+                            <div class="auto-row">
+                                <span class="auto-label">Автоставка</span>
+                                <label class="auto-toggle">
+                                    <input type="checkbox" id="auto-bet-1" onchange="onAutoBetChange(1)">
+                                    <span class="auto-toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="auto-row">
+                                <span class="auto-label">Автовиведення</span>
+                                <label class="auto-toggle">
+                                    <input type="checkbox" id="auto-cashout-1" onchange="onAutoCashoutChange(1)">
+                                    <span class="auto-toggle-slider"></span>
+                                </label>
+                                <input type="number" class="auto-coeff-input" id="auto-coeff-1" value="1.10" min="1.01" step="0.01" disabled>
+                            </div>
+                            <div class="auto-status-text" id="auto-status-1"></div>
+                        </div>
                         <div class="action-container">
                             <button class="action-btn btn-bet" id="btn-1" onclick="handleAction(1)">
                                 СТАВКА <div class="btn-text-small" id="subtext-1">10 🪙</div>
@@ -168,9 +211,13 @@
                 </div>
 
                 <div class="bet-box" id="box-2">
-                    <div class="bet-tabs"><div class="bet-tab active">Ставка</div><div class="bet-tab">Авто</div></div>
+                    <div class="bet-tabs">
+                        <div class="bet-tab active" onclick="switchTab(2,'manual')">Ставка</div>
+                        <div class="bet-tab" onclick="switchTab(2,'auto')">Авто</div>
+                    </div>
                     <div class="bet-main-row">
-                        <div class="bet-inputs">
+                        <!-- MANUAL PANEL -->
+                        <div class="bet-inputs manual-panel" id="manual-panel-2">
                             <div class="amount-control">
                                 <button class="amt-btn" onclick="adjustBet(2, -10)">-</button>
                                 <input type="number" class="amt-input" id="input-2" value="10" min="10" step="10" readonly>
@@ -182,6 +229,25 @@
                                 <button class="q-btn" onclick="setBet(2, 500)">500</button>
                                 <button class="q-btn" onclick="setBet(2, 1000)">1000</button>
                             </div>
+                        </div>
+                        <!-- AUTO PANEL -->
+                        <div class="bet-inputs auto-panel" id="auto-panel-2">
+                            <div class="auto-row">
+                                <span class="auto-label">Автоставка</span>
+                                <label class="auto-toggle">
+                                    <input type="checkbox" id="auto-bet-2" onchange="onAutoBetChange(2)">
+                                    <span class="auto-toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="auto-row">
+                                <span class="auto-label">Автовиведення</span>
+                                <label class="auto-toggle">
+                                    <input type="checkbox" id="auto-cashout-2" onchange="onAutoCashoutChange(2)">
+                                    <span class="auto-toggle-slider"></span>
+                                </label>
+                                <input type="number" class="auto-coeff-input" id="auto-coeff-2" value="1.10" min="1.01" step="0.01" disabled>
+                            </div>
+                            <div class="auto-status-text" id="auto-status-2"></div>
                         </div>
                         <div class="action-container">
                             <button class="action-btn btn-bet" id="btn-2" onclick="handleAction(2)">
@@ -399,7 +465,9 @@
         // ==========================================
 
         // Новий раунд: скидаємо завершені, виставляємо queued
-        function handleNewRound() {
+        // Використовуємо window.handleNewRound щоб авто-режим міг перевизначити
+        function handleNewRound() { window.handleNewRound(); }
+        window.handleNewRound = function() {
             for (let i = 1; i <= 2; i++) {
                 const bet = window.myBets[i];
 
@@ -418,7 +486,7 @@
                     });
                 }
             }
-        }
+        };
 
         // Перехід waiting->flying: bet_placed стає playing
         function activatePlacedBets() {
@@ -755,6 +823,128 @@
         }
 
         requestAnimationFrame(drawGame);
+
+        // ==========================================
+        // АВТО-РЕЖИМ
+        // ==========================================
+
+        // Стан авто для кожного боксу
+        window.autoMode = {
+            1: { tab: 'manual', autoBet: false, autoCashout: false },
+            2: { tab: 'manual', autoBet: false, autoCashout: false }
+        };
+
+        // Перемикання між вкладками Ставка / Авто
+        window.switchTab = function(box, tab) {
+            const manualPanel = document.getElementById(`manual-panel-${box}`);
+            const autoPanel = document.getElementById(`auto-panel-${box}`);
+            const tabs = document.querySelectorAll(`#box-${box} .bet-tab`);
+
+            window.autoMode[box].tab = tab;
+
+            if (tab === 'manual') {
+                manualPanel.classList.remove('hidden');
+                autoPanel.classList.remove('active');
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+                // Вимикаємо авто при переході на ручний режим
+                window.autoMode[box].autoBet = false;
+                window.autoMode[box].autoCashout = false;
+                document.getElementById(`auto-bet-${box}`).checked = false;
+                document.getElementById(`auto-cashout-${box}`).checked = false;
+                document.getElementById(`auto-coeff-${box}`).disabled = true;
+                document.getElementById(`auto-status-${box}`).innerText = '';
+            } else {
+                manualPanel.classList.add('hidden');
+                autoPanel.classList.add('active');
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+            }
+        };
+
+        // Тогл "Автоставка"
+        window.onAutoBetChange = function(box) {
+            const checked = document.getElementById(`auto-bet-${box}`).checked;
+            window.autoMode[box].autoBet = checked;
+            updateAutoStatus(box);
+        };
+
+        // Тогл "Автовиведення"
+        window.onAutoCashoutChange = function(box) {
+            const checked = document.getElementById(`auto-cashout-${box}`).checked;
+            window.autoMode[box].autoCashout = checked;
+            const coeffInput = document.getElementById(`auto-coeff-${box}`);
+            coeffInput.disabled = !checked;
+            updateAutoStatus(box);
+        };
+
+        function updateAutoStatus(box) {
+            const mode = window.autoMode[box];
+            const statusEl = document.getElementById(`auto-status-${box}`);
+            if (mode.autoBet && mode.autoCashout) {
+                const coeff = parseFloat(document.getElementById(`auto-coeff-${box}`).value) || 1.10;
+                statusEl.innerText = `Авто: ставка + вивід на ${coeff.toFixed(2)}x`;
+            } else if (mode.autoBet) {
+                statusEl.innerText = 'Авто: ставка активна';
+            } else if (mode.autoCashout) {
+                const coeff = parseFloat(document.getElementById(`auto-coeff-${box}`).value) || 1.10;
+                statusEl.innerText = `Авто: вивід на ${coeff.toFixed(2)}x`;
+            } else {
+                statusEl.innerText = '';
+            }
+        }
+
+        // Оновлення статусу при зміні коефіцієнта
+        document.getElementById('auto-coeff-1').addEventListener('input', () => updateAutoStatus(1));
+        document.getElementById('auto-coeff-2').addEventListener('input', () => updateAutoStatus(2));
+
+        // ---- Авто-логіка, яка спрацьовує при зміні стану гри ----
+
+        // Авто-ставка: коли починається новий раунд — автоматично ставимо
+        function triggerAutoActions_newRound() {
+            for (let i = 1; i <= 2; i++) {
+                const mode = window.autoMode[i];
+                if (mode.tab !== 'auto' || !mode.autoBet) continue;
+                const bet = window.myBets[i];
+                if (bet.state === 'none') {
+                    const inputAmt = parseInt(document.getElementById(`input-${i}`).value);
+                    if (inputAmt > currentBalance) {
+                        document.getElementById(`auto-status-${i}`).innerText = '⚠ Недостатньо фішок';
+                        continue;
+                    }
+                    handleAction(i);
+                }
+            }
+        }
+
+        // Авто-вивід: перевіряємо кожні 50мс чи досяг коефіцієнт потрібного значення
+        function triggerAutoActions_flying() {
+            for (let i = 1; i <= 2; i++) {
+                const mode = window.autoMode[i];
+                if (mode.tab !== 'auto' || !mode.autoCashout) continue;
+                const bet = window.myBets[i];
+                if (bet.state !== 'playing') continue;
+                const targetCoeff = parseFloat(document.getElementById(`auto-coeff-${i}`).value) || 1.10;
+                if (currentMultiplier >= targetCoeff) {
+                    handleAction(i); // cashout
+                }
+            }
+        }
+
+        // Патчимо window.handleNewRound щоб вставити авто-ставку після основної логіки
+        const _baseHandleNewRound = window.handleNewRound;
+        window.handleNewRound = function() {
+            _baseHandleNewRound();
+            setTimeout(() => triggerAutoActions_newRound(), 150);
+        };
+
+        // Перевіряємо авто-вивід кожні 50мс під час польоту
+        setInterval(() => {
+            if (gameState === 'flying') {
+                triggerAutoActions_flying();
+            }
+        }, 50);
+
     </script>
 </body>
 </html>

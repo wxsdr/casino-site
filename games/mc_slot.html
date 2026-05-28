@@ -727,9 +727,40 @@
             document.getElementById('balance-amount').innerText = currentBalance;
         });
 
-        const blockTypes = ['block-dirt', 'block-wood', 'block-gold', 'block-diamond', 'block-emerald'];
+        // Символи з вагою для реалістичних шансів
+        const symbolWeights = [
+            { block: 'block-dirt', weight: 35 },    // 35%
+            { block: 'block-wood', weight: 30 },    // 30%
+            { block: 'block-gold', weight: 15 },    // 15%
+            { block: 'block-emerald', weight: 12 }, // 12%
+            { block: 'block-diamond', weight: 8 }   // 8%
+        ];
+        
+        // Розрахунок загальної ваги
+        let totalWeight = 0;
+        symbolWeights.forEach(w => totalWeight += w.weight);
+        
+        function getRandomBlock() {
+            const rand = Math.random() * totalWeight;
+            let sum = 0;
+            for (let item of symbolWeights) {
+                sum += item.weight;
+                if (rand < sum) return item.block;
+            }
+            return 'block-dirt';
+        }
+        
         const wildBlock = 'block-wild';
         const scatterBlock = 'block-scatter';
+        
+        // Нова таблиця виплат з реалістичними коефіцієнтами
+        const payTable = {
+            'block-dirt': { 3: 2, 4: 5, 5: 10 },
+            'block-wood': { 3: 3, 4: 8, 5: 15 },
+            'block-gold': { 3: 5, 4: 15, 5: 30 },
+            'block-emerald': { 3: 8, 4: 20, 5: 50 },
+            'block-diamond': { 3: 15, 4: 40, 5: 100 }
+        };
         
         let isSpinning = false;
         let isBonusGame = false;
@@ -743,15 +774,6 @@
         
         const betInput = document.getElementById('bet-input');
         const bonusPriceSpan = document.getElementById('bonus-price');
-        
-        // Оновлена таблиця виплат з реалістичними коефіцієнтами
-        const payTable = {
-            'block-dirt': { 3: 5, 4: 15, 5: 40 },
-            'block-wood': { 3: 8, 4: 20, 5: 60 },
-            'block-gold': { 3: 15, 4: 40, 5: 100 },
-            'block-diamond': { 3: 30, 4: 80, 5: 200 },
-            'block-emerald': { 3: 25, 4: 60, 5: 150 }
-        };
         
         function updateBonusPrice() {
             let bonusPrice = currentBet * 100;
@@ -870,7 +892,7 @@
                     cellsHtml += getBlockDisplay(block, hasMult, multVal);
                 }
                 for (let i = 0; i < STRIP_LENGTH - 3; i++) {
-                    cellsHtml += getBlockDisplay(blockTypes[Math.floor(Math.random() * blockTypes.length)]);
+                    cellsHtml += getBlockDisplay(getRandomBlock());
                 }
                 stripDiv.innerHTML = cellsHtml;
                 stripDiv.style.transform = 'translateY(0px)';
@@ -892,28 +914,36 @@
         function generateMatrix() {
             let matrix = [[], [], []];
             let rainingWilds = (isBonusGame && activeBonusType === 'raining') ? Math.floor(Math.random() * 3) + 1 : 0;
+            
             for (let y = 0; y < 3; y++) {
                 for (let x = 0; x < 5; x++) {
+                    // Sticky wilds from bonus
                     if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) {
                         matrix[y][x] = wildBlock;
                         continue;
                     }
-                    if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.3) {
+                    
+                    // Raining wilds bonus
+                    if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.25) {
                         matrix[y][x] = wildBlock;
                         rainingWilds--;
-                    } else {
-                        let r = Math.random();
-                        // Зменшений шанс випадання WILD (4% замість 10%)
-                        if (!isBonusGame && r < 0.04) {
-                            matrix[y][x] = wildBlock;
-                        } 
-                        // Зменшений шанс випадання SCATTER (2%)
-                        else if (!isBonusGame && r < 0.06) {
-                            matrix[y][x] = scatterBlock;
-                        }
-                        else {
-                            matrix[y][x] = blockTypes[Math.floor(Math.random() * blockTypes.length)];
-                        }
+                        continue;
+                    }
+                    
+                    // Regular spin with realistic chances
+                    let rand = Math.random();
+                    
+                    // Scatter - 2% chance
+                    if (!isBonusGame && rand < 0.02) {
+                        matrix[y][x] = scatterBlock;
+                    }
+                    // Wild - 3% chance
+                    else if (!isBonusGame && rand < 0.05) {
+                        matrix[y][x] = wildBlock;
+                    }
+                    // Regular symbols with weights
+                    else {
+                        matrix[y][x] = getRandomBlock();
                     }
                 }
             }
@@ -934,9 +964,10 @@
                 { indices: [[1,0],[1,1],[1,2],[1,3],[1,4]] },
                 { indices: [[2,0],[2,1],[2,2],[2,3],[2,4]] }
             ];
+            
             for (let line of lines) {
                 let firstBlock = matrix[line.indices[0][0]][line.indices[0][1]];
-                if (firstBlock === wildBlock) continue;
+                if (firstBlock === wildBlock || firstBlock === scatterBlock) continue;
                 let count = 1;
                 for (let i = 1; i < 5; i++) {
                     let block = matrix[line.indices[i][0]][line.indices[i][1]];
@@ -1010,7 +1041,7 @@
                             cellsHtml += getBlockDisplay(block, hasMult, multVal);
                         }
                         for (let i = 0; i < STRIP_LENGTH - 3; i++) {
-                            cellsHtml += getBlockDisplay(blockTypes[Math.floor(Math.random() * blockTypes.length)]);
+                            cellsHtml += getBlockDisplay(getRandomBlock());
                         }
                         strip.innerHTML = cellsHtml;
                         strip.style.transform = 'translateY(0px)';
@@ -1025,7 +1056,7 @@
                 const winPositions = winResult.winPositions;
                 
                 if (winAmount > 0) {
-                    if (winAmount >= currentBet * 50) playSound('bigwin');
+                    if (winAmount >= currentBet * 30) playSound('bigwin');
                     else playSound('win');
                     
                     for (let pos of winPositions) {
@@ -1039,7 +1070,7 @@
                 }
                 
                 if (winAmount > 0) {
-                    addToHistory(`🏆 +${winAmount} 🪙`, winAmount >= currentBet * 50 ? 'big-win' : 'win');
+                    addToHistory(`🏆 +${winAmount} 🪙`, winAmount >= currentBet * 30 ? 'big-win' : 'win');
                     setStatus(`🏆 ВИГРАШ: ${winAmount}`);
                     if (!isBonusGame) await userRef.update({ chips: currentBalance + winAmount });
                 } else if (scatters >= 3) {
@@ -1152,9 +1183,9 @@
         
         function initGame() {
             const initMatrix = [
-                [blockTypes[2], blockTypes[1], blockTypes[3], blockTypes[0], blockTypes[4]],
-                [blockTypes[0], blockTypes[2], blockTypes[4], blockTypes[1], blockTypes[3]],
-                [blockTypes[3], blockTypes[4], blockTypes[0], blockTypes[2], blockTypes[1]]
+                ['block-diamond', 'block-gold', 'block-emerald', 'block-dirt', 'block-wood'],
+                ['block-wood', 'block-diamond', 'block-gold', 'block-emerald', 'block-dirt'],
+                ['block-emerald', 'block-dirt', 'block-wood', 'block-diamond', 'block-gold']
             ];
             buildReels(initMatrix);
             updateBonusPrice();

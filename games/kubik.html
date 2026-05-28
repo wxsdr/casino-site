@@ -449,42 +449,34 @@
 
     <script>
         // ========== ЗВУКИ ==========
-        // Щоб додати свої звуки, потрібно:
-        // 1. Покласти файли в папку з грою:
-        //    - dice.mp3 (звук кидання кубиків)
-        //    - win.mp3 (звук виграшу)
-        //    - lose.mp3 (звук програшу)
-        //    - bigwin.mp3 (звук великого виграшу)
-        // 2. Розкоментувати код нижче та закоментувати тестові звуки
-        
         let audioContext = null;
+        let diceAudio = null;
         
-        // ===== ТЕСТОВІ ЗВУКИ (для перевірки) - видаліть або закоментуйте коли додасте свої файли =====
+        // Функція для ініціалізації аудіо
         function initAudio() {
-            if (audioContext) return;
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (diceAudio) return;
+            // Звук кидання кубиків з файлу dice.mp3
+            diceAudio = new Audio('dice.mp3');
+            diceAudio.volume = 0.5;
         }
         
+        // Звук кидання кубиків (з файлу)
         function playDiceSound() {
             try {
                 initAudio();
-                if (audioContext.state === 'suspended') audioContext.resume();
-                const now = audioContext.currentTime;
-                const gainNode = audioContext.createGain();
-                gainNode.connect(audioContext.destination);
-                gainNode.gain.value = 0.08;
-                const osc = audioContext.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.value = 380;
-                osc.connect(gainNode);
-                osc.start();
-                osc.stop(now + 0.08);
+                if (diceAudio) {
+                    diceAudio.currentTime = 0;
+                    diceAudio.play().catch(e => console.log('Audio play error:', e));
+                }
             } catch(e) { console.log('Audio error:', e); }
         }
         
+        // Звук виграшу (синтезований)
         function playWinSound() {
             try {
-                initAudio();
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
                 if (audioContext.state === 'suspended') audioContext.resume();
                 const now = audioContext.currentTime;
                 const notes = [523.25, 659.25, 783.99];
@@ -503,9 +495,12 @@
             } catch(e) {}
         }
         
+        // Звук програшу (синтезований)
         function playLoseSound() {
             try {
-                initAudio();
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
                 if (audioContext.state === 'suspended') audioContext.resume();
                 const now = audioContext.currentTime;
                 const osc = audioContext.createOscillator();
@@ -521,9 +516,12 @@
             } catch(e) {}
         }
         
+        // Звук великого виграшу (синтезований)
         function playBigWinSound() {
             try {
-                initAudio();
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
                 if (audioContext.state === 'suspended') audioContext.resume();
                 const now = audioContext.currentTime;
                 const notes = [523.25, 659.25, 783.99, 1046.50];
@@ -541,54 +539,6 @@
                 });
             } catch(e) {}
         }
-        
-        let diceAudio = null;
-        let winAudio = null;
-        let loseAudio = null;
-        let bigWinAudio = null;
-        
-        function initAudio() {
-            if (diceAudio) return;
-            diceAudio = new Audio('dice.mp3');
-            winAudio = new Audio('win.mp3');
-            loseAudio = new Audio('lose.mp3');
-            bigWinAudio = new Audio('bigwin.mp3');
-            // Налаштування гучності (0.0 - 1.0)
-            diceAudio.volume = 0.5;
-            winAudio.volume = 0.6;
-            loseAudio.volume = 0.5;
-            bigWinAudio.volume = 0.7;
-        }
-        
-        function playDiceSound() {
-            if (diceAudio) {
-                diceAudio.currentTime = 0;
-                diceAudio.play().catch(e => console.log(e));
-            }
-        }
-        
-        function playWinSound() {
-            if (winAudio) {
-                winAudio.currentTime = 0;
-                winAudio.play().catch(e => console.log(e));
-            }
-        }
-        
-        function playLoseSound() {
-            if (loseAudio) {
-                loseAudio.currentTime = 0;
-                loseAudio.play().catch(e => console.log(e));
-            }
-        }
-        
-        function playBigWinSound() {
-            if (bigWinAudio) {
-                bigWinAudio.currentTime = 0;
-                bigWinAudio.play().catch(e => console.log(e));
-            }
-        }
-        
-        ===== КІНЕЦЬ КОДУ ДЛЯ ВАШИХ ЗВУКІВ ===== */
 
         // Firebase
         const firebaseConfig = {
@@ -782,7 +732,7 @@
             const dice2 = Math.floor(Math.random() * 6) + 1;
             const sum = dice1 + dice2;
             
-            // Звук кидання кубиків
+            // Звук кидання кубиків з файлу dice.mp3
             playDiceSound();
             
             await animateDice(dice1, dice2);
@@ -870,6 +820,7 @@
         
         updateBetUI();
         
+        // Ініціалізація аудіо контексту при першому кліку
         document.body.addEventListener('click', () => {
             if (audioContext && audioContext.state === 'suspended') {
                 audioContext.resume();

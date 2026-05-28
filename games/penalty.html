@@ -7,127 +7,162 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         :root {
-            --neon: #00ff9d; --gold: #d4af37; --bg-dark: #0f172a;
+            --neon: #00ff9d; --gold: #d4af37; --bg-dark: #070913;
+            --holo-red: #ff3366; --holo-blue: #00e5ff;
         }
         
-        body { margin: 0; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; user-select: none; background: #000;}
+        body { margin: 0; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; user-select: none; background: var(--bg-dark);}
+
+        /* НАВІГАЦІЯ */
+        .nav-bar { position: absolute; top: 15px; left: 20px; z-index: 100;}
+        .back-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 4px; cursor: pointer; backdrop-filter: blur(5px); font-weight: bold; text-transform: uppercase; transition: 0.3s;}
+        .back-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--neon); color: var(--neon); box-shadow: 0 0 10px rgba(0,255,157,0.3);}
 
         /* =========================================
-           1. ФОН СТАДІОНУ ТА ПОЛЕ
-           Для ідеалу скачай фон стадіону і заміни URL
+           ФОН ТА ПОЛЕ (PURE CSS)
         ========================================= */
         .game-screen {
             flex: 1; position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-            background: url('https://img.freepik.com/free-vector/soccer-stadium-night-with-spotlights_107791-15555.jpg') center/cover no-repeat;
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+            background: radial-gradient(circle at 50% 30%, #1a1c2e 0%, var(--bg-dark) 80%);
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+            perspective: 1000px;
         }
 
-        .pitch { position: absolute; bottom: 0; left: 0; width: 100%; height: 25%; background: linear-gradient(to bottom, #1b5e20, #22c55e); z-index: 1;}
+        /* Прожектори */
+        .game-screen::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at 30% -20%, rgba(0,229,255,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% -20%, rgba(0,255,157,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
 
-        /* НАВІГАЦІЯ (Міні) */
-        .nav-bar { position: absolute; top: 15px; left: 20px; z-index: 100;}
-        .back-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 4px; cursor: pointer; backdrop-filter: blur(5px);}
-        .back-btn:hover { background: rgba(255,255,255,0.2); }
+        /* 3D Трава */
+        .pitch { 
+            position: absolute; bottom: 0; left: -50%; width: 200%; height: 40%; 
+            background: repeating-linear-gradient(90deg, #0d381e 0px, #0d381e 100px, #114a27 100px, #114a27 200px);
+            transform: rotateX(75deg); transform-origin: top;
+            border-top: 4px solid rgba(255,255,255,0.3); z-index: 1;
+            box-shadow: inset 0 50px 100px rgba(0,0,0,0.9);
+        }
 
         /* =========================================
-           2. ВЕРХНЯ ПАНЕЛЬ (МНОЖНИКИ ЯК НА СКРІНІ)
+           ВЕРХНЯ ПАНЕЛЬ МНОЖНИКІВ
         ========================================= */
-        .top-bar { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: rgba(15, 23, 42, 0.7); padding: 5px 15px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); z-index: 10; backdrop-filter: blur(8px); width: 600px; justify-content: space-between;}
-        .flag { font-size: 24px; line-height: 1;}
+        .top-bar { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: rgba(10, 15, 25, 0.8); padding: 5px 20px; border-radius: 40px; border: 1px solid rgba(0,229,255,0.3); z-index: 10; backdrop-filter: blur(10px); width: 650px; justify-content: space-between; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,229,255,0.1);}
         .multiplier-track { display: flex; align-items: center; justify-content: space-between; flex: 1; margin: 0 20px; position: relative;}
-        .multiplier-track::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.2); transform: translateY(-50%); z-index: -1; border-radius: 2px;}
+        .multiplier-track::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.1); transform: translateY(-50%); z-index: -1; border-radius: 2px;}
         
         .step { display: flex; flex-direction: column; align-items: center; position: relative;}
-        .dot { width: 10px; height: 10px; background: #555; border-radius: 50%; margin-bottom: 5px; transition: 0.3s; border: 2px solid #222;}
-        .step-text { color: #888; font-size: 12px; font-weight: bold;}
+        .dot { width: 12px; height: 12px; background: #333; border-radius: 50%; margin-bottom: 5px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid #111;}
+        .step-text { color: #666; font-size: 13px; font-weight: bold; transition: 0.3s;}
         
-        .step.passed .dot { background: var(--neon); box-shadow: 0 0 10px var(--neon); border-color: white;}
-        .step.active .dot { background: white; box-shadow: 0 0 15px white, 0 0 5px var(--neon); border-color: var(--neon); transform: scale(1.5);}
-        .step.passed .step-text, .step.active .step-text { color: white; }
+        .step.passed .dot { background: var(--neon); box-shadow: 0 0 15px var(--neon); border-color: #fff;}
+        .step.passed .step-text { color: var(--neon); text-shadow: 0 0 5px var(--neon);}
+        
+        .step.active .dot { background: #fff; box-shadow: 0 0 25px #fff, 0 0 15px var(--neon); border-color: var(--neon); transform: scale(1.6);}
+        .step.active .step-text { color: white; text-shadow: 0 0 10px white; transform: scale(1.1);}
 
         /* =========================================
-           3. ЛІВЕ МЕНЮ (ІКОНКИ)
+           НЕОНОВІ ВОРОТА
         ========================================= */
-        .side-menu { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 10;}
-        .side-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; backdrop-filter: blur(5px);}
-        .side-icon:hover { background: rgba(255,255,255,0.3); }
-
-        /* =========================================
-           4. ВОРОТА З ГЕКСАГОНАЛЬНОЮ СІТКОЮ
-        ========================================= */
-        .goal-container { position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%); width: 65%; max-width: 900px; height: 400px; border: 12px solid #e2e8f0; border-bottom: none; box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 40px rgba(0,0,0,0.8); display: flex; align-items: flex-end; justify-content: center; z-index: 2;
-            /* Ідеальна сітка як на фото */
-            background-color: rgba(0,0,0,0.2);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='69.28' viewBox='0 0 40 69.28'%3E%3Cpath d='M40 17.32l-20 11.55L0 17.32V0l20 11.55L40 0v17.32zm0 34.64l-20 11.55L0 51.96V34.64l20 11.55L40 34.64v17.32z' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3C/svg%3E");
+        .goal-container { position: absolute; bottom: 22%; left: 50%; transform: translateX(-50%); width: 65%; max-width: 900px; height: 380px; 
+            border: 10px solid #fff; border-bottom: none; border-radius: 8px 8px 0 0; 
+            box-shadow: 0 0 20px rgba(255,255,255,0.5), inset 0 0 20px rgba(255,255,255,0.5), 0 20px 50px rgba(0,0,0,0.8); 
+            display: flex; align-items: flex-end; justify-content: center; z-index: 2;
+            /* Ідеальна CSS Сітка */
+            background-image: 
+                linear-gradient(45deg, rgba(255,255,255,0.15) 2px, transparent 2px),
+                linear-gradient(-45deg, rgba(255,255,255,0.15) 2px, transparent 2px);
+            background-size: 30px 30px;
         }
 
-        /* ВОРОТАР (Заміни URL на свого воротаря) */
-        .goalkeeper { position: absolute; bottom: 0; left: 50%; width: 150px; height: 200px; margin-left: -75px;
-            background-image: url('https://cdn-icons-png.flaticon.com/512/3048/3048122.png'); /* ЗАМІНИТИ НА СВІЙ ФАЙЛ */
-            background-size: contain; background-repeat: no-repeat; background-position: bottom center; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); z-index: 3; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); transform-origin: bottom center;}
-        
-        /* 5 ЗОН ДЛЯ УДАРУ */
+        /* =========================================
+           ГОЛОГРАФІЧНИЙ ВОРОТАР (PURE CSS)
+        ========================================= */
+        .goalkeeper { 
+            position: absolute; bottom: 0; left: 50%; width: 140px; height: 190px; margin-left: -70px;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            z-index: 3; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            filter: drop-shadow(0 0 15px var(--holo-red));
+        }
+        /* Голова */
+        .gk-head { width: 35px; height: 35px; background: rgba(255,51,102,0.8); border: 2px solid #fff; border-radius: 50%; margin-bottom: 5px; box-shadow: 0 0 20px var(--holo-red); }
+        /* Тіло */
+        .gk-body { width: 70px; height: 80px; background: rgba(255,51,102,0.5); border: 2px solid #fff; border-radius: 15px; position: relative; box-shadow: inset 0 0 15px var(--holo-red);}
+        /* Руки (розмах) */
+        .gk-arms { position: absolute; top: 10px; left: -45px; right: -45px; height: 20px; background: rgba(255,51,102,0.7); border: 2px solid #fff; border-radius: 10px; box-shadow: 0 0 15px var(--holo-red);}
+        /* Ноги */
+        .gk-legs { display: flex; justify-content: space-between; width: 60px; margin-top: 5px; }
+        .gk-leg { width: 20px; height: 65px; background: rgba(255,51,102,0.6); border: 2px solid #fff; border-radius: 10px; box-shadow: 0 0 10px var(--holo-red);}
+
+        /* =========================================
+           ЗОНИ ДЛЯ УДАРУ ТА ПРИЦІЛИ
+        ========================================= */
         .target-zones { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
         .target-zones.active { pointer-events: auto; }
-        .zone { position: absolute; display: flex; align-items: center; justify-content: center; cursor: pointer;}
-        .zone-tl { top: 5%; left: 5%; width: 30%; height: 40%; }
-        .zone-tc { top: 5%; left: 35%; width: 30%; height: 90%; }
-        .zone-tr { top: 5%; left: 65%; width: 30%; height: 40%; }
-        .zone-bl { top: 45%; left: 5%; width: 30%; height: 45%; }
-        .zone-br { top: 45%; left: 65%; width: 30%; height: 45%; }
+        .zone { position: absolute; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;}
+        .zone-tl { top: 0; left: 0; width: 30%; height: 45%; }
+        .zone-tc { top: 0; left: 30%; width: 40%; height: 85%; }
+        .zone-tr { top: 0; left: 70%; width: 30%; height: 45%; }
+        .zone-bl { top: 45%; left: 0; width: 30%; height: 55%; }
+        .zone-br { top: 45%; left: 70%; width: 30%; height: 55%; }
         
-        .target-icon { width: 50px; height: 50px; border: 3px solid rgba(0,255,157,0.5); border-radius: 50%; opacity: 0; transition: 0.2s; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(0,255,157,0.3); transform: scale(0.5); background: rgba(0,0,0,0.3);}
-        .target-icon::before { content: '🎯'; font-size: 24px; color: var(--neon); opacity: 0.8;}
-        .target-zones.active .zone:hover .target-icon { opacity: 1; transform: scale(1);}
+        /* Неоновий приціл */
+        .target-icon { width: 60px; height: 60px; border: 2px dashed rgba(0,255,157,0.5); border-radius: 50%; opacity: 0; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; justify-content: center; transform: scale(0.3); background: rgba(0,0,0,0.3);}
+        .target-icon::after { content: '+'; font-size: 30px; color: var(--neon); text-shadow: 0 0 10px var(--neon);}
+        .target-zones.active .zone:hover .target-icon { opacity: 1; transform: scale(1); border: 3px solid var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.4), inset 0 0 20px rgba(0,255,157,0.4); background: rgba(0,255,157,0.1);}
 
         /* =========================================
-           5. 3D М'ЯЧ
+           3D М'ЯЧ (PURE CSS)
         ========================================= */
-        .ball { width: 100px; height: 100px; border-radius: 50%; position: absolute; bottom: 5%; left: 50%; margin-left: -50px; z-index: 10;
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/d/d3/Soccerball.svg'); /* ЗАМІНИТИ НА СВІЙ ФАЙЛ */
-            background-size: cover; box-shadow: -15px 15px 25px rgba(0,0,0,0.8), inset -10px -10px 20px rgba(0,0,0,0.6); background-color: white;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none;}
+        .ball { 
+            width: 80px; height: 80px; border-radius: 50%; position: absolute; bottom: 5%; left: 50%; margin-left: -40px; z-index: 10;
+            background: radial-gradient(circle at 35% 35%, #fff 0%, #ddd 40%, #777 80%, #333 100%);
+            box-shadow: -15px 20px 25px rgba(0,0,0,0.8), inset -5px -5px 15px rgba(0,0,0,0.6);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
+        }
+        /* Патерн м'яча */
+        .ball::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,20 65,35 60,55 40,55 35,35' fill='%23111'/%3E%3Cpolygon points='15,30 25,15 45,25 35,45 20,45' fill='none' stroke='%23111' stroke-width='3'/%3E%3Cpolygon points='85,30 75,15 55,25 65,45 80,45' fill='none' stroke='%23111' stroke-width='3'/%3E%3Cpolygon points='25,75 40,85 60,85 75,75 50,60' fill='none' stroke='%23111' stroke-width='3'/%3E%3C/svg%3E");
+            opacity: 0.9;
+        }
 
         /* =========================================
-           6. НИЖНЯ ПАНЕЛЬ (ТОЧНА КОПІЯ)
+           НИЖНЯ ПАНЕЛЬ КЕРУВАННЯ
         ========================================= */
-        .controls-bar { background: rgba(15, 23, 42, 0.95); padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid rgba(255,255,255,0.1); z-index: 100; height: 80px; position: relative;}
+        .controls-bar { background: rgba(10, 15, 25, 0.95); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,229,255,0.2); z-index: 100; height: 90px; box-shadow: 0 -10px 30px rgba(0,0,0,0.8);}
         
-        /* Трава поверх панелі (опціонально) */
-        .controls-bar::before { content:''; position: absolute; top: -15px; left: 0; width: 100%; height: 15px; background: url('https://www.transparenttextures.com/patterns/grass.png'); opacity: 0.5; pointer-events: none;}
-
-        .panel-block { display: flex; align-items: center; gap: 20px; flex: 1;}
+        .panel-block { display: flex; align-items: center; gap: 30px; flex: 1;}
         .panel-block.right { justify-content: flex-end;}
 
         /* СТАВКА */
-        .bet-label { color: #888; font-size: 10px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; text-align: center;}
-        .bet-controls { display: flex; align-items: center; background: rgba(0,0,0,0.6); border-radius: 20px; padding: 5px 10px;}
-        .bet-btn { background: #333; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;}
-        .bet-btn:hover { background: white; color: black; }
-        .bet-input { background: transparent; color: white; border: none; font-size: 18px; font-weight: bold; width: 80px; text-align: center; outline: none;}
+        .label { color: #888; font-size: 11px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; text-align: center; letter-spacing: 1px;}
+        .bet-controls { display: flex; align-items: center; background: rgba(0,0,0,0.8); border-radius: 30px; padding: 5px 15px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 0 15px rgba(0,0,0,0.8);}
+        .bet-btn { background: transparent; color: #aaa; border: none; font-size: 24px; cursor: pointer; transition: 0.2s; padding: 0 10px;}
+        .bet-btn:hover { color: white; transform: scale(1.2);}
+        .bet-input { background: transparent; color: white; border: none; font-size: 22px; font-weight: bold; width: 100px; text-align: center; outline: none;}
 
-        /* ВЕЛИКА БІЛА КНОПКА PLAY */
-        .play-btn { background: white; border: none; width: 90px; height: 90px; border-radius: 20px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transform: translateY(-20px); position: absolute; left: 50%; margin-left: -45px;}
-        .play-btn:hover { transform: translateY(-25px); box-shadow: 0 15px 30px rgba(255,255,255,0.3);}
-        .play-btn:disabled { background: #444; cursor: not-allowed; transform: translateY(-20px); box-shadow: none;}
-        .play-icon { width: 0; height: 0; border-top: 15px solid transparent; border-bottom: 15px solid transparent; border-left: 25px solid #22c55e; margin-bottom: 5px; margin-left: 5px;}
-        .play-text { color: #22c55e; font-weight: bold; font-size: 14px;}
+        /* КНОПКА PLAY */
+        .play-btn { background: #fff; border: none; width: 110px; height: 110px; border-radius: 25px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 -5px 0 rgba(0,0,0,0.2); transform: translateY(-25px); position: absolute; left: 50%; margin-left: -55px; border: 4px solid var(--neon);}
+        .play-btn:hover { transform: translateY(-30px) scale(1.05); box-shadow: 0 15px 35px rgba(0,255,157,0.4);}
+        .play-btn:disabled { background: #333; border-color: #555; cursor: not-allowed; transform: translateY(-25px) scale(1); box-shadow: none;}
+        .play-icon { width: 0; height: 0; border-top: 18px solid transparent; border-bottom: 18px solid transparent; border-left: 28px solid #16a34a; margin-bottom: 5px; margin-left: 8px;}
+        .play-text { color: #16a34a; font-weight: 900; font-size: 16px; letter-spacing: 1px;}
 
         /* КНОПКА COLLECT */
-        .collect-btn { background: linear-gradient(to bottom, #fde047, #d4af37); border: none; height: 90px; padding: 0 30px; border-radius: 20px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.4); transform: translateY(-20px); position: absolute; left: 50%; margin-left: -65px; display: none;}
-        .collect-btn:hover { transform: translateY(-25px); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.6);}
-        .collect-text { color: black; font-weight: bold; font-size: 16px; margin-top: 5px;}
+        .collect-btn { background: linear-gradient(to bottom, #fde047, #d4af37); border: none; height: 110px; padding: 0 40px; border-radius: 25px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4), inset 0 -5px 0 rgba(0,0,0,0.2); transform: translateY(-25px); position: absolute; left: 50%; margin-left: -85px; display: none; border: 4px solid #fff;}
+        .collect-btn:hover { transform: translateY(-30px) scale(1.05); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);}
+        .collect-text { color: #000; font-weight: 900; font-size: 18px; margin-top: 5px;}
 
         /* БАЛАНС ТА ВИГРАШ */
-        .stat-box { display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.6); padding: 8px 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); min-width: 120px;}
-        .stat-label { color: #888; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;}
-        .stat-value { font-size: 18px; font-weight: bold; color: white;}
-        .stat-value.win { color: var(--gold); }
+        .stat-box { display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.7); padding: 10px 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); min-width: 140px; box-shadow: inset 0 0 15px rgba(0,0,0,0.5);}
+        .stat-value { font-size: 22px; font-weight: bold; color: white;}
+        .stat-value.win { color: var(--gold); text-shadow: 0 0 10px rgba(212,175,55,0.5);}
 
         /* СТАТУС ПОВІДОМЛЕННЯ */
-        #status-msg { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0.5); font-size: 80px; font-weight: 900; text-transform: uppercase; opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50; text-shadow: 0 15px 30px rgba(0,0,0,0.9); pointer-events: none;}
+        #status-msg { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) scale(0.5); font-size: 90px; font-weight: 900; text-transform: uppercase; opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50; text-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 30px currentColor; pointer-events: none;}
         .msg-goal { color: var(--neon); }
-        .msg-save { color: var(--red); }
+        .msg-save { color: var(--holo-red); }
         .msg-win { color: var(--gold); }
         #status-msg.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
@@ -135,24 +170,27 @@
 </head>
 <body>
 
+    <!-- ЕКРАН БЛОКУВАННЯ -->
     <div id="out-of-casino-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,5,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(15px);">
-        <h1 style="color: #ff003c; font-size: 50px; margin: 0;">🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
-        <p style="color: #aaa; font-size: 24px;">Ви покинули територію казино.</p>
+        <h1 style="color: var(--holo-red); font-size: 50px; margin: 0; text-shadow: 0 0 30px var(--holo-red);">🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
+        <p style="color: #aaa; font-size: 24px; margin-top: 15px;">Ви покинули територію Diamond Casino.</p>
         <button onclick="window.location.href='../index.html'" style="padding: 15px 40px; margin-top: 30px; background: var(--gold); color: black; border:none; cursor:pointer; font-weight:bold; border-radius:8px; font-size:18px;">В Лобі</button>
     </div>
 
-    <audio id="sound-kick" src="../sounds/spin.mp3" preload="auto"></audio>
-    <audio id="sound-win" src="../sounds/win.mp3" preload="auto"></audio>
-    <audio id="sound-lose" src="../sounds/lose.mp3" preload="auto"></audio>
+    <!-- ВБУДОВАНІ ЗВУКИ ВИСОКОЇ ЯКОСТІ (Прямі лінки) -->
+    <audio id="sound-kick" src="https://cdn.freesound.org/previews/346/346049_5121236-lq.mp3" preload="auto"></audio>
+    <audio id="sound-win" src="https://cdn.freesound.org/previews/270/270404_5123851-lq.mp3" preload="auto"></audio>
+    <audio id="sound-lose" src="https://cdn.freesound.org/previews/131/131657_2398403-lq.mp3" preload="auto"></audio>
+    <audio id="sound-collect" src="https://cdn.freesound.org/previews/201/201159_255853-lq.mp3" preload="auto"></audio>
 
     <div class="nav-bar">
-        <button class="back-btn" onclick="window.location.href='../index.html'">Лобі</button>
+        <button class="back-btn" onclick="window.location.href='../index.html'">⬅ Назад</button>
     </div>
 
     <div class="game-screen">
         
+        <!-- БАР МНОЖНИКІВ -->
         <div class="top-bar">
-            <div class="flag">🇮🇪</div>
             <div class="multiplier-track">
                 <div class="step" id="step-0"><div class="dot"></div><div class="step-text">x1.92</div></div>
                 <div class="step" id="step-1"><div class="dot"></div><div class="step-text">x3.84</div></div>
@@ -160,18 +198,13 @@
                 <div class="step" id="step-3"><div class="dot"></div><div class="step-text">x15.36</div></div>
                 <div class="step" id="step-4"><div class="dot"></div><div class="step-text">x30.72</div></div>
             </div>
-            <div class="flag">🇺🇿</div>
-        </div>
-
-        <div class="side-menu">
-            <div class="side-icon">⭐</div>
-            <div class="side-icon">📄</div>
-            <div class="side-icon">⚙️</div>
         </div>
 
         <div id="status-msg">GOAL!</div>
 
+        <!-- ВОРОТА ТА ПЕРСОНАЖІ -->
         <div class="goal-container">
+            
             <div class="target-zones" id="target-zones">
                 <div class="zone zone-tl" onclick="shoot('tl')"><div class="target-icon"></div></div>
                 <div class="zone zone-tc" onclick="shoot('tc')"><div class="target-icon"></div></div>
@@ -179,23 +212,32 @@
                 <div class="zone zone-bl" onclick="shoot('bl')"><div class="target-icon"></div></div>
                 <div class="zone zone-br" onclick="shoot('br')"><div class="target-icon"></div></div>
             </div>
-            <div class="goalkeeper" id="goalkeeper"></div>
+            
+            <!-- Голографічний воротар на CSS -->
+            <div class="goalkeeper" id="goalkeeper">
+                <div class="gk-head"></div>
+                <div class="gk-body"><div class="gk-arms"></div></div>
+                <div class="gk-legs">
+                    <div class="gk-leg"></div><div class="gk-leg"></div>
+                </div>
+            </div>
+
         </div>
 
         <div class="pitch"></div>
         <div class="ball" id="ball"></div>
     </div>
 
+    <!-- НИЖНЯ ПАНЕЛЬ КЕРУВАННЯ -->
     <div class="controls-bar">
         
         <div class="panel-block">
             <div>
-                <div class="bet-label">СТАВКА (BET)</div>
+                <div class="label">СТАВКА (BET)</div>
                 <div class="bet-controls">
                     <button class="bet-btn" onclick="changeBet(-10)">-</button>
                     <input type="number" class="bet-input" id="bet-input" value="10" readonly>
                     <button class="bet-btn" onclick="changeBet(10)">+</button>
-                    <span style="font-size: 20px; margin-left: 10px;">🪙</span>
                 </div>
             </div>
         </div>
@@ -206,23 +248,26 @@
         </button>
         
         <button class="collect-btn" id="collect-btn" onclick="collectWinnings()">
-            <div style="font-size: 24px; color: black;">💰</div>
+            <div style="font-size: 28px; color: black;">💰</div>
             <div class="collect-text">COLLECT</div>
         </button>
 
         <div class="panel-block right">
             <div class="stat-box">
-                <div class="stat-label">BALANCE</div>
+                <div class="label">БАЛАНС</div>
                 <div class="stat-value"><span id="balance-display">0</span></div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">WIN</div>
+                <div class="label">ПОТОЧНИЙ ВИГРАШ</div>
                 <div class="stat-value win"><span id="win-display">0.00</span></div>
             </div>
         </div>
     </div>
 
     <script>
+        // ==========================================
+        // БАЗА ДАНИХ ТА АВТОРИЗАЦІЯ
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -245,8 +290,12 @@
             document.getElementById('balance-display').innerText = currentBalance;
         });
 
-        // ІГРОВА ЛОГІКА
+        // ==========================================
+        // ІГРОВА ЛОГІКА ТА ЖОРСТКИЙ БАЛАНС (50%)
+        // ==========================================
         const multipliers = [1.92, 3.84, 7.68, 15.36, 30.72];
+        const WIN_CHANCE = 0.50; // РІВНО 50% НА КОЖЕН УДАР. Це дає 4% House Edge.
+
         let currentStep = -1; 
         let currentBet = 10;
         let potentialWin = 0;
@@ -272,21 +321,16 @@
 
             await userRef.update({ chips: currentBalance - currentBet });
 
-            currentStep = 0;
-            potentialWin = 0;
-            updateUI();
+            currentStep = 0; potentialWin = 0; updateUI();
             showMsg("ОБЕРІТЬ ЦІЛЬ!", "msg-goal");
         }
 
         function updateUI() {
             if (currentStep === -1) {
-                playBtn.style.display = "flex";
-                collectBtn.style.display = "none";
-                targetZones.classList.remove('active');
-                winDisplay.innerText = "0.00";
+                playBtn.style.display = "flex"; collectBtn.style.display = "none";
+                targetZones.classList.remove('active'); winDisplay.innerText = "0.00";
             } else {
-                playBtn.style.display = "none";
-                collectBtn.style.display = "flex";
+                playBtn.style.display = "none"; collectBtn.style.display = "flex";
                 targetZones.classList.add('active');
                 
                 if (currentStep === 0) {
@@ -317,55 +361,58 @@
             targetZones.classList.remove('active');
             collectBtn.disabled = true;
 
-            document.getElementById('sound-kick').play().catch(()=>{});
+            // ЗВУК УДАРУ
+            let soundKick = document.getElementById('sound-kick');
+            soundKick.currentTime = 0; soundKick.play().catch(()=>{});
 
             const ball = document.getElementById('ball');
             const goalie = document.getElementById('goalkeeper');
 
-            // 3D АНІМАЦІЯ ПОЛЬОТУ (Зменшуємо масштаб (s), щоб здавалося, що м'яч летить вдалину)
+            // 3D АНІМАЦІЯ ПОЛЬОТУ
             const targets = {
-                'tl': { x: '-350px', y: '-350px', s: 0.35 },
-                'tc': { x: '0px',    y: '-350px', s: 0.35 },
-                'tr': { x: '350px',  y: '-350px', s: 0.35 },
+                'tl': { x: '-320px', y: '-280px', s: 0.35 },
+                'tc': { x: '0px',    y: '-300px', s: 0.35 },
+                'tr': { x: '320px',  y: '-280px', s: 0.35 },
                 'bl': { x: '-350px', y: '-100px', s: 0.45 },
                 'br': { x: '350px',  y: '-100px', s: 0.45 }
             };
 
             const dives = [
-                { id: 'tl', t: 'translate(-200px, -120px) rotate(-45deg)' },
-                { id: 'tc', t: 'translate(0, -150px)' },
-                { id: 'tr', t: 'translate(200px, -120px) rotate(45deg)' },
-                { id: 'bl', t: 'translate(-200px, 0) rotate(-70deg)' },
-                { id: 'br', t: 'translate(200px, 0) rotate(70deg)' }
+                { id: 'tl', t: 'translate(-200px, -100px) rotate(-55deg)' },
+                { id: 'tc', t: 'translate(0, -140px) scale(1.1)' },
+                { id: 'tr', t: 'translate(200px, -100px) rotate(55deg)' },
+                { id: 'bl', t: 'translate(-220px, 10px) rotate(-75deg)' },
+                { id: 'br', t: 'translate(220px, 10px) rotate(75deg)' }
             ];
 
-            const isGoal = Math.random() < 0.70;
+            // МАТЕМАТИКА
+            const isGoal = Math.random() < WIN_CHANCE;
 
             let goalieDive;
-            if (!isGoal) {
-                goalieDive = dives.find(d => d.id === target).t; 
-            } else {
+            if (!isGoal) goalieDive = dives.find(d => d.id === target).t; 
+            else {
                 const wrongDives = dives.filter(d => d.id !== target); 
                 goalieDive = wrongDives[Math.floor(Math.random() * wrongDives.length)].t;
             }
 
             const pos = targets[target];
-            // М'яч летить, крутиться і зменшується
-            ball.style.transform = `translateX(calc(-50% + ${pos.x})) translateY(${pos.y}) scale(${pos.s}) rotate(${Math.random() * 1000}deg)`;
+            ball.style.transform = `translateX(calc(-50% + ${pos.x})) translateY(${pos.y}) scale(${pos.s}) rotate(${Math.random() * 1080}deg)`;
             
-            setTimeout(() => { goalie.style.transform = goalieDive; }, 150);
+            setTimeout(() => { goalie.style.transform = goalieDive; }, 100);
 
             setTimeout(() => {
                 if (isGoal) {
                     potentialWin = Math.floor(currentBet * multipliers[currentStep]);
                     currentStep++;
                     showMsg("ГОЛ!", "msg-goal");
+                    document.getElementById('sound-win').currentTime = 0;
                     document.getElementById('sound-win').play().catch(()=>{});
                     
                     if (currentStep >= 5) setTimeout(() => collectWinnings(), 1500); 
                     else setTimeout(() => resetPitch(), 1500); 
                 } else {
                     showMsg("СЕЙВ!", "msg-save");
+                    document.getElementById('sound-lose').currentTime = 0;
                     document.getElementById('sound-lose').play().catch(()=>{});
                     currentStep = -1; potentialWin = 0;
                     setTimeout(() => resetPitch(), 2000);
@@ -378,7 +425,8 @@
             isAnimating = true;
 
             showMsg(`ВИГРАШ:\n${potentialWin} 🪙`, "msg-win");
-            document.getElementById('sound-win').play().catch(()=>{});
+            document.getElementById('sound-collect').currentTime = 0;
+            document.getElementById('sound-collect').play().catch(()=>{});
             
             await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + potentialWin }); });
 
@@ -396,8 +444,8 @@
             goalie.style.transform = 'translateX(-50%) translateY(0) rotate(0deg)';
             
             setTimeout(() => {
-                ball.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
-                goalie.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                ball.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                goalie.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
                 isAnimating = false; updateUI();
             }, 50);
         }

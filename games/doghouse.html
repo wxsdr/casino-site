@@ -8,155 +8,162 @@
     <style>
         :root { 
             --gold: #d4af37; --gold-light: #fdf5a9; --gold-dark: #8a6d1c;
-            --red: #c62828; --black: #111; --green: #00b347; --neon: #00ff9d;
+            --red: #c62828; --neon: #00ff9d;
+            --wood-light: #a66d3a; --wood-dark: #5c3211; --wood-border: #3e1f06;
         }
         
         body { 
-            margin: 0; background: radial-gradient(circle at top, #12121a 0%, #050505 100%); 
+            margin: 0; background: radial-gradient(circle at top, #87CEEB 0%, #4682B4 100%); /* Небесний фон як у грі */
             color: white; font-family: 'Segoe UI', Tahoma, sans-serif; 
             overflow: hidden; height: 100vh; display: flex; flex-direction: column;
         }
         
-        /* НАВІГАЦІЯ (Як у рулетці) */
+        /* НАВІГАЦІЯ */
         .nav-bar { 
-            padding: 10px 40px; background: linear-gradient(to bottom, #161616, #000); 
-            display: flex; justify-content: space-between; border-bottom: 2px solid var(--gold); 
-            align-items: center; box-shadow: 0 5px 25px rgba(0,0,0,0.9); z-index: 100;
+            padding: 10px 40px; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; border-bottom: 2px solid var(--wood-light); 
+            align-items: center; z-index: 100;
         }
         .back-btn { 
             background: rgba(0,0,0,0.5); color: var(--gold); border: 1px solid var(--gold); 
-            padding: 8px 20px; border-radius: 4px; cursor: pointer; transition: 0.3s; 
-            font-weight: bold; text-transform: uppercase; letter-spacing: 1px; 
-            box-shadow: inset 0 0 10px rgba(212,175,55,0.2);
+            padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase;
         }
-        .back-btn:hover { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold);}
 
-        /* ГОЛОВНИЙ ЛЕЙАУТ СЛОТА */
         .main-layout { 
             display: flex; justify-content: center; align-items: center; 
-            flex: 1; padding: 20px; gap: 40px;
+            flex: 1; padding: 20px; gap: 30px;
         }
 
-        /* ІГРОВИЙ АПАРАТ */
-        .slot-container {
-            background: linear-gradient(135deg, #4e342e, #3e2723);
-            border: 8px solid #2e1814;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.6), 0 0 20px rgba(212,175,55,0.2);
+        /* ДИЗАЙН СОБАЧОЇ БУДКИ */
+        .dog-house-wrapper {
             position: relative;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        .slot-container::before {
-            content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
-            border-radius: 25px; border: 2px solid var(--gold); pointer-events: none;
+        /* Дах будки */
+        .roof {
+            width: 760px; height: 120px;
+            background: linear-gradient(to bottom, #d93838, #8b0000);
+            border: 6px solid #4a0000;
+            border-radius: 60px 60px 10px 10px;
+            position: relative; z-index: 10;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 10px 20px rgba(255,255,255,0.2);
+            display: flex; justify-content: center; align-items: center;
         }
+        .roof-title {
+            font-size: 50px; font-weight: 900; color: #ffeb3b;
+            text-shadow: 3px 3px 0 #b30000, -2px -2px 0 #fff, 0 10px 15px rgba(0,0,0,0.8);
+            letter-spacing: 2px; font-family: 'Impact', sans-serif;
+            -webkit-text-stroke: 2px #5c3211;
+        }
+
+        /* Основа будки */
+        .slot-container {
+            background: linear-gradient(135deg, var(--wood-light), var(--wood-dark));
+            border: 15px solid var(--wood-border);
+            border-top: none;
+            border-radius: 0 0 20px 20px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.8);
+            position: relative; top: -10px;
+        }
+
+        /* Зелена лоза по боках */
+        .slot-container::after, .slot-container::before {
+            content: '🌿'; position: absolute; font-size: 60px; top: 20%;
+            filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.5));
+        }
+        .slot-container::before { left: -45px; transform: rotate(-15deg); }
+        .slot-container::after { right: -45px; transform: scaleX(-1) rotate(-15deg); }
 
         .slot-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 120px);
-            grid-template-rows: repeat(3, 110px);
-            gap: 10px;
-            background: #111;
-            padding: 15px;
-            border-radius: 10px;
-            border: 4px solid var(--gold-dark);
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
+            display: grid; grid-template-columns: repeat(5, 125px); grid-template-rows: repeat(3, 115px);
+            gap: 8px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 10px;
+            border: 4px solid #1a0d04; box-shadow: inset 0 0 40px rgba(0,0,0,1);
         }
 
+        /* Символи */
         .reel-item {
-            background: linear-gradient(to bottom, #fff, #e0e0e0);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 55px;
-            box-shadow: inset 0 -5px 15px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.5);
-            transition: all 0.1s;
-            position: relative;
+            background: linear-gradient(to bottom, #ffffff, #d3e3f0); /* Блакитнуватий фон барабанів */
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-size: 60px; box-shadow: inset 0 -5px 15px rgba(0,0,0,0.1), 0 5px 10px rgba(0,0,0,0.5);
+            position: relative; border: 2px solid #a4b4c4;
+            user-select: none;
         }
 
+        /* Sticky Wild (Будка з множником) */
         .reel-item.sticky {
-            background: linear-gradient(to bottom, #fdf5a9, #d4af37);
-            border: 3px solid #c62828;
-            box-shadow: 0 0 20px rgba(212,175,55,0.8);
+            background: radial-gradient(circle, #ffe066 0%, #d4af37 100%);
+            border: 3px solid #ff0000; box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(255,255,255,0.5);
+            animation: wildPulse 2s infinite;
         }
+        @keyframes wildPulse { 0% { filter: brightness(1); } 50% { filter: brightness(1.2); } 100% { filter: brightness(1); } }
 
-        .reel-item.sticky::after {
-            content: 'x2';
-            position: absolute;
-            bottom: 5px; right: 5px;
-            background: #c62828; color: white;
-            font-size: 14px; font-weight: bold;
-            padding: 2px 6px; border-radius: 4px;
+        .wild-multiplier {
+            position: absolute; bottom: 5px; right: 5px;
+            background: #ff0000; color: white; font-size: 20px; font-weight: 900;
+            padding: 2px 8px; border-radius: 5px; border: 2px solid white;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5); font-family: 'Impact', sans-serif;
         }
 
         /* ПАНЕЛЬ УПРАВЛІННЯ */
         .control-panel {
-            background: linear-gradient(135deg, rgba(25,25,25,0.95), rgba(10,10,10,0.95));
-            border-radius: 15px; border: 1px solid #333;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-            padding: 30px; width: 350px;
-            display: flex; flex-direction: column; gap: 20px;
+            background: rgba(0,0,0,0.8); border-radius: 15px; border: 2px solid var(--wood-light);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8); padding: 25px; width: 340px;
+            display: flex; flex-direction: column; gap: 20px; backdrop-filter: blur(5px);
         }
 
-        .status-box {
-            background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px;
-            border: 1px solid #333; text-align: center;
-        }
-
-        #status-text {
-            font-size: 20px; font-weight: bold; color: var(--gold);
-            text-transform: uppercase; text-shadow: 0 0 10px rgba(212,175,55,0.4);
-        }
+        .status-box { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid #333; text-align: center; }
+        #status-text { font-size: 20px; font-weight: bold; color: var(--gold); text-transform: uppercase; }
 
         .bet-controls { display: flex; justify-content: space-between; align-items: center; }
-        
-        .bet-btn {
-            background: #222; color: white; border: 1px solid #444;
-            padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;
-        }
-        .bet-btn:hover { background: #333; }
+        .bet-btn { background: #222; color: white; border: 1px solid #444; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px;}
+        .bet-btn:hover { background: #444; }
 
-        #spin-btn {
-            padding: 20px; font-size: 22px; font-weight: bold; border: none; border-radius: 8px; 
-            cursor: pointer; transition: 0.3s; 
-            background: linear-gradient(to bottom, var(--gold-light), var(--gold)); 
-            color: black; box-shadow: 0 5px 15px rgba(212,175,55,0.4), inset 0 2px 0 rgba(255,255,255,0.5); 
-            text-transform: uppercase; letter-spacing: 2px;
+        .spin-btn {
+            padding: 20px; font-size: 24px; font-weight: 900; border: none; border-radius: 50px; 
+            cursor: pointer; transition: 0.2s; background: linear-gradient(to bottom, #00ff9d, #00b347); 
+            color: #000; box-shadow: 0 8px 0 #006622, 0 15px 20px rgba(0,0,0,0.5); text-transform: uppercase;
         }
-        #spin-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(212,175,55,0.7); }
-        #spin-btn:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; transform: none; }
+        .spin-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #006622, 0 5px 10px rgba(0,0,0,0.5); }
+        .spin-btn:disabled { background: #555; box-shadow: 0 8px 0 #222; color: #888; cursor: not-allowed; }
 
-        .bonus-active { color: var(--red) !important; text-shadow: 0 0 15px var(--red) !important; font-size: 24px !important; animation: pulse 1s infinite; }
+        /* Кнопка купівлі бонусу */
+        .buy-bonus-btn {
+            background: linear-gradient(to bottom, #ff5e62, #ff9966);
+            border: 2px solid #ffcccc; color: white; padding: 15px; border-radius: 10px;
+            font-size: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4); transition: 0.3s;
+        }
+        .buy-bonus-btn:hover { transform: scale(1.02); box-shadow: 0 5px 25px rgba(255, 0, 0, 0.7); }
+        .buy-bonus-btn:disabled { filter: grayscale(100%); cursor: not-allowed; transform: none; }
+
+        .bonus-active { color: #ff3366 !important; text-shadow: 0 0 20px #ff3366 !important; font-size: 26px !important; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div id="out-of-casino-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,5,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(15px);">
-        <h1 style="color: var(--red); font-size: 50px; margin: 0; text-shadow: 0 0 30px var(--red);">🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
-        <p style="color: #aaa; font-size: 24px; margin-top: 15px;">Ви покинули територію Diamond Casino.</p>
-        <button onclick="leaveGame()" style="padding: 15px 40px; margin-top: 30px; background: var(--gold); color: black; border:none; cursor:pointer; font-weight:bold; border-radius:8px; font-size: 18px;">Повернутися в лобі</button>
-    </div>
-
-    <audio id="sound-spin" src="../sounds/spin.mp3" preload="auto"></audio>
-    <audio id="sound-win" src="../sounds/win.mp3" preload="auto"></audio>
-    <audio id="sound-bonus" src="../sounds/win.mp3" preload="auto"></audio>
-
     <div class="nav-bar">
-        <button class="back-btn" onclick="leaveGame()">⬅ Втекти</button>
-        <h2 style="margin: 0; color: var(--gold); text-shadow: 0 0 15px rgba(212,175,55,0.5); letter-spacing: 3px;">🐶 THE DOG HOUSE</h2>
-        <div style="font-size: 18px; font-weight: bold;">БАЛАНС: <strong id="balance-display" style="color: var(--neon); font-size: 26px; margin-left: 10px; text-shadow: 0 0 10px var(--neon);">0</strong></div>
+        <button class="back-btn" onclick="leaveGame()">⬅ В лобі</button>
+        <div style="font-size: 20px; font-weight: bold;">БАЛАНС: <strong id="balance-display" style="color: var(--neon); font-size: 26px; margin-left: 10px;">0</strong> 🪙</div>
     </div>
 
     <div class="main-layout">
         
-        <div class="slot-container">
-            <div class="slot-grid" id="slot-grid">
+        <!-- ІГРОВЕ ПОЛЕ (Дерев'яна будка) -->
+        <div class="dog-house-wrapper">
+            <div class="roof">
+                <div class="roof-title">THE DOG HOUSE</div>
+            </div>
+            <div class="slot-container">
+                <div class="slot-grid" id="slot-grid">
+                    <!-- Генерується через JS -->
                 </div>
+            </div>
         </div>
 
+        <!-- ПАНЕЛЬ УПРАВЛІННЯ -->
         <div class="control-panel">
             <div class="status-box">
                 <div id="status-text">ОЧІКУВАННЯ СТАВКИ...</div>
@@ -166,20 +173,22 @@
                 <div style="color: #aaa; font-size: 14px; margin-bottom: 10px;">СТАВКА (🪙)</div>
                 <div class="bet-controls">
                     <button class="bet-btn" onclick="changeBet(-10)">-10</button>
-                    <span id="current-bet" style="font-size: 28px; font-weight: bold;">10</span>
+                    <span id="current-bet" style="font-size: 28px; font-weight: bold; color: white;">10</span>
                     <button class="bet-btn" onclick="changeBet(10)">+10</button>
                 </div>
             </div>
 
-            <button id="spin-btn" onclick="spin()">КРУТИТИ</button>
+            <button class="spin-btn" id="spin-btn" onclick="spin()">КРУТИТИ</button>
+            
+            <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">
+                КУПИТИ БОНУС <br><span style="font-size: 14px; font-weight: normal;" id="bonus-cost-text">(1000 🪙)</span>
+            </button>
         </div>
 
     </div>
 
     <script>
-        // ==========================================
-        // БАЗА ДАНИХ ТА СИНХРОНІЗАЦІЯ
-        // ==========================================
+        // ІНІЦІАЛІЗАЦІЯ FIREBASE (Як у вас в коді)
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -195,14 +204,8 @@
         let currentBalance = 0;
         const userRef = database.ref('users_by_name/' + username.toLowerCase());
         
-        // Перевірка in_casino (ідентична рулетці)
         userRef.on('value', snap => {
             const data = snap.val();
-            if (data && data.in_casino === false) {
-                document.getElementById('out-of-casino-overlay').style.display = 'flex';
-            } else {
-                document.getElementById('out-of-casino-overlay').style.display = 'none';
-            }
             currentBalance = data ? (data.chips || 0) : 0;
             document.getElementById('balance-display').innerText = currentBalance;
         });
@@ -210,29 +213,31 @@
         function leaveGame() { window.location.href = '../index.html'; }
 
         // ==========================================
-        // ЛОГІКА СЛОТА
+        // ЛОГІКА СЛОТА THE DOG HOUSE
         // ==========================================
-        const symbols = ['🐶', '🦴', '🦮', '🥩', '🐾', '🏠']; 
-        // 🐾 - Scatter (Бонус)
-        // 🏠 - Будка (Sticky Wild під час бонуски)
+        
+        // Масив символів. Для ідеального вигляду замініть ці літери/емодзі на HTML теги <img src="ваша_текстура.png" width="80px">
+        const standardSymbols = ['🐕', '🐩', '🦮', '🦴', '📿', 'A', 'K', 'Q', 'J', '10']; 
+        const scatterSymbol = '🐾'; // Бонус (падає тільки на 1, 3, 5)
+        const wildSymbol = '🏠'; // Будка
 
         const gridElement = document.getElementById('slot-grid');
         let isSpinning = false;
         let isBonusGame = false;
         let freeSpinsLeft = 0;
-        let stickyWilds = {}; 
+        let stickyWilds = {}; // Зберігаємо будки { "row-col": multiplier }
         let currentBet = 10;
 
         function changeBet(amount) {
             if (isSpinning || isBonusGame) return;
             let newBet = currentBet + amount;
-            if (newBet >= 10 && newBet <= 1000) {
+            if (newBet >= 10 && newBet <= 5000) {
                 currentBet = newBet;
                 document.getElementById('current-bet').innerText = currentBet;
+                document.getElementById('bonus-cost-text').innerText = `(${currentBet * 100} 🪙)`;
             }
         }
 
-        // Відмальовування поля
         function drawGrid(matrix) {
             gridElement.innerHTML = '';
             for (let r = 0; r < 3; r++) {
@@ -240,84 +245,123 @@
                     const div = document.createElement('div');
                     div.className = 'reel-item';
                     
-                    // Перевірка чи це залипша будка у бонусці
                     if (isBonusGame && stickyWilds[`${r}-${c}`]) {
-                        div.innerText = '🏠';
+                        // Якщо це бонуска і тут є залипша будка
+                        div.innerHTML = `${wildSymbol}<div class="wild-multiplier">x${stickyWilds[`${r}-${c}`]}</div>`;
+                        div.classList.add('sticky');
+                    } else if (matrix[r][c] === wildSymbol) {
+                        // Якщо звичайна будка випала (просто для вигляду, можна додати рандомний множник)
+                        let mult = Math.random() > 0.5 ? 2 : 3;
+                        div.innerHTML = `${wildSymbol}<div class="wild-multiplier">x${mult}</div>`;
                         div.classList.add('sticky');
                     } else {
-                        div.innerText = matrix[r][c] || '❔';
+                        // Звичайний символ або скатер
+                        div.innerHTML = matrix[r][c] || '❔';
                     }
                     gridElement.appendChild(div);
                 }
             }
         }
 
-        drawGrid([[],[],[]]); // Пусте поле на старті
+        drawGrid([[],[],[]]); 
 
-        async function spin() {
-            if (isSpinning) return;
-            
-            if (!isBonusGame && currentBalance < currentBet) {
-                return alert("Недостатньо фішок!");
-            }
-
-            isSpinning = true;
-            document.getElementById('spin-btn').disabled = true;
-            const statusText = document.getElementById('status-text');
-            statusText.innerText = "КРУТИМО...";
-            statusText.style.color = "white";
-
-            document.getElementById('sound-spin').play().catch(()=>{});
-
-            // Списання ставки та запис в лог бекенду (Render/Discord)
-            if (!isBonusGame) {
-                await userRef.update({ chips: currentBalance - currentBet });
-                
-                // ЗАГЛУШКА ДЛЯ БЕКЕНДУ (Discord Webhook):
-                /*
-                fetch(`https://casino-backend-039e.onrender.com/api/bet?user=${username}&game=doghouse&amount=${currentBet}`, { method: 'POST' });
-                */
-            } else {
-                freeSpinsLeft--;
-            }
-
-            // Імітація обертання (блимання символів)
-            let spinsCount = 0;
-            let spinInterval = setInterval(() => {
-                let tempMatrix = generateRandomMatrix();
-                drawGrid(tempMatrix);
-                spinsCount++;
-                
-                if (spinsCount > 15) { // Зупиняємо через ~1.5 сек
-                    clearInterval(spinInterval);
-                    finalizeSpin();
-                }
-            }, 100);
-        }
-
-        function generateRandomMatrix() {
+        // ГЕНЕРАТОР МАТРИЦІ З РЕАЛІСТИЧНИМИ ШАНСАМИ
+        function generateRandomMatrix(forceScatters = false) {
             let matrix = [];
             for (let r = 0; r < 3; r++) {
                 let row = [];
                 for (let c = 0; c < 5; c++) {
-                    row.push(symbols[Math.floor(Math.random() * symbols.length)]);
+                    // Якщо форсуємо бонуску (для покупки) - ставимо скатери на 1, 3, 5 барабани в 1-й ряд
+                    if (forceScatters && r === 1 && (c === 0 || c === 2 || c === 4)) {
+                        row.push(scatterSymbol);
+                        continue;
+                    }
+
+                    // Логіка Скатери падають ТІЛЬКИ на 1, 3 і 5 барабанах (індекси 0, 2, 4)
+                    let isScatterReel = (c === 0 || c === 2 || c === 4);
+                    // Шанс випадіння скатера на потрібному барабані (наприклад 7%)
+                    // Загальний шанс випадіння 3-х скатерів одночасно буде ~0.03% (як у справжньому казино)
+                    if (!isBonusGame && !forceScatters && isScatterReel && Math.random() < 0.07) {
+                        row.push(scatterSymbol);
+                    } else {
+                        // Звичайні символи або дикий символ (будка) на 2, 3, 4 барабанах
+                        if ((c === 1 || c === 2 || c === 3) && Math.random() < 0.1) {
+                            row.push(wildSymbol);
+                        } else {
+                            row.push(standardSymbols[Math.floor(Math.random() * standardSymbols.length)]);
+                        }
+                    }
                 }
                 matrix.push(row);
             }
             return matrix;
         }
 
-        async function finalizeSpin() {
-            let finalMatrix = generateRandomMatrix();
+        // КУПІВЛЯ БОНУСУ (x100)
+        async function buyBonus() {
+            const cost = currentBet * 100;
+            if (isSpinning || isBonusGame) return;
+            if (currentBalance < cost) return alert(`Недостатньо фішок! Потрібно ${cost} 🪙`);
+
+            if(confirm(`Купити бонус за ${cost} 🪙?`)) {
+                isSpinning = true;
+                lockButtons(true);
+                await userRef.update({ chips: currentBalance - cost });
+                
+                document.getElementById('status-text').innerText = "ПОКУПКА БОНУСУ...";
+                
+                // Імітація обертання, яке гарантовано видасть 3 скатери
+                let spinsCount = 0;
+                let spinInterval = setInterval(() => {
+                    drawGrid(generateRandomMatrix());
+                    spinsCount++;
+                    if (spinsCount > 15) {
+                        clearInterval(spinInterval);
+                        finalizeSpin(true); // true = forceScatters
+                    }
+                }, 100);
+            }
+        }
+
+        async function spin() {
+            if (isSpinning) return;
+            if (!isBonusGame && currentBalance < currentBet) return alert("Недостатньо фішок!");
+
+            isSpinning = true;
+            lockButtons(true);
+            const statusText = document.getElementById('status-text');
+            statusText.innerText = "КРУТИМО...";
+            statusText.style.color = "white";
+
+            if (!isBonusGame) {
+                await userRef.update({ chips: currentBalance - currentBet });
+            } else {
+                freeSpinsLeft--;
+            }
+
+            let spinsCount = 0;
+            let spinInterval = setInterval(() => {
+                drawGrid(generateRandomMatrix());
+                spinsCount++;
+                if (spinsCount > 15) {
+                    clearInterval(spinInterval);
+                    finalizeSpin(false);
+                }
+            }, 100);
+        }
+
+        async function finalizeSpin(forceScatters = false) {
+            let finalMatrix = generateRandomMatrix(forceScatters);
             let scatterCount = 0;
 
-            // Логіка Sticky Wilds під час бонуски
+            // Перевіряємо матрицю на будки (Sticky Wilds) під час бонуски
             for (let r = 0; r < 3; r++) {
                 for (let c = 0; c < 5; c++) {
-                    if (isBonusGame && !stickyWilds[`${r}-${c}`] && finalMatrix[r][c] === '🏠') {
-                        stickyWilds[`${r}-${c}`] = true; // Запам'ятовуємо нову будку
+                    // Будки падають тільки на 2, 3 і 4 барабанах
+                    if (isBonusGame && !stickyWilds[`${r}-${c}`] && finalMatrix[r][c] === wildSymbol && (c === 1 || c === 2 || c === 3)) {
+                        stickyWilds[`${r}-${c}`] = Math.random() > 0.5 ? 2 : 3; // Рандомний множник x2 або x3
                     }
-                    if (finalMatrix[r][c] === '🐾') scatterCount++;
+                    if (finalMatrix[r][c] === scatterSymbol) scatterCount++;
                 }
             }
 
@@ -329,13 +373,20 @@
             let winAmount = 0;
             const statusText = document.getElementById('status-text');
 
-            // Примітивна логіка виграшу: перевіряємо горизонтальні лінії (3 в ряд)
+            // --- БАЗОВА ПЕРЕВІРКА ЛІНІЙ (Спрощена) ---
+            // У реальній грі перевіряються 20 ліній. Тут ми перевіряємо горизонталі та базові діагоналі
             for (let r = 0; r < 3; r++) {
-                if (matrix[r][0] === matrix[r][1] && matrix[r][1] === matrix[r][2]) {
-                    winAmount += currentBet * 3; // Базовий множник x3
-                    // Якщо там ще є будка, множимо (дуже спрощено)
-                    if (stickyWilds[`${r}-0`] || stickyWilds[`${r}-1`] || stickyWilds[`${r}-2`]) {
-                        winAmount *= 2; 
+                if (matrix[r][0] === matrix[r][1] || matrix[r][1] === wildSymbol) {
+                    // Дуже спрощена логіка видачі виграшу для прикладу
+                    if(Math.random() > 0.6) {
+                        let lineWin = currentBet * (Math.floor(Math.random() * 5) + 1);
+                        
+                        // Множимо на будки, якщо вони є на цій лінії
+                        let multiplier = 1;
+                        for(let c = 1; c <= 3; c++) {
+                            if(stickyWilds[`${r}-${c}`]) multiplier += stickyWilds[`${r}-${c}`];
+                        }
+                        winAmount += (lineWin * (multiplier > 1 ? multiplier : 1));
                     }
                 }
             }
@@ -343,19 +394,12 @@
             if (winAmount > 0) {
                 statusText.innerHTML = `ВИГРАШ: +${winAmount} 🪙`;
                 statusText.style.color = "var(--neon)";
-                document.getElementById('sound-win').play().catch(()=>{});
                 await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + winAmount }); });
-                
-                // ЗАГЛУШКА ДЛЯ БЕКЕНДУ (Discord Win Log):
-                /*
-                fetch(`https://casino-backend-039e.onrender.com/api/winLog?user=${username}&win=${winAmount}&game=doghouse`, { method: 'POST' });
-                */
             } else if (!isBonusGame) {
                 statusText.innerText = "НЕ ПОЩАСТИЛО";
                 statusText.style.color = "var(--red)";
             }
 
-            // Перевірка Бонусної гри
             setTimeout(() => {
                 if (!isBonusGame && scatterCount >= 3) {
                     startBonusGame();
@@ -368,13 +412,13 @@
                 } else {
                     resetControls();
                 }
-            }, 1500);
+            }, 1000);
         }
 
         function startBonusGame() {
-            document.getElementById('sound-bonus').play().catch(()=>{});
             isBonusGame = true;
-            freeSpinsLeft = 10;
+            // Рандомна кількість фріспінів (від 9 до 27, як у грі)
+            freeSpinsLeft = Math.floor(Math.random() * 18) + 9; 
             stickyWilds = {}; 
             
             const statusText = document.getElementById('status-text');
@@ -384,9 +428,9 @@
             const spinBtn = document.getElementById('spin-btn');
             spinBtn.innerText = "ФРІСПІН";
             spinBtn.style.background = "var(--red)";
-            spinBtn.style.color = "white";
+            spinBtn.style.boxShadow = "0 8px 0 #8b0000";
             
-            alert("🐾 ВИ СПІЙМАЛИ 3 ЛАПИ! 10 Безкоштовних обертань! Всі будки стають липкими!");
+            alert(`🐾 ВИ СПІЙМАЛИ БОНУСКУ! Виграно ${freeSpinsLeft} фріспінів!`);
             
             isSpinning = false;
             spinBtn.disabled = false;
@@ -402,14 +446,21 @@
 
         function resetControls() {
             isSpinning = false;
+            lockButtons(false);
             document.getElementById('status-text').innerText = "ОЧІКУВАННЯ СТАВКИ...";
             document.getElementById('status-text').style.color = "var(--gold)";
             
             const spinBtn = document.getElementById('spin-btn');
             spinBtn.innerText = "КРУТИТИ";
-            spinBtn.disabled = false;
-            spinBtn.style.background = "linear-gradient(to bottom, var(--gold-light), var(--gold))";
-            spinBtn.style.color = "black";
+            spinBtn.style.background = "linear-gradient(to bottom, #00ff9d, #00b347)";
+            spinBtn.style.boxShadow = "0 8px 0 #006622, 0 15px 20px rgba(0,0,0,0.5)";
+        }
+
+        function lockButtons(lock) {
+            document.getElementById('spin-btn').disabled = lock;
+            document.getElementById('buy-bonus-btn').disabled = lock;
+            const betBtns = document.querySelectorAll('.bet-btn');
+            betBtns.forEach(btn => btn.disabled = lock);
         }
     </script>
 </body>

@@ -7,143 +7,201 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         :root {
-            --bg-top: #0f172a; --bg-bottom: #1e293b;
-            --grass-light: #22c55e; --grass-dark: #166534;
+            --bg-top: #1e3a8a; --bg-bottom: #0f172a;
+            --grass-top: #166534; --grass-bottom: #22c55e;
             --gold: #d4af37; --neon: #00ff9d; --red: #ef4444;
+            --panel-bg: rgba(15, 23, 42, 0.85);
         }
-        body { margin: 0; background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom)); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; user-select: none;}
+        
+        body { margin: 0; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; user-select: none; background: #000;}
         
         /* НАВІГАЦІЯ */
-        .nav-bar { padding: 10px 40px; background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; z-index: 100;}
-        .back-btn { background: transparent; color: white; border: 1px solid #555; padding: 8px 20px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-weight: bold; text-transform: uppercase;}
-        .back-btn:hover { background: #333; color: var(--gold); border-color: var(--gold);}
+        .nav-bar { padding: 10px 30px; background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7)); display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1); z-index: 100; position: absolute; width: 100%; box-sizing: border-box;}
+        .back-btn { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-weight: bold; text-transform: uppercase;}
+        .back-btn:hover { background: rgba(255,255,255,0.1); border-color: white;}
         
-        /* СТАДІОН (Ігрове поле) */
-        .stadium { flex: 1; position: relative; display: flex; flex-direction: column; justify-content: flex-end; perspective: 1000px;}
+        /* СТАДІОН ТА ФОН */
+        .stadium { flex: 1; position: relative; background: radial-gradient(ellipse at center, var(--bg-top) 0%, var(--bg-bottom) 100%); display: flex; flex-direction: column; justify-content: flex-end; align-items: center;}
         
-        /* ПРОГРЕС-БАР МНОЖНИКІВ */
-        .multiplier-bar { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: rgba(0,0,0,0.6); padding: 10px 30px; border-radius: 30px; border: 1px solid #444; z-index: 10;}
-        .step { padding: 5px 15px; margin: 0 5px; border-radius: 15px; color: #888; font-weight: bold; transition: 0.3s;}
-        .step.active { background: var(--neon); color: black; box-shadow: 0 0 15px var(--neon); transform: scale(1.1);}
-        .step.passed { color: var(--neon); }
-
-        /* ВОРОТА ТА СІТКА */
-        .goal-container { position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%); width: 700px; height: 350px; border: 10px solid #e2e8f0; border-bottom: none; box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.8); display: flex; align-items: flex-end; justify-content: center; z-index: 2;
-            /* Текстура сітки */
-            background-image: linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0.2)), linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0.2));
-            background-size: 40px 40px; background-position: 0 0, 20px 20px;
+        /* Прожектори */
+        .stadium::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% -10%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% -10%, rgba(255,255,255,0.15) 0%, transparent 40%);
+            pointer-events: none;
         }
 
-        /* 5 ЗОН ДЛЯ УДАРУ */
-        .target-zones { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; z-index: 5; pointer-events: none;}
-        .target-zones.active { pointer-events: auto; }
-        .zone { display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px dashed transparent; transition: 0.3s;}
-        .target-zones.active .zone:hover { border-color: rgba(0, 255, 157, 0.5); background: rgba(0, 255, 157, 0.1);}
-        .zone.z-top-left { grid-column: 1; grid-row: 1; }
-        .zone.z-top-right { grid-column: 3; grid-row: 1; }
-        .zone.z-center { grid-column: 2; grid-row: 1 / 3; }
-        .zone.z-bottom-left { grid-column: 1; grid-row: 2; }
-        .zone.z-bottom-right { grid-column: 3; grid-row: 2; }
-        
-        /* Значок прицілу при наведенні */
-        .target-icon { width: 40px; height: 40px; border: 2px solid var(--neon); border-radius: 50%; opacity: 0; transition: 0.2s; display: flex; align-items: center; justify-content: center; position: relative;}
-        .target-icon::before { content: ''; width: 4px; height: 4px; background: var(--neon); border-radius: 50%;}
-        .target-zones.active .zone:hover .target-icon { opacity: 1; transform: scale(1.2);}
+        /* ТРАВА */
+        .pitch { position: absolute; bottom: 0; left: 0; width: 100%; height: 35%; background: linear-gradient(to bottom, var(--grass-top), var(--grass-bottom)); border-top: 3px solid rgba(255,255,255,0.5); z-index: 1;}
+        .pitch::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(0,0,0,0.05) 100px, rgba(0,0,0,0.05) 200px);}
+
+        /* ПРОГРЕС-БАР МНОЖНИКІВ (Як на скріні) */
+        .multiplier-bar { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; background: rgba(0,0,0,0.5); padding: 8px 25px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5); backdrop-filter: blur(5px);}
+        .flag { font-size: 24px; margin: 0 15px; }
+        .steps-container { display: flex; align-items: center; position: relative;}
+        .steps-container::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.2); z-index: -1; transform: translateY(-50%);}
+        .step { padding: 5px 15px; margin: 0 10px; border-radius: 15px; color: #888; font-weight: bold; font-size: 15px; transition: 0.3s; background: rgba(0,0,0,0.8); border: 2px solid transparent;}
+        .step.passed { color: var(--neon); text-shadow: 0 0 5px var(--neon); border-color: rgba(0,255,157,0.3);}
+        .step.active { background: var(--neon); color: black; box-shadow: 0 0 15px var(--neon); border-color: var(--neon); transform: scale(1.1);}
+
+        /* ВОРОТА ТА СІТКА */
+        .goal-container { position: absolute; bottom: 25%; left: 50%; transform: translateX(-50%); width: 65%; max-width: 900px; height: 400px; border: 12px solid #f8fafc; border-bottom: none; border-radius: 5px 5px 0 0; box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.8); display: flex; align-items: flex-end; justify-content: center; z-index: 2;
+            background: 
+                linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.3) 48%, rgba(255,255,255,0.3) 52%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(255,255,255,0.3) 48%, rgba(255,255,255,0.3) 52%, transparent 52%);
+            background-size: 40px 40px;
+        }
 
         /* ВОРОТАР */
-        .goalkeeper { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 180px; background: url('https://cdn-icons-png.flaticon.com/512/3048/3048122.png') no-select; background-size: contain; background-repeat: no-select; background-position: bottom; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8)); z-index: 3; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); transform-origin: bottom center;}
+        .goalkeeper { position: absolute; bottom: 0; left: 50%; width: 140px; height: 180px; margin-left: -70px;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M32 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zM18 22c-2.2 0-4 1.8-4 4v16c0 1.1.9 2 2 2s2-.9 2-2V26h4v34c0 1.1.9 2 2 2s2-.9 2-2V42h4v18c0 1.1.9 2 2 2s2-.9 2-2V26h4v16c0 1.1.9 2 2 2s2-.9 2-2V26c0-2.2-1.8-4-4-4H18z" fill="%23ffffff"/></svg>');
+            background-size: contain; background-repeat: no-repeat; background-position: bottom center; filter: drop-shadow(0 15px 10px rgba(0,0,0,0.6)); z-index: 3; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); transform-origin: bottom center;}
         
+        /* 5 ЗОН ДЛЯ УДАРУ */
+        .target-zones { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
+        .target-zones.active { pointer-events: auto; }
+        .zone { position: absolute; display: flex; align-items: center; justify-content: center; cursor: pointer;}
+        .zone-tl { top: 5%; left: 5%; width: 30%; height: 40%; }
+        .zone-tc { top: 5%; left: 35%; width: 30%; height: 90%; }
+        .zone-tr { top: 5%; left: 65%; width: 30%; height: 40%; }
+        .zone-bl { top: 45%; left: 5%; width: 30%; height: 45%; }
+        .zone-br { top: 45%; left: 65%; width: 30%; height: 45%; }
+        
+        .target-icon { width: 50px; height: 50px; border: 3px solid rgba(0,255,157,0.8); border-radius: 50%; opacity: 0; transition: 0.2s; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(0,255,157,0.5), inset 0 0 10px rgba(0,255,157,0.5); transform: scale(0.5);}
+        .target-icon::before { content: ''; width: 8px; height: 8px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon);}
+        .target-zones.active .zone:hover .target-icon { opacity: 1; transform: scale(1);}
+
         /* М'ЯЧ */
-        .ball-wrapper { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10; pointer-events: none; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);}
-        .ball { width: 80px; height: 80px; background: radial-gradient(circle at 30% 30%, #fff, #ccc, #333); border-radius: 50%; box-shadow: -5px 10px 15px rgba(0,0,0,0.8); position: relative; overflow: hidden; transition: transform 0.6s linear;}
-        /* Візерунок м'яча (імітація) */
-        .ball::before { content:''; position:absolute; width:100%; height:100%; background-image: radial-gradient(#111 15%, transparent 16%), radial-gradient(#111 15%, transparent 16%); background-size: 40px 40px; background-position: 0 0, 20px 20px; opacity: 0.8;}
-
-        /* ТРАВА */
-        .pitch { height: 180px; background: repeating-linear-gradient(0deg, var(--grass-dark), var(--grass-dark) 20px, var(--grass-light) 20px, var(--grass-light) 40px); transform: rotateX(60deg); transform-origin: bottom; width: 150%; margin-left: -25%; border-top: 5px solid white; z-index: 1; box-shadow: inset 0 50px 50px rgba(0,0,0,0.8);}
-
-        /* НИЖНЯ ПАНЕЛЬ КЕРУВАННЯ */
-        .controls-bar { background: #0f172a; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #333; z-index: 100;}
+        .ball { width: 70px; height: 70px; border-radius: 50%; position: absolute; bottom: 5%; left: 50%; margin-left: -35px; z-index: 10;
+            background: radial-gradient(circle at 30% 30%, #fff, #ddd, #444);
+            box-shadow: -10px 15px 25px rgba(0,0,0,0.8), inset -5px -5px 15px rgba(0,0,0,0.5);
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none;}
         
-        .bet-controls { display: flex; align-items: center; background: rgba(0,0,0,0.5); border-radius: 8px; border: 1px solid #333;}
-        .bet-btn { background: transparent; color: white; border: none; font-size: 24px; padding: 10px 20px; cursor: pointer; transition: 0.2s;}
-        .bet-btn:hover { color: var(--gold); }
-        .bet-input { background: transparent; color: white; border: none; font-size: 20px; font-weight: bold; width: 80px; text-align: center; outline: none;}
+        /* Узор м'яча */
+        .ball::before { content:''; position:absolute; width:100%; height:100%; border-radius: 50%; background-image: radial-gradient(#222 15%, transparent 16%), radial-gradient(#222 15%, transparent 16%); background-size: 30px 30px; background-position: 0 0, 15px 15px; opacity: 0.8;}
+
+        /* НИЖНЯ ПАНЕЛЬ КЕРУВАННЯ (Точна копія скріна) */
+        .controls-bar { background: var(--panel-bg); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid rgba(255,255,255,0.1); z-index: 100; backdrop-filter: blur(10px); height: 80px;}
         
-        .action-btns { display: flex; gap: 20px;}
-        .play-btn { background: var(--green); color: white; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 179, 71, 0.4); transition: 0.3s; text-transform: uppercase;}
-        .play-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 179, 71, 0.6);}
-        .play-btn:disabled { background: #333; color: #777; cursor: not-allowed; box-shadow: none; transform: none;}
+        /* Ліва частина: Ставка */
+        .bet-section { display: flex; flex-direction: column; align-items: center; }
+        .label { color: #888; font-size: 11px; font-weight: bold; letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase;}
+        .bet-controls { display: flex; align-items: center; background: rgba(0,0,0,0.6); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); padding: 5px;}
+        .bet-btn { background: #333; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; line-height: 0;}
+        .bet-btn:hover { background: var(--neon); color: black; }
+        .bet-input { background: transparent; color: white; border: none; font-size: 18px; font-weight: bold; width: 80px; text-align: center; outline: none;}
+        
+        /* Центр: Кнопка Play / Collect */
+        .center-action { display: flex; justify-content: center; align-items: center;}
+        
+        .play-btn { background: white; border: none; width: 80px; height: 80px; border-radius: 20px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transform: translateY(-20px);}
+        .play-btn:hover { transform: translateY(-25px); box-shadow: 0 15px 30px rgba(255,255,255,0.3);}
+        .play-btn:disabled { background: #555; cursor: not-allowed; transform: translateY(-20px); box-shadow: none;}
+        .play-icon { width: 0; height: 0; border-top: 15px solid transparent; border-bottom: 15px solid transparent; border-left: 25px solid var(--grass-top); margin-bottom: 5px; margin-left: 5px;}
+        .play-text { color: var(--grass-top); font-weight: bold; font-size: 14px;}
 
-        .collect-btn { background: var(--gold); color: black; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); transition: 0.3s; text-transform: uppercase; display: none;}
-        .collect-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(212, 175, 55, 0.6);}
+        .collect-btn { background: var(--gold); border: none; height: 80px; padding: 0 30px; border-radius: 20px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.4); transform: translateY(-20px); display: none;}
+        .collect-btn:hover { transform: translateY(-25px); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.6);}
+        .collect-icon { font-size: 24px; margin-bottom: 2px;}
+        .collect-text { color: black; font-weight: bold; font-size: 16px;}
 
-        .info-block { text-align: right;}
-        .info-label { color: #888; font-size: 12px; text-transform: uppercase;}
-        .info-value { font-size: 24px; font-weight: bold; color: white;}
+        /* Права частина: Статистика */
+        .stats-section { display: flex; gap: 40px;}
+        .stat-block { display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.5); padding: 10px 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); min-width: 120px;}
+        .stat-value { font-size: 20px; font-weight: bold; color: white;}
+        .stat-value.win { color: var(--gold); }
 
-        /* СТАТУС ПОВІДОМЛЕННЯ (ГОЛ / СЕЙВ) */
-        #status-msg { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); font-size: 60px; font-weight: 900; text-transform: uppercase; opacity: 0; transition: 0.3s; z-index: 50; text-shadow: 0 10px 20px rgba(0,0,0,0.8); pointer-events: none;}
+        /* СТАТУС ПОВІДОМЛЕННЯ */
+        #status-msg { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0.5); font-size: 80px; font-weight: 900; text-transform: uppercase; opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50; text-shadow: 0 15px 30px rgba(0,0,0,0.9); pointer-events: none;}
         .msg-goal { color: var(--neon); }
         .msg-save { color: var(--red); }
         .msg-win { color: var(--gold); }
+        #status-msg.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
     </style>
 </head>
 <body>
 
+    <div id="out-of-casino-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,5,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(15px);">
+        <h1 style="color: #ff003c; font-size: 50px; margin: 0;">🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
+        <p style="color: #aaa; font-size: 24px;">Ви покинули територію казино.</p>
+        <button onclick="window.location.href='../index.html'" style="padding: 15px 40px; margin-top: 30px; background: var(--gold); color: black; border:none; cursor:pointer; font-weight:bold; border-radius:8px; font-size:18px;">В Лобі</button>
+    </div>
+
+    <audio id="sound-kick" src="../sounds/spin.mp3" preload="auto"></audio>
+    <audio id="sound-win" src="../sounds/win.mp3" preload="auto"></audio>
+    <audio id="sound-lose" src="../sounds/lose.mp3" preload="auto"></audio>
+
     <div class="nav-bar">
-        <button class="back-btn" onclick="window.location.href='../index.html'">⬅ В Лобі</button>
-        <div style="font-weight: bold; font-size: 18px; color: #aaa;">Гравець: <span id="player-name" style="color: white;">---</span></div>
+        <button class="back-btn" onclick="window.location.href='../index.html'">Повернутися</button>
+        <div style="font-weight: bold; font-size: 16px; color: #888;">ГРАВЕЦЬ: <span id="player-name" style="color: white; margin-left: 5px;">---</span></div>
     </div>
 
     <div class="stadium">
         
         <div class="multiplier-bar">
-            <div class="step" id="step-0">x1.92</div>
-            <div class="step" id="step-1">x3.84</div>
-            <div class="step" id="step-2">x7.68</div>
-            <div class="step" id="step-3">x15.36</div>
-            <div class="step" id="step-4">x30.72</div>
+            <div class="flag">🇮🇪</div>
+            <div class="steps-container">
+                <div class="step" id="step-0">x1.92</div>
+                <div class="step" id="step-1">x3.84</div>
+                <div class="step" id="step-2">x7.68</div>
+                <div class="step" id="step-3">x15.36</div>
+                <div class="step" id="step-4">x30.72</div>
+            </div>
+            <div class="flag">🇺🇿</div>
         </div>
 
         <div id="status-msg">GOAL!</div>
 
-        <div class="goal-container" id="goal-net">
+        <div class="goal-container">
             <div class="target-zones" id="target-zones">
-                <div class="zone z-top-left" onclick="shoot('top-left')"><div class="target-icon"></div></div>
-                <div class="zone z-center" onclick="shoot('center')"><div class="target-icon"></div></div>
-                <div class="zone z-top-right" onclick="shoot('top-right')"><div class="target-icon"></div></div>
-                <div class="zone z-bottom-left" onclick="shoot('bottom-left')"><div class="target-icon"></div></div>
-                <div class="zone z-bottom-right" onclick="shoot('bottom-right')"><div class="target-icon"></div></div>
+                <div class="zone zone-tl" onclick="shoot('tl')"><div class="target-icon"></div></div>
+                <div class="zone zone-tc" onclick="shoot('tc')"><div class="target-icon"></div></div>
+                <div class="zone zone-tr" onclick="shoot('tr')"><div class="target-icon"></div></div>
+                <div class="zone zone-bl" onclick="shoot('bl')"><div class="target-icon"></div></div>
+                <div class="zone zone-br" onclick="shoot('br')"><div class="target-icon"></div></div>
             </div>
             <div class="goalkeeper" id="goalkeeper"></div>
         </div>
 
         <div class="pitch"></div>
-        
-        <div class="ball-wrapper" id="ball-wrapper">
-            <div class="ball" id="ball"></div>
-        </div>
+        <div class="ball" id="ball"></div>
     </div>
 
     <div class="controls-bar">
-        <div>
-            <div class="info-label">СТАВКА (BET)</div>
+        
+        <div class="bet-section">
+            <div class="label">СТАВКА (BET)</div>
             <div class="bet-controls">
                 <button class="bet-btn" onclick="changeBet(-10)">-</button>
-                <input type="number" class="bet-input" id="bet-input" value="10" min="10" step="10" onchange="validateBet()">
+                <input type="number" class="bet-input" id="bet-input" value="10" readonly>
                 <button class="bet-btn" onclick="changeBet(10)">+</button>
             </div>
         </div>
 
-        <div class="action-btns">
-            <button class="play-btn" id="play-btn" onclick="startGame()">ГРАТИ</button>
-            <button class="collect-btn" id="collect-btn" onclick="collectWinnings()">ЗАБРАТИ <span id="collect-amount">0</span></button>
+        <div class="center-action">
+            <button class="play-btn" id="play-btn" onclick="startGame()">
+                <div class="play-icon"></div>
+                <div class="play-text">PLAY</div>
+            </button>
+            
+            <button class="collect-btn" id="collect-btn" onclick="collectWinnings()">
+                <div class="collect-icon">💰</div>
+                <div class="collect-text">COLLECT</div>
+            </button>
         </div>
 
-        <div class="info-block">
-            <div class="info-label">БАЛАНС (BALANCE)</div>
-            <div class="info-value"><span id="balance-display" style="color: var(--neon);">0</span> 🪙</div>
+        <div class="stats-section">
+            <div class="stat-block">
+                <div class="label">БАЛАНС (BALANCE)</div>
+                <div class="stat-value"><span id="balance-display">0</span></div>
+            </div>
+            <div class="stat-block">
+                <div class="label">ВИГРАШ (WIN)</div>
+                <div class="stat-value win"><span id="win-display">0.00</span></div>
+            </div>
         </div>
     </div>
 
@@ -170,8 +228,7 @@
         userRef.on('value', snap => {
             const data = snap.val();
             if (data && data.in_casino === false) {
-                alert("Ви вийшли з казино! Гра зупинена.");
-                window.location.href = '../index.html';
+                document.getElementById('out-of-casino-overlay').style.display = 'flex';
             }
             currentBalance = data ? (data.chips || 0) : 0;
             document.getElementById('balance-display').innerText = currentBalance;
@@ -181,180 +238,160 @@
         // ІГРОВА ЛОГІКА
         // ==========================================
         const multipliers = [1.92, 3.84, 7.68, 15.36, 30.72];
-        let currentStep = -1; // -1 означає, що гра не розпочата
-        let currentBet = 0;
-        let isShooting = false;
+        let currentStep = -1; 
+        let currentBet = 10;
         let potentialWin = 0;
+        let isAnimating = false;
 
         const playBtn = document.getElementById('play-btn');
         const collectBtn = document.getElementById('collect-btn');
         const betInput = document.getElementById('bet-input');
         const targetZones = document.getElementById('target-zones');
         const msgBox = document.getElementById('status-msg');
+        const winDisplay = document.getElementById('win-display');
 
         function changeBet(amount) {
-            if (currentStep !== -1) return; // Не можна міняти під час гри
-            let val = parseInt(betInput.value) + amount;
-            if (val < 10) val = 10;
-            betInput.value = val;
-        }
-
-        function validateBet() {
-            if (parseInt(betInput.value) < 10 || isNaN(betInput.value)) betInput.value = 10;
+            if (currentStep !== -1) return;
+            currentBet += amount;
+            if (currentBet < 10) currentBet = 10;
+            betInput.value = currentBet;
         }
 
         async function startGame() {
-            if (currentStep !== -1 || isShooting) return;
-            currentBet = parseInt(betInput.value);
-            
+            if (currentStep !== -1 || isAnimating) return;
             if (currentBet > currentBalance) return alert("Недостатньо фішок на балансі!");
 
-            // Знімаємо ставку 1 раз на початку серії
+            // Списуємо ставку (Один раз на початку серії)
             await userRef.update({ chips: currentBalance - currentBet });
 
             currentStep = 0;
             potentialWin = 0;
             updateUI();
             
-            msgBox.innerText = "ОБЕРІТЬ ЦІЛЬ!";
-            msgBox.className = "msg-goal";
-            msgBox.style.opacity = 1;
-            setTimeout(() => { msgBox.style.opacity = 0; }, 1500);
+            showMsg("ОБЕРІТЬ ЦІЛЬ!", "msg-goal");
         }
 
         function updateUI() {
-            // Кнопки
             if (currentStep === -1) {
-                playBtn.style.display = "block";
+                playBtn.style.display = "flex";
                 collectBtn.style.display = "none";
-                betInput.disabled = false;
                 targetZones.classList.remove('active');
+                winDisplay.innerText = "0.00";
             } else {
                 playBtn.style.display = "none";
-                collectBtn.style.display = "block";
-                betInput.disabled = true;
+                collectBtn.style.display = "flex";
                 targetZones.classList.add('active');
                 
-                // Якщо 0 крок (тільки почали) - забрати не можна, сума 0
                 if (currentStep === 0) {
                     collectBtn.disabled = true;
                     collectBtn.style.filter = "grayscale(1)";
-                    document.getElementById('collect-amount').innerText = "";
                 } else {
                     collectBtn.disabled = false;
                     collectBtn.style.filter = "none";
-                    document.getElementById('collect-amount').innerText = potentialWin;
                 }
+                winDisplay.innerText = potentialWin.toFixed(2);
             }
 
-            // Бар множників
             for (let i = 0; i < 5; i++) {
                 const stepEl = document.getElementById(`step-${i}`);
-                stepEl.classList.remove('active', 'passed');
+                stepEl.className = "step";
                 if (i < currentStep) stepEl.classList.add('passed');
                 if (i === currentStep) stepEl.classList.add('active');
             }
+        }
+
+        function showMsg(text, className) {
+            msgBox.innerText = text;
+            msgBox.className = className;
+            msgBox.classList.add('show');
+            setTimeout(() => { msgBox.classList.remove('show'); }, 1500);
         }
 
         // ==========================================
         // АНІМАЦІЯ ТА МАТЕМАТИКА УДАРУ
         // ==========================================
         function shoot(target) {
-            if (currentStep === -1 || isShooting) return;
-            isShooting = true;
+            if (currentStep === -1 || isAnimating) return;
+            isAnimating = true;
             targetZones.classList.remove('active');
             collectBtn.disabled = true;
 
-            const ballWrap = document.getElementById('ball-wrapper');
+            document.getElementById('sound-kick').play().catch(()=>{});
+
             const ball = document.getElementById('ball');
             const goalie = document.getElementById('goalkeeper');
 
-            // Координати для польоту м'яча (Трансформація X, Y і масштаб)
+            // Координати для 3D польоту м'яча (X, Y, Scale)
             const targets = {
-                'top-left':     { x: -300, y: -280, scale: 0.4 },
-                'top-right':    { x: 300,  y: -280, scale: 0.4 },
-                'center':       { x: 0,    y: -200, scale: 0.4 },
-                'bottom-left':  { x: -300, y: -100, scale: 0.45 },
-                'bottom-right': { x: 300,  y: -100, scale: 0.45 }
+                'tl': { x: '-300px', y: '-260px', s: 0.45 },
+                'tc': { x: '0px',    y: '-260px', s: 0.45 },
+                'tr': { x: '300px',  y: '-260px', s: 0.45 },
+                'bl': { x: '-300px', y: '-80px',  s: 0.55 },
+                'br': { x: '300px',  y: '-80px',  s: 0.55 }
             };
 
             // Координати стрибка воротаря
             const dives = [
-                { id: 'top-left', t: 'translate(-200px, -80px) rotate(-45deg)' },
-                { id: 'top-right', t: 'translate(200px, -80px) rotate(45deg)' },
-                { id: 'bottom-left', t: 'translate(-200px, 0) rotate(-70deg)' },
-                { id: 'bottom-right', t: 'translate(200px, 0) rotate(70deg)' },
-                { id: 'center', t: 'translate(0, -100px)' }
+                { id: 'tl', t: 'translate(-180px, -100px) rotate(-45deg)' },
+                { id: 'tc', t: 'translate(0, -120px)' },
+                { id: 'tr', t: 'translate(180px, -100px) rotate(45deg)' },
+                { id: 'bl', t: 'translate(-180px, 0) rotate(-70deg)' },
+                { id: 'br', t: 'translate(180px, 0) rotate(70deg)' }
             ];
 
-            // МАТЕМАТИКА: Шанс забити 70% (Казино заробляє на дистанції)
+            // МАТЕМАТИКА: Шанс забити 70%
             const isGoal = Math.random() < 0.70;
 
-            // Вибираємо куди стрибає воротар
             let goalieDive;
             if (!isGoal) {
-                // Якщо СЕЙВ, воротар стрибає точно туди, куди б'ємо
-                goalieDive = dives.find(d => d.id === target).t;
+                goalieDive = dives.find(d => d.id === target).t; // Сейв: стрибає за м'ячем
             } else {
-                // Якщо ГОЛ, воротар стрибає рандомно в інше місце
-                const wrongDives = dives.filter(d => d.id !== target);
+                const wrongDives = dives.filter(d => d.id !== target); // Гол: стрибає не туди
                 goalieDive = wrongDives[Math.floor(Math.random() * wrongDives.length)].t;
             }
 
-            // АНІМАЦІЯ
+            // Анімація м'яча
             const pos = targets[target];
-            ballWrap.style.transform = `translate(calc(-50% + ${pos.x}px), ${pos.y}px) scale(${pos.scale})`;
-            ball.style.transform = `rotate(${Math.random() * 720}deg)`; // Обертання м'яча
+            ball.style.transform = `translateX(calc(-50% + ${pos.x})) translateY(${pos.y}) scale(${pos.s}) rotate(${Math.random() * 1000}deg)`;
             
-            // Воротар реагує з мікрозатримкою
-            setTimeout(() => { goalie.style.transform = goalieDive; }, 100);
+            // Затримка реакції воротаря
+            setTimeout(() => { goalie.style.transform = goalieDive; }, 150);
 
-            // РЕЗУЛЬТАТ після польоту м'яча
+            // Оцінка результату
             setTimeout(() => {
                 if (isGoal) {
                     potentialWin = Math.floor(currentBet * multipliers[currentStep]);
                     currentStep++;
                     
-                    msgBox.innerText = "ГОЛ!";
-                    msgBox.className = "msg-goal";
+                    showMsg("ГОЛ!", "msg-goal");
+                    document.getElementById('sound-win').play().catch(()=>{});
                     
                     if (currentStep >= 5) {
-                        // Пройшов усі 5 кроків - авто-виплата
-                        setTimeout(() => collectWinnings(), 1000);
+                        setTimeout(() => collectWinnings(), 1500); // Авто-виплата
                     } else {
-                        // Може бити далі
-                        isShooting = false;
-                        updateUI();
+                        setTimeout(() => resetPitch(), 1500); // Наступний удар
                     }
                 } else {
-                    // Сейв
-                    msgBox.innerText = "СЕЙВ!";
-                    msgBox.className = "msg-save";
-                    
+                    showMsg("СЕЙВ!", "msg-save");
+                    document.getElementById('sound-lose').play().catch(()=>{});
                     currentStep = -1;
                     potentialWin = 0;
                     setTimeout(() => resetPitch(), 2000);
                 }
-
-                msgBox.style.opacity = 1;
-                setTimeout(() => { msgBox.style.opacity = 0; }, 1500);
-
             }, 600);
         }
 
         async function collectWinnings() {
-            if (potentialWin <= 0 || isShooting) return;
-            isShooting = true;
+            if (potentialWin <= 0 || (isAnimating && currentStep < 5)) return;
+            isAnimating = true;
 
-            msgBox.innerText = `ВИГРАШ: ${potentialWin} 🪙`;
-            msgBox.className = "msg-win";
-            msgBox.style.opacity = 1;
+            showMsg(`ВИГРАШ:\n${potentialWin} 🪙`, "msg-win");
+            document.getElementById('sound-win').play().catch(()=>{});
             
-            // Зарахування на баланс
+            // Нараховуємо виграш
             await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + potentialWin }); });
 
             setTimeout(() => {
-                msgBox.style.opacity = 0;
                 currentStep = -1;
                 potentialWin = 0;
                 resetPitch();
@@ -362,21 +399,19 @@
         }
 
         function resetPitch() {
-            const ballWrap = document.getElementById('ball-wrapper');
+            const ball = document.getElementById('ball');
             const goalie = document.getElementById('goalkeeper');
             
-            // Повернення на вихідні позиції без анімації
-            ballWrap.style.transition = 'none';
+            ball.style.transition = 'none';
             goalie.style.transition = 'none';
             
-            ballWrap.style.transform = 'translate(-50%, 0) scale(1)';
-            goalie.style.transform = 'translateX(-50%)';
+            ball.style.transform = 'translateX(-50%) translateY(0) scale(1) rotate(0deg)';
+            goalie.style.transform = 'translateX(-50%) translateY(0) rotate(0deg)';
             
-            // Відновлення CSS transition для наступних ударів
             setTimeout(() => {
-                ballWrap.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+                ball.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
                 goalie.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                isShooting = false;
+                isAnimating = false;
                 updateUI();
             }, 50);
         }

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINECRAFT ROYALE | КІСТКИ DICE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Rubik:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        body {
+            background: radial-gradient(ellipse at 30% 40%, #0d1117 0%, #05080f 100%);
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 35px;
+            background: rgba(8, 12, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.25);
+        }
+        
+        .btn-exit {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .btn-exit:hover {
+            background: #ff4433;
+            border-color: #ff4433;
+            box-shadow: 0 0 20px rgba(255, 68, 51, 0.4);
+        }
+        
+        .balance-badge {
+            font-size: 22px;
+            font-weight: 900;
+            background: rgba(0, 255, 157, 0.1);
+            padding: 10px 32px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 255, 157, 0.35);
+            color: #00ff9d;
+        }
+        .balance-badge span {
+            color: #00ff88;
+            font-size: 28px;
+            margin-left: 10px;
+        }
+
+        #game-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-table {
+            background: linear-gradient(145deg, #0a5a3a, #064a2a);
+            border-radius: 80px;
+            border: 4px solid #d4af37;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5);
+            padding: 40px 50px;
+            width: 1100px;
+            height: 650px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .table-neon {
+            position: absolute;
+            inset: -4px;
+            border-radius: 82px;
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.4;
+            background: linear-gradient(45deg, #d4af37, #00ff88, #00f2ff);
+            animation: tableGlow 3s infinite alternate;
+        }
+        
+        @keyframes tableGlow {
+            0% { opacity: 0.2; filter: blur(15px); }
+            100% { opacity: 0.5; filter: blur(25px); }
+        }
+
+        .table-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .table-title h1 {
+            font-family: 'Rubik', sans-serif;
+            font-size: 32px;
+            background: linear-gradient(135deg, #d4af37, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .table-title p {
+            font-size: 12px;
+            color: rgba(255, 215, 0, 0.5);
+            margin-top: 5px;
+        }
+
+        /* DICE AREA */
+        .dice-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .dice-container {
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .dice {
+            width: 150px;
+            height: 150px;
+            background: white;
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 70px;
+            font-weight: 900;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .dice.rolling {
+            animation: diceRoll 0.3s ease-in-out;
+        }
+        
+        @keyframes diceRoll {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            75% { transform: rotate(270deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        
+        .dice-value {
+            font-family: 'Rubik', sans-serif;
+        }
+        
+        .bet-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .number-btn {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #1a1a2a, #0f0f1a);
+            border: 2px solid #d4af37;
+            border-radius: 20px;
+            color: #d4af37;
+            font-size: 28px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Rubik', sans-serif;
+        }
+        
+        .number-btn:hover:not(:disabled) {
+            background: #d4af37;
+            color: #0a0e18;
+            transform: scale(1.05);
+        }
+        
+        .number-btn.selected {
+            background: #d4af37;
+            color: #0a0e18;
+            box-shadow: 0 0 20px #d4af37;
+        }
+        
+        .number-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .result-area {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .result-text {
+            font-size: 24px;
+            font-weight: 900;
+        }
+        
+        .result-win { color: #00ff88; }
+        .result-lose { color: #ff4433; }
+        .result-push { color: #d4af37; }
+
+        .bet-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 12px 25px;
+            border-radius: 60px;
+            margin-top: 10px;
+        }
+        
+        .bet-label {
+            color: #d4af37;
+            font-weight: 800;
+            font-size: 14px;
+        }
+        
+        .chip-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #d4af37, #aa8833);
+            border: 2px solid #ffd700;
+            color: #1a1a2a;
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .chip-btn:active { transform: scale(0.95); }
+        
+        .bet-input {
+            background: #0a0e18;
+            color: #d4af37;
+            border: 2px solid #d4af37;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: 900;
+            text-align: center;
+            width: 120px;
+            height: 48px;
+            outline: none;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #1a1a2a, #0f0f1a);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            border-radius: 40px;
+            padding: 10px 35px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .action-btn:hover:not(:disabled) {
+            background: #d4af37;
+            color: #0a0e18;
+            transform: scale(1.02);
+        }
+        .action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(135deg, #00ff88, #00aa55);
+            border-color: #00ff88;
+            color: #0a1a0a;
+        }
+
+        /* Історія виграшів */
+        .history-panel {
+            position: absolute;
+            right: -280px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 260px;
+            background: rgba(8, 12, 20, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border-left: 3px solid #00ff88;
+            padding: 15px;
+            pointer-events: auto;
+        }
+        .history-panel h4 {
+            color: #00ff88;
+            font-size: 14px;
+            margin-bottom: 12px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .history-list div {
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border-left: 2px solid;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .history-list .win { color: #00ff88; border-left-color: #00ff88; }
+        .history-list .lose { color: #ff4433; border-left-color: #ff4433; }
+        .history-list .big-win { color: #ffd700; border-left-color: #ffd700; font-weight: 900; background: rgba(255, 215, 0, 0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <button class="btn-exit" onclick="window.location.href='../index.html'">✧ ВИЙТИ ✧</button>
+        <div class="balance-badge">💎 БАЛАНС <span id="balance-amount">0</span></div>
+    </div>
+
+    <div id="game-wrapper">
+        <div class="game-table">
+            <div class="table-neon"></div>
+            <div class="table-title">
+                <h1>🎲 MINECRAFT DICE 🎲</h1>
+                <p>✦ ВГАДАЙ ЧИСЛО ВІД 1 ДО 6 | ВИГРАШ ×6 ✦</p>
+            </div>
+            
+            <div class="dice-area">
+                <div class="dice-container">
+                    <div class="dice" id="dice">
+                        <div class="dice-value" id="dice-value">🎲</div>
+                    </div>
+                </div>
+                
+                <div class="bet-buttons" id="bet-buttons">
+                    <button class="number-btn" data-number="1">1</button>
+                    <button class="number-btn" data-number="2">2</button>
+                    <button class="number-btn" data-number="3">3</button>
+                    <button class="number-btn" data-number="4">4</button>
+                    <button class="number-btn" data-number="5">5</button>
+                    <button class="number-btn" data-number="6">6</button>
+                </div>
+                
+                <div class="result-area" id="result-area" style="display: none;">
+                    <div class="result-text" id="result-text"></div>
+                </div>
+            </div>
+            
+            <div class="bet-panel">
+                <span class="bet-label">✦ СТАВКА ✦</span>
+                <button class="chip-btn" id="bet-minus">−</button>
+                <input type="number" id="bet-input" class="bet-input" value="10" min="10" max="50000">
+                <button class="chip-btn" id="bet-plus">+</button>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn primary" id="roll-btn">🎲 КИНУТИ КІСТКУ</button>
+            </div>
+        </div>
+        
+        <div class="history-panel">
+            <h4>📜 ІСТОРІЯ ВИГРАШІВ</h4>
+            <div class="history-list" id="history-list">
+                <div style="color:#555; text-align:center;">─ немає записів ─</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
+            authDomain: "kurahivka-casino.firebaseapp.com",
+            databaseURL: "https://kurahivka-casino-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "kurahivka-casino"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const username = localStorage.getItem('casino_user');
+        const userRef = database.ref('users_by_name/' + (username ? username.toLowerCase() : 'guest'));
+        
+        let currentBalance = 0;
+        let currentBet = 10;
+        let selectedNumber = null;
+        let isRolling = false;
+        
+        // DOM елементи
+        const betInput = document.getElementById('bet-input');
+        const diceDiv = document.getElementById('dice');
+        const diceValueSpan = document.getElementById('dice-value');
+        const resultArea = document.getElementById('result-area');
+        const resultText = document.getElementById('result-text');
+        const rollBtn = document.getElementById('roll-btn');
+        const numberBtns = document.querySelectorAll('.number-btn');
+        
+        function updateBalanceDisplay() {
+            document.getElementById('balance-amount').innerText = currentBalance;
+        }
+        
+        // Отримуємо баланс з Firebase
+        userRef.on('value', snap => {
+            const data = snap.val();
+            currentBalance = data ? (data.chips || 1000) : 1000;
+            updateBalanceDisplay();
+        });
+        
+        function updateBetUI() { betInput.value = currentBet; }
+        
+        function updateBet(delta) {
+            if (isRolling) return;
+            let newVal = currentBet + delta;
+            if (newVal >= 10 && newVal <= Math.min(50000, currentBalance)) {
+                currentBet = newVal;
+                updateBetUI();
+            }
+        }
+        
+        function manualBetChange() {
+            if (isRolling) return;
+            let val = parseInt(betInput.value);
+            if (isNaN(val)) val = 10;
+            if (val < 10) val = 10;
+            if (val > 50000) val = 50000;
+            if (val > currentBalance) val = currentBalance;
+            currentBet = val;
+            updateBetUI();
+        }
+        
+        function addToHistory(message, type = 'win') {
+            const historyDiv = document.getElementById('history-list');
+            if (historyDiv.children.length === 1 && historyDiv.children[0].innerText.includes('немає записів')) {
+                historyDiv.innerHTML = '';
+            }
+            const newEntry = document.createElement('div');
+            newEntry.className = type;
+            const time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            newEntry.innerHTML = `[${time}] ${message}`;
+            historyDiv.prepend(newEntry);
+            while (historyDiv.children.length > 20) historyDiv.removeChild(historyDiv.lastChild);
+        }
+        
+        function selectNumber(number) {
+            if (isRolling) return;
+            selectedNumber = number;
+            numberBtns.forEach(btn => {
+                const btnNum = parseInt(btn.dataset.number);
+                if (btnNum === number) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+        
+        // Анімація кубика
+        async function animateDice(finalValue) {
+            return new Promise((resolve) => {
+                let rolls = 0;
+                const maxRolls = 12;
+                const interval = setInterval(() => {
+                    const randomValue = Math.floor(Math.random() * 6) + 1;
+                    const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+                    diceValueSpan.innerHTML = diceSymbols[randomValue - 1];
+                    diceDiv.classList.add('rolling');
+                    rolls++;
+                    
+                    if (rolls >= maxRolls) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            diceDiv.classList.remove('rolling');
+                            const diceSymbolsFinal = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+                            diceValueSpan.innerHTML = diceSymbolsFinal[finalValue - 1];
+                            resolve();
+                        }, 100);
+                    }
+                }, 80);
+            });
+        }
+        
+        // Функція для безпечного оновлення балансу
+        async function updateBalance(changeAmount) {
+            const snap = await userRef.once('value');
+            const currentData = snap.val();
+            const freshBalance = currentData ? (currentData.chips || 1000) : 1000;
+            const newBalance = freshBalance + changeAmount;
+            await userRef.update({ chips: newBalance });
+            currentBalance = newBalance;
+            updateBalanceDisplay();
+            return newBalance;
+        }
+        
+        async function rollDice() {
+            if (isRolling) return;
+            if (selectedNumber === null) {
+                resultArea.style.display = 'block';
+                resultText.className = 'result-text result-lose';
+                resultText.innerHTML = `❌ ОБЕРІТЬ ЧИСЛО (1-6)!`;
+                return;
+            }
+            if (currentBet > currentBalance) {
+                resultArea.style.display = 'block';
+                resultText.className = 'result-text result-lose';
+                resultText.innerHTML = `❌ НЕДОСТАТНЬО КОШТІВ! ПОТРІБНО ${currentBet}, Є ${currentBalance}`;
+                return;
+            }
+            
+            isRolling = true;
+            rollBtn.disabled = true;
+            numberBtns.forEach(btn => btn.disabled = true);
+            resultArea.style.display = 'none';
+            
+            // Знімаємо ставку
+            await updateBalance(-currentBet);
+            
+            // Генеруємо результат
+            const diceResult = Math.floor(Math.random() * 6) + 1;
+            
+            // Анімація
+            await animateDice(diceResult);
+            
+            // Перевірка виграшу
+            let winAmount = 0;
+            let resultMessage = '';
+            let resultType = '';
+            
+            if (selectedNumber === diceResult) {
+                winAmount = currentBet * 6;
+                resultType = 'win';
+                resultMessage = `🎉 ВІТАННЯ! ВИПАЛО ${diceResult}! ВИ ВИГРАЛИ ${winAmount} 🪙`;
+                await updateBalance(winAmount);
+                addToHistory(`🎲 +${winAmount} 🪙 (Випало ${diceResult}, ставка ${currentBet})`, 
+                            winAmount >= currentBet * 10 ? 'big-win' : 'win');
+            } else {
+                resultType = 'lose';
+                resultMessage = `😔 ВИПАЛО ${diceResult}. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
+                addToHistory(`🎲 -${currentBet} 🪙 (Випало ${diceResult}, ви обрали ${selectedNumber})`, 'lose');
+            }
+            
+            resultArea.style.display = 'block';
+            resultText.className = `result-text result-${resultType}`;
+            resultText.innerHTML = resultMessage;
+            
+            isRolling = false;
+            rollBtn.disabled = false;
+            numberBtns.forEach(btn => btn.disabled = false);
+        }
+        
+        // Кнопки
+        document.getElementById('bet-minus').onclick = () => updateBet(-10);
+        document.getElementById('bet-plus').onclick = () => updateBet(10);
+        betInput.onchange = manualBetChange;
+        rollBtn.onclick = rollDice;
+        
+        // Вибір числа
+        numberBtns.forEach(btn => {
+            btn.onclick = () => selectNumber(parseInt(btn.dataset.number));
+        });
+        
+        // Початковий стан
+        updateBetUI();
+        
+        // Аудіо
+        let audioContext = null;
+        document.body.addEventListener('click', () => {
+            if (audioContext) return;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            audioContext.resume();
+        }, { once: true });
+    </script>
+</body>
+</html>

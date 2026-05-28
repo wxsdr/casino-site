@@ -125,7 +125,7 @@
             margin-top: 5px;
         }
 
-        /* DICE AREA */
+        /* DICE AREA - тільки емодзі */
         .dice-area {
             flex: 1;
             display: flex;
@@ -137,28 +137,20 @@
         
         .dice-container {
             display: flex;
-            gap: 40px;
+            gap: 60px;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
         }
         
         .dice {
-            width: 130px;
-            height: 130px;
-            background: white;
-            border-radius: 25px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 65px;
-            font-weight: 900;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            transition: all 0.2s;
+            font-size: 120px;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+            transition: all 0.1s ease;
         }
         
         .dice.rolling {
-            animation: diceRoll 0.2s ease-in-out infinite;
+            animation: diceRoll 0.1s infinite;
         }
         
         @keyframes diceRoll {
@@ -170,16 +162,17 @@
         }
         
         .sum-display {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 900;
             color: #d4af37;
             margin-top: 10px;
             text-align: center;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
         
         .bet-options {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
             justify-content: center;
             margin-top: 20px;
@@ -189,14 +182,14 @@
             background: linear-gradient(135deg, #1a1a2a, #0f0f1a);
             border: 2px solid #d4af37;
             border-radius: 20px;
-            padding: 12px 25px;
+            padding: 10px 20px;
             color: #d4af37;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
             cursor: pointer;
             transition: 0.2s;
             text-align: center;
-            min-width: 120px;
+            min-width: 110px;
         }
         
         .bet-option:hover:not(:disabled) {
@@ -212,7 +205,7 @@
         }
         
         .bet-option .multiplier {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.8;
             margin-top: 4px;
         }
@@ -375,12 +368,8 @@
             
             <div class="dice-area">
                 <div class="dice-container">
-                    <div class="dice" id="dice1">
-                        <div class="dice-value" id="dice1-value">🎲</div>
-                    </div>
-                    <div class="dice" id="dice2">
-                        <div class="dice-value" id="dice2-value">🎲</div>
-                    </div>
+                    <div class="dice" id="dice1">🎲</div>
+                    <div class="dice" id="dice2">🎲</div>
                 </div>
                 <div class="sum-display" id="sum-display"></div>
                 
@@ -452,15 +441,16 @@
         
         // DOM елементи
         const betInput = document.getElementById('bet-input');
-        const dice1Div = document.getElementById('dice1');
-        const dice2Div = document.getElementById('dice2');
-        const dice1ValueSpan = document.getElementById('dice1-value');
-        const dice2ValueSpan = document.getElementById('dice2-value');
+        const dice1El = document.getElementById('dice1');
+        const dice2El = document.getElementById('dice2');
         const sumDisplay = document.getElementById('sum-display');
         const resultArea = document.getElementById('result-area');
         const resultText = document.getElementById('result-text');
         const rollBtn = document.getElementById('roll-btn');
         const betOptions = document.querySelectorAll('.bet-option');
+        
+        // Емодзі кубиків (1-6)
+        const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
         
         function updateBalanceDisplay() {
             document.getElementById('balance-amount').innerText = currentBalance;
@@ -552,33 +542,31 @@
             return names[betType] || betType;
         }
         
-        // Анімація кубиків
+        // Анімація кубиків (тільки емодзі)
         async function animateDice(finalValue1, finalValue2) {
             return new Promise((resolve) => {
                 let rolls = 0;
-                const maxRolls = 10;
+                const maxRolls = 12;
                 const interval = setInterval(() => {
-                    const random1 = Math.floor(Math.random() * 6) + 1;
-                    const random2 = Math.floor(Math.random() * 6) + 1;
-                    const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-                    dice1ValueSpan.innerHTML = diceSymbols[random1 - 1];
-                    dice2ValueSpan.innerHTML = diceSymbols[random2 - 1];
-                    dice1Div.classList.add('rolling');
-                    dice2Div.classList.add('rolling');
+                    const random1 = Math.floor(Math.random() * 6);
+                    const random2 = Math.floor(Math.random() * 6);
+                    dice1El.innerHTML = diceEmojis[random1];
+                    dice2El.innerHTML = diceEmojis[random2];
+                    dice1El.classList.add('rolling');
+                    dice2El.classList.add('rolling');
                     rolls++;
                     
                     if (rolls >= maxRolls) {
                         clearInterval(interval);
                         setTimeout(() => {
-                            dice1Div.classList.remove('rolling');
-                            dice2Div.classList.remove('rolling');
-                            const diceSymbolsFinal = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-                            dice1ValueSpan.innerHTML = diceSymbolsFinal[finalValue1 - 1];
-                            dice2ValueSpan.innerHTML = diceSymbolsFinal[finalValue2 - 1];
+                            dice1El.classList.remove('rolling');
+                            dice2El.classList.remove('rolling');
+                            dice1El.innerHTML = diceEmojis[finalValue1 - 1];
+                            dice2El.innerHTML = diceEmojis[finalValue2 - 1];
                             resolve();
                         }, 100);
                     }
-                }, 70);
+                }, 60);
             });
         }
         

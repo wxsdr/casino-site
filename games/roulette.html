@@ -19,8 +19,8 @@
         .back-btn { background: rgba(0,0,0,0.5); color: var(--gold); border: 1px solid var(--gold); padding: 8px 20px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; box-shadow: inset 0 0 10px rgba(212,175,55,0.2);}
         .back-btn:hover { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold);}
         
-        /* ШИРОКИЙ ЛЕЙАУТ (Головна зміна) */
-        .main-layout { display: flex; flex-direction: row; justify-content: center; align-items: stretch; width: 100%; max-width: 1800px; margin: 0 auto; padding: 20px; gap: 20px; flex: 1; box-sizing: border-box;}
+        /* ШИРОКИЙ ЛЕЙАУТ */
+        .main-layout { display: flex; flex-direction: row; justify-content: center; align-items: stretch; width: 100%; max-width: 1850px; margin: 0 auto; padding: 20px; gap: 20px; flex: 1; box-sizing: border-box;}
         
         /* ПАНЕЛІ */
         .panel { background: linear-gradient(135deg, rgba(25,25,25,0.95), rgba(10,10,10,0.95)); border-radius: 15px; border: 1px solid #333; box-shadow: 0 15px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative;}
@@ -41,29 +41,29 @@
         .history-item.won { border: 2px solid var(--gold); box-shadow: 0 0 15px var(--gold), inset 0 0 10px rgba(212,175,55,0.5); transform: scale(1.1); z-index: 2;}
         .history-item.lost { opacity: 0.5; }
 
-        /* 2. ЦЕНТРАЛЬНА ПАНЕЛЬ: СТІЛ + ФІШКИ */
-        .center-col { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 30px; background: #151515; border-radius: 20px; box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.8); border: 1px solid #222;}
+        /* 2. ЦЕНТРАЛЬНА ПАНЕЛЬ: ВЕЛЕТЕНСЬКИЙ СТІЛ */
+        .center-col { flex: 1.5; min-width: 800px; display: flex; flex-direction: column; justify-content: space-between; padding: 30px; background: #151515; border-radius: 20px; box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.8); border: 1px solid #222;}
         
-        /* ОБ'ЄМНИЙ СТІЛ */
-        .table-wrapper { background: var(--table-felt); padding: 30px; border-radius: 120px 20px 20px 120px; border: 15px solid #1a0d05; box-shadow: 0 25px 50px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.9); position: relative; margin: 0 auto;}
-        .table-wrapper::before { content:''; position:absolute; top:-5px; left:-5px; right:-5px; bottom:-5px; border-radius: 110px 15px 15px 110px; border: 2px solid rgba(255,255,255,0.1); pointer-events: none;}
+        /* ОБ'ЄМНИЙ ЗБІЛЬШЕНИЙ СТІЛ */
+        .table-wrapper { background: var(--table-felt); padding: 45px; border-radius: 140px 20px 20px 140px; border: 20px solid #1a0d05; box-shadow: 0 35px 70px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,1); position: relative; margin: 0 auto; width: 100%; box-sizing: border-box; max-width: 1050px;}
+        .table-wrapper::before { content:''; position:absolute; top:-8px; left:-8px; right:-8px; bottom:-8px; border-radius: 125px 12px 12px 125px; border: 3px solid rgba(255,255,255,0.1); pointer-events: none;}
         
-        .betting-board { display: grid; grid-template-columns: 80px repeat(12, 1fr); grid-template-rows: repeat(3, 60px); gap: 4px; border: 3px solid rgba(255,255,255,0.6); padding: 4px; border-radius: 5px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);}
-        .cell { display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 22px; border: 1px solid rgba(255,255,255,0.3); cursor: pointer; position: relative; user-select: none; transition: 0.2s; text-shadow: 1px 1px 3px black;}
-        .cell:hover { background-color: rgba(255,255,255,0.3); box-shadow: inset 0 0 20px rgba(255,255,255,0.9); z-index: 2;}
-        .cell-zero { grid-row: 1 / 4; grid-column: 1; background: var(--green); border-right: 2px solid white; border-radius: 80px 0 0 80px;}
+        /* РОЗТЯГНУТІ КЛІТИНКИ */
+        .betting-board { display: grid; grid-template-columns: 110px repeat(12, 1fr); grid-template-rows: repeat(3, 75px); gap: 5px; border: 4px solid rgba(255,255,255,0.6); padding: 5px; border-radius: 6px; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);}
+        .cell { display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 28px; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; position: relative; user-select: none; transition: 0.2s; text-shadow: 2px 2px 4px black;}
+        .cell:hover { background-color: rgba(255,255,255,0.3); box-shadow: inset 0 0 25px rgba(255,255,255,0.9); z-index: 2;}
+        .cell-zero { grid-row: 1 / 4; grid-column: 1; background: var(--green); border-right: 3px solid white; border-radius: 100px 0 0 100px;}
         .row-1 { grid-row: 1; } .row-2 { grid-row: 2; } .row-3 { grid-row: 3; }
         
-        .bottom-bets { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; border: 3px solid white; margin-top: 6px; height: 60px;}
-        .cell-red-bet { background: var(--red); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 20px; text-shadow: 1px 1px 4px black;}
-        .cell-black-bet { background: var(--black); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 20px; text-shadow: 1px 1px 4px black;}
+        .bottom-bets { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; border: 4px solid white; margin-top: 8px; height: 75px;}
+        .cell-red-bet { background: var(--red); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; letter-spacing: 2px; font-size: 24px; text-shadow: 2px 2px 5px black;}
+        .cell-black-bet { background: var(--black); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; letter-spacing: 2px; font-size: 24px; text-shadow: 2px 2px 5px black;}
         
-        /* 3D ФІШКИ НА СТОЛІ ТА В СЕЛЕКТОРІ */
+        /* ЗБІЛЬШЕНІ 3D ФІШКИ НА СТОЛІ */
         .chip { 
             width: 60px; height: 60px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; 
             font-weight: bold; color: white; font-size: 16px; transition: 0.2s; text-shadow: 1px 1px 2px black;
             border: 4px dashed rgba(255,255,255,0.7);
-            /* Справжній 3D ефект (Товщина фішки) */
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 1px 0 #222, 0 2px 0 #222, 0 3px 0 #111, 0 4px 0 #000, 0 8px 15px rgba(0,0,0,0.8);
         }
         .chip.active { transform: translateY(-5px); box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 1px 0 var(--gold-dark), 0 2px 0 var(--gold-dark), 0 3px 0 var(--gold-dark), 0 4px 0 #000, 0 15px 25px var(--gold); border-color: var(--gold); }
@@ -71,9 +71,8 @@
         .c-10 { background-color: #7f8c8d; } .c-50 { background-color: #2980b9; } .c-100 { background-color: #27ae60; } .c-500 { background-color: #8e44ad; } .c-1000 { background-color: #f39c12; }
 
         .chip-on-table { 
-            position: absolute; width: 34px; height: 34px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; pointer-events: none; z-index: 10; text-shadow: 1px 1px 1px black; border: 3px dashed rgba(255,255,255,0.8); background-color: var(--chip-color);
-            /* Товщина фішки на столі */
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 1px 0 #111, 0 2px 0 #000, 2px 4px 6px rgba(0,0,0,0.9);
+            position: absolute; width: 42px; height: 42px; border-radius: 50%; font-size: 13px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; pointer-events: none; z-index: 10; text-shadow: 1px 1px 2px black; border: 4px dashed rgba(255,255,255,0.9); background-color: var(--chip-color);
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.6), 0 1px 0 #111, 0 2px 0 #000, 3px 6px 10px rgba(0,0,0,0.9);
         }
 
         .controls-row { display: flex; justify-content: space-between; align-items: center; width: 100%; background: rgba(0,0,0,0.4); padding: 15px 30px; border-radius: 15px; border: 1px solid #333; box-sizing: border-box;}
@@ -136,7 +135,7 @@
             </div>
         </div>
 
-        <!-- ЦЕНТРАЛЬНА КОЛОНКА (Стіл + Фішки) -->
+        <!-- ЦЕНТРАЛЬНА КОЛОНКА (Велетенський стіл + Фішки) -->
         <div class="center-col">
             <div style="display: flex; justify-content: center; align-items: center; flex: 1;">
                 <div class="table-wrapper">
@@ -364,8 +363,8 @@
                 chip.className = 'chip-on-table chip-temp';
                 chip.style.setProperty('--chip-color', selectedChipColor); 
                 chip.innerText = activeBets[target] >= 1000 ? (activeBets[target]/1000).toFixed(1)+'k' : activeBets[target];
-                // Рандомний зсув для ефекту стопки фішок
-                chip.style.transform = `translate(${Math.random() * 12 - 6}px, ${Math.random() * 12 - 6}px)`;
+                // Більший розкид для гігантського столу
+                chip.style.transform = `translate(${Math.random() * 20 - 10}px, ${Math.random() * 20 - 10}px)`;
                 tElem.querySelectorAll('.chip-temp').forEach(c => c.remove());
                 tElem.appendChild(chip);
             }
@@ -378,7 +377,7 @@
         }
 
         // ==========================================
-        // CANVAS ДВИЖОК ТА РЕАЛІСТИЧНА ФІЗИКА
+        // CANVAS ДВИЖОК
         // ==========================================
         const canvas = document.getElementById('rouletteCanvas');
         const ctx = canvas.getContext('2d');
@@ -397,7 +396,6 @@
         function drawAll() {
             ctx.clearRect(0, 0, 340, 340);
 
-            // КОЛЕСО
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(currentWheelRot - Math.PI/2); 
@@ -406,7 +404,6 @@
                 let num = wheelOrder[i];
                 let color = (num === 0) ? '#00b347' : (redNumbers.includes(num) ? '#c62828' : '#111');
                 
-                // Сектор
                 ctx.beginPath();
                 ctx.moveTo(0,0);
                 ctx.arc(0, 0, wheelRadius, i * sliceAngle, (i+1) * sliceAngle);
@@ -414,7 +411,6 @@
                 ctx.fill();
                 ctx.lineWidth = 1; ctx.strokeStyle = '#d4af37'; ctx.stroke();
 
-                // Цифра (ІДЕАЛЬНИЙ ЦЕНТР)
                 ctx.save();
                 ctx.rotate(i * sliceAngle + sliceAngle/2);
                 ctx.translate(wheelRadius - 18, 0);
@@ -427,7 +423,6 @@
                 ctx.restore();
             }
 
-            // ЗОЛОТИЙ ЦЕНТР
             ctx.beginPath();
             ctx.arc(0, 0, 30, 0, Math.PI*2);
             let grad = ctx.createRadialGradient(0,0,5, 0,0,30);
@@ -436,13 +431,11 @@
             ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
             ctx.restore();
 
-            // ДЕРЕВ'ЯНИЙ БОРТ
             ctx.beginPath();
             ctx.arc(cx, cy, 155, 0, Math.PI*2);
             ctx.lineWidth = 18; ctx.strokeStyle = '#2a1608'; ctx.stroke();
             ctx.lineWidth = 4; ctx.strokeStyle = '#d4af37'; ctx.stroke();
 
-            // ШАРИК З ТІННЮ
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(currentBallRot - Math.PI/2);
@@ -498,18 +491,17 @@
             let easeBall = 1 - Math.pow(1 - progress, 4);
             currentBallRot = initialBallRot + (targetBallRot - initialBallRot) * easeBall;
 
-            // ФІЗИКА ШАРИКА: Відскоки та тряска в кінці
             if (progress > 0.75) {
                 let wobble = Math.sin((progress - 0.75) * 40) * 0.04 * (1 - progress);
                 currentBallRot += wobble;
             }
 
             if (progress < 0.8) {
-                currentBallRadius = 150; // Їде по борту
+                currentBallRadius = 150; 
             } else {
                 let dropProgress = (progress - 0.8) / 0.2;
                 let bounce = Math.abs(Math.cos(dropProgress * Math.PI * 3)) * (1 - dropProgress) * 10;
-                currentBallRadius = 150 - (30 * dropProgress) + bounce; // Падає в лузу
+                currentBallRadius = 150 - (30 * dropProgress) + bounce;
             }
 
             drawAll();
@@ -522,7 +514,7 @@
             let winAmount = 0;
             const winningColor = (winningNumber === 0) ? 'green' : (redNumbers.includes(winningNumber) ? 'red' : 'black');
 
-            // ВИПЛАТИ (Класичні шанси)
+            // ВИПЛАТИ 
             for (const [target, amount] of Object.entries(activeBets)) {
                 if (target === winningNumber.toString()) winAmount += amount * 36;
                 else if (target === winningColor) winAmount += amount * 2;

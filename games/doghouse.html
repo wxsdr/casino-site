@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>The Dog House RP</title>
+    <style>
+        body { background: #1a1a24; color: white; font-family: sans-serif; text-align: center; }
+        .slot-machine { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 10px; 
+            width: 600px; 
+            margin: 50px auto; 
+            background: #8b4513; /* Колір дерева */
+            padding: 20px;
+            border-radius: 15px;
+            border: 5px solid #d2691e;
+        }
+        .reel-item { 
+            background: white; 
+            height: 100px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 40px; 
+            border-radius: 10px;
+            color: black;
+        }
+        .controls { margin-top: 20px; }
+        button { padding: 15px 30px; font-size: 20px; background: #00ff9d; border: none; border-radius: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>Слот: Собача Будка</h1>
+    <h2 id="status-text">Баланс: <span id="balance">1000</span> | Ставка: 10</h2>
+    
+    <div class="slot-machine" id="grid">
+        <!-- Поле 5х3 генерується через JS -->
+    </div>
+
+    <div class="controls">
+        <button id="spin-btn" onclick="spin()">КРУТИТИ (10 🪙)</button>
+    </div>
+
+    <script>
+        const symbols = ['🐶', '🦴', '🦮', '🥩', '🐾']; // 🐾 - це Scatter для бонуски
+        const gridElement = document.getElementById('grid');
+        let balance = 1000;
+        let isBonusGame = false;
+        let freeSpinsLeft = 0;
+        let stickyWilds = {}; // Зберігаємо позиції будок під час бонуски
+
+        // Ініціалізація пустого поля
+        function drawGrid(matrix) {
+            gridElement.innerHTML = '';
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 5; c++) {
+                    const div = document.createElement('div');
+                    div.className = 'reel-item';
+                    div.innerText = matrix[r][c] || '❔';
+                    gridElement.appendChild(div);
+                }
+            }
+        }
+
+        function spin() {
+            if (!isBonusGame && balance < 10) return alert("Недостатньо фішок!");
+            
+            if (!isBonusGame) {
+                balance -= 10; // Знімаємо ставку
+            } else {
+                freeSpinsLeft--;
+            }
+            
+            document.getElementById('balance').innerText = balance;
+            document.getElementById('spin-btn').disabled = true;
+
+            // Імітація обертання (проста генерація)
+            setTimeout(() => {
+                let currentMatrix = [];
+                let scatterCount = 0;
+
+                for (let r = 0; r < 3; r++) {
+                    let row = [];
+                    for (let c = 0; c < 5; c++) {
+                        // Якщо це бонуска і тут є Sticky Wild, залишаємо його
+                        if (isBonusGame && stickyWilds[`${r}-${c}`]) {
+                            row.push(stickyWilds[`${r}-${c}`]);
+                            continue;
+                        }
+
+                        let randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                        row.push(randomSymbol);
+                        if (randomSymbol === '🐾') scatterCount++;
+                    }
+                    currentMatrix.push(row);
+                }
+
+                drawGrid(currentMatrix);
+                checkWinLines(currentMatrix, scatterCount);
+                
+                document.getElementById('spin-btn').disabled = false;
+            }, 500); // Затримка для імітації анімації
+        }
+
+        function checkWinLines(matrix, scatterCount) {
+            // Тут має бути логіка перевірки ліній (winlines)
+            
+            // Перевірка на тригери бонуски
+            if (!isBonusGame && scatterCount >= 3) {
+                startBonusGame();
+            } else if (isBonusGame && freeSpinsLeft === 0) {
+                endBonusGame();
+            }
+        }
+
+        function startBonusGame() {
+            isBonusGame = true;
+            freeSpinsLeft = 10;
+            stickyWilds = {}; // Очищаємо будки перед новою бонускою
+            document.getElementById('status-text').innerText = "🔥 БОНУСНА ГРА! Залишилось спінів: " + freeSpinsLeft;
+            document.getElementById('spin-btn').innerText = "АВТОСПІН";
+            alert("ВИ СПІЙМАЛИ БОНУСКУ! 10 Фріспінів!");
+        }
+
+        function endBonusGame() {
+            isBonusGame = false;
+            document.getElementById('status-text').innerText = "Баланс: " + balance + " | Ставка: 10";
+            document.getElementById('spin-btn').innerText = "КРУТИТИ (10 🪙)";
+            alert("Бонусна гра завершена!");
+        }
+
+        // Малюємо пусте поле при старті
+        drawGrid([[],[],[]]);
+    </script>
+</body>
+</html>

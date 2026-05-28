@@ -10,20 +10,21 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
-        :root {
-            --diamond: #00f2ff;
-            --emerald: #00ff88;
-            --gold: #ffd700;
-            --nether: #ff4433;
-            --ender: #9b30ff;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            background: radial-gradient(ellipse at 30% 40%, #0d1117 0%, #05080f 100%);
-            color: white; font-family: 'Montserrat', sans-serif;
-            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+            background: linear-gradient(135deg, #1a2a1a 0%, #0a1a0a 50%, #0d0f1a 100%);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             position: relative;
         }
 
@@ -31,210 +32,562 @@
             content: '';
             position: absolute;
             inset: 0;
-            background-image: radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
-                              radial-gradient(1px 1px at 80px 150px, var(--gold), rgba(0,0,0,0));
-            background-size: 200px 200px, 150px 150px;
-            background-repeat: repeat;
-            opacity: 0.1;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 2px, transparent 2px, transparent 8px),
+                repeating-linear-gradient(90deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 8px);
             pointer-events: none;
             z-index: 0;
         }
 
-        body.bonus-sticky { background: radial-gradient(ellipse at 30% 40%, #3a0a0a 0%, #1a0303 100%); }
-        body.bonus-raining { background: radial-gradient(ellipse at 30% 40%, #0a0a3a 0%, #03031a 100%); }
+        body.bonus-sticky { background: linear-gradient(135deg, #3a1a0a 0%, #2a0a00 100%); }
+        body.bonus-raining { background: linear-gradient(135deg, #0a1a3a 0%, #000a2a 100%); }
 
+        /* TOP BAR */
         .top-bar {
-            position: relative; z-index: 100; display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 35px; background: rgba(8, 12, 20, 0.95); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,215,0,0.25);
-        }
-        
-        .btn-exit { 
-            background: rgba(255,255,255,0.03); color: #fff; border: 1px solid rgba(255,255,255,0.15); 
-            padding: 10px 28px; border-radius: 40px; font-weight: 800; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-exit:hover { background: var(--nether); border-color: var(--nether); box-shadow: 0 0 20px rgba(255,68,51,0.4); }
-        
-        .balance-badge { 
-            font-size: 22px; font-weight: 900; background: rgba(0,255,157,0.1);
-            padding: 10px 32px; border-radius: 40px; border: 1px solid rgba(0,255,157,0.35);
+            position: relative;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 35px;
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(10px);
+            border-bottom: 3px solid #5a5a3a;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
-        .balance-badge span { color: var(--emerald); font-size: 28px; margin-left: 10px; }
+        
+        .btn-exit {
+            background: #3a2a1a;
+            color: #ffaa44;
+            border: 2px solid #ffaa44;
+            padding: 8px 24px;
+            border-radius: 8px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            box-shadow: inset 0 -2px 0 #5a4a2a;
+        }
+        .btn-exit:hover {
+            background: #ff4433;
+            border-color: #fff;
+            color: white;
+            transform: scale(1.02);
+        }
+        
+        .balance-badge {
+            font-size: 20px;
+            font-weight: 900;
+            background: #1a1a0a;
+            padding: 8px 28px;
+            border-radius: 8px;
+            border: 2px solid #ffaa44;
+            color: #ffaa44;
+            text-shadow: 0 0 5px rgba(255,170,68,0.5);
+            font-family: 'Courier New', monospace;
+        }
+        .balance-badge span {
+            color: #44ffaa;
+            font-size: 26px;
+            margin-left: 10px;
+            text-shadow: 0 0 5px #44ffaa;
+        }
 
-        #game-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; position: relative; z-index: 1; }
-        #game-scene { width: 1600px; height: 900px; transform-origin: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+        /* GAME WRAPPER */
+        #game-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        #game-scene {
+            width: 1400px;
+            height: 850px;
+            transform-origin: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+        }
 
+        /* SLOT MACHINE - MINECRAFT STYLE */
         .slot-machine {
-            background: linear-gradient(145deg, rgba(18,22,35,0.95), rgba(8,10,20,0.98));
-            border-radius: 50px; border: 1px solid rgba(255,215,0,0.25); padding: 25px 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+            background: #2a2a1a;
+            border-radius: 20px;
+            border: 4px solid #5a5a3a;
+            padding: 20px 35px;
+            box-shadow: inset 0 0 0 2px #3a3a2a, 0 15px 35px rgba(0,0,0,0.5);
             position: relative;
         }
         
         .machine-neon {
-            position: absolute; inset: -2px; border-radius: 52px; z-index: -1; 
-            filter: blur(18px); opacity: 0.35;
-            background: linear-gradient(45deg, var(--gold), var(--ender), var(--diamond)); 
-            animation: neonBreathe 3s infinite alternate;
+            position: absolute;
+            inset: -3px;
+            border-radius: 22px;
+            z-index: -1;
+            filter: blur(15px);
+            opacity: 0.4;
+            background: linear-gradient(45deg, #ffaa44, #aa44ff, #44ffaa);
+            animation: neonGlow 3s infinite alternate;
         }
         
-        @keyframes neonBreathe { 0% { opacity: 0.25; filter: blur(12px); } 100% { opacity: 0.5; filter: blur(22px); } }
-        body.bonus-sticky .machine-neon { background: linear-gradient(45deg, var(--nether), #ff8800, #ffcc00); animation: neonFire 0.4s infinite alternate; opacity: 0.7;}
-        body.bonus-raining .machine-neon { background: linear-gradient(45deg, var(--diamond), var(--ender), var(--emerald)); animation: neonRain 0.4s infinite alternate; opacity: 0.7;}
-        @keyframes neonFire { 0% { filter: blur(12px); } 100% { filter: blur(32px); } }
-        @keyframes neonRain { 0% { filter: blur(12px); } 100% { filter: blur(32px); } }
+        @keyframes neonGlow {
+            0% { opacity: 0.2; filter: blur(10px); }
+            100% { opacity: 0.6; filter: blur(20px); }
+        }
+        
+        body.bonus-sticky .machine-neon {
+            background: linear-gradient(45deg, #ff6633, #ffaa33, #ff4433);
+            animation: fireGlow 0.3s infinite alternate;
+            opacity: 0.7;
+        }
+        body.bonus-raining .machine-neon {
+            background: linear-gradient(45deg, #33aaff, #33ffaa, #44aaff);
+            animation: waterGlow 0.3s infinite alternate;
+            opacity: 0.7;
+        }
+        @keyframes fireGlow {
+            0% { filter: blur(10px); opacity: 0.5; }
+            100% { filter: blur(30px); opacity: 0.9; }
+        }
+        @keyframes waterGlow {
+            0% { filter: blur(10px); opacity: 0.5; }
+            100% { filter: blur(30px); opacity: 0.9; }
+        }
 
-        .slot-title { font-family: 'Rubik', sans-serif; font-size: 42px; text-align: center; letter-spacing: 6px; margin-bottom: 5px; }
-        .slot-title .main { background: linear-gradient(135deg, #fff, var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .slot-title .accent { background: linear-gradient(135deg, var(--diamond), var(--emerald)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .slot-subtitle { text-align: center; font-size: 10px; letter-spacing: 4px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+        .slot-title {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .slot-title .main {
+            font-family: 'Rubik', sans-serif;
+            font-size: 40px;
+            background: linear-gradient(135deg, #ffaa44, #ffdd88);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: none;
+            letter-spacing: 4px;
+        }
+        .slot-title .accent {
+            font-family: 'Rubik', sans-serif;
+            font-size: 40px;
+            background: linear-gradient(135deg, #44ffaa, #88ffcc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 4px;
+        }
+        .slot-subtitle {
+            text-align: center;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: #8a8a6a;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
 
+        /* REELS */
         .reels-window {
-            background: #07090f; padding: 12px; border-radius: 28px;
-            border: 1px solid rgba(255,215,0,0.2);
-            display: flex; gap: 10px; overflow: hidden; height: 470px;
+            background: #0a0a05;
+            padding: 12px;
+            border-radius: 16px;
+            border: 3px solid #5a5a3a;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
+            display: flex;
+            gap: 8px;
+            height: 440px;
         }
-        .reel { width: 154px; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6)); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,215,0,0.15); }
-        .reel-strip { width: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; transition: transform 0s ease; }
+        .reel {
+            width: 148px;
+            height: 100%;
+            background: #1a1a0f;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #3a3a2a;
+            position: relative;
+        }
+        .reel-strip {
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0s ease;
+        }
         
-        .symbol-cell { width: 154px; height: 147px; display: flex; justify-content: center; align-items: center; position: relative; perspective: 1200px; }
-
-        .iso-block {
-            width: 82px; height: 82px; position: relative; transform-style: preserve-3d;
-            transform: rotateX(-18deg) rotateY(-38deg);
-            transition: all 0.2s ease;
-            z-index: 1;
+        /* SYMBOL CELL - MINECRAFT BLOCK STYLE */
+        .symbol-cell {
+            width: 148px;
+            height: 138px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: #1a1a0a;
+            border-bottom: 1px solid #3a3a2a;
         }
 
-        .iso-face {
-            position: absolute; width: 82px; height: 82px; box-sizing: border-box; 
-            border: 1.5px solid rgba(0,0,0,0.5);
-            background-image: linear-gradient(45deg, rgba(255,255,255,0.06) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.06) 75%);
-            background-size: 14px 14px;
-            background-color: var(--c-front);
+        /* MINECRAFT STYLE 3D BLOCK */
+        .minecraft-block {
+            width: 90px;
+            height: 90px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-25deg) rotateY(-35deg);
+            transition: all 0.15s ease;
+            cursor: pointer;
         }
-        
-        .face-top   { transform: rotateX(90deg) translateZ(41px); background-color: var(--c-top); }
-        .face-front { transform: translateZ(41px); background-color: var(--c-front); }
-        .face-right { transform: rotateY(90deg) translateZ(41px); background-color: var(--c-right); }
 
-        .tex-diamond { --c-top: #51eeea; --c-front: #35c4c4; --c-right: #229494; }
-        .tex-gold    { --c-top: #fce029; --c-front: #d4b51c; --c-right: #a3890f; }
-        .tex-emerald { --c-top: #41f384; --c-front: #27c964; --c-right: #189647; }
-        .tex-wood    { --c-top: #a68453; --c-front: #85663d; --c-right: #614a2b; }
-        .tex-dirt    { --c-top: #5cb85c; --c-front: #79553a; --c-right: #533824; }
-        
-        .tex-wild { --c-top: #2f1d40; --c-front: #1f122b; --c-right: #130a1c; }
-        .tex-wild .iso-face { border: 2px solid var(--gold); box-shadow: inset 0 0 15px var(--gold); }
-        
-        .tex-scatter { --c-top: #4a1763; --c-front: #320d45; --c-right: #20062e; }
-        .tex-scatter .iso-face { border: 2px solid var(--ender); box-shadow: inset 0 0 15px var(--ender); }
-        
-        .block-text { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            font-size: 20px; font-weight: 900; z-index: 10;
-            text-shadow: 0 0 8px black;
+        .block-face {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        /* Pixelated texture style */
+        .face-top {
+            transform: rotateX(90deg) translateZ(45px);
+            background-size: 16px 16px;
+            background-repeat: repeat;
+        }
+        .face-front {
+            transform: translateZ(45px);
+            background-size: 16px 16px;
+            background-repeat: repeat;
+        }
+        .face-right {
+            transform: rotateY(90deg) translateZ(45px);
+            background-size: 16px 16px;
+            background-repeat: repeat;
+        }
+
+        /* Block colors with pixelated pattern */
+        .block-dirt { --c-top: #6b4c3b; --c-front: #8b5e3c; --c-right: #5a3d2a; }
+        .block-wood { --c-top: #8b6b4a; --c-front: #ab8b5a; --c-right: #6b4b3a; }
+        .block-gold { --c-top: #fce029; --c-front: #d4b51c; --c-right: #a3890f; }
+        .block-diamond { --c-top: #51eeea; --c-front: #35c4c4; --c-right: #229494; }
+        .block-emerald { --c-top: #41f384; --c-front: #27c964; --c-right: #189647; }
+        .block-wild { --c-top: #4a2a5a; --c-front: #3a1a4a; --c-right: #2a0a3a; }
+        .block-scatter { --c-top: #6a1a3a; --c-front: #5a0a2a; --c-right: #4a0a1a; }
+
+        .face-top { background-color: var(--c-top); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), inset 0 0 0 3px rgba(0,0,0,0.2); }
+        .face-front { background-color: var(--c-front); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15), inset 0 0 0 3px rgba(0,0,0,0.2); }
+        .face-right { background-color: var(--c-right); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 0 0 3px rgba(0,0,0,0.25); }
+
+        /* Add pixel pattern */
+        .face-top::before, .face-front::before, .face-right::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 8px),
+                              repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+        }
+
+        /* WILD and SCATTER special styling */
+        .block-wild .face-front, .block-wild .face-top, .block-wild .face-right {
+            border: 2px solid #ffaa44;
+            box-shadow: inset 0 0 10px #ffaa44, 0 0 10px #ffaa44;
+        }
+        .block-scatter .face-front, .block-scatter .face-top, .block-scatter .face-right {
+            border: 2px solid #aa44ff;
+            box-shadow: inset 0 0 10px #aa44ff, 0 0 10px #aa44ff;
+        }
+
+        .block-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            font-weight: 900;
+            z-index: 10;
+            text-align: center;
+            text-shadow: 0 0 5px black, 0 0 5px black;
             white-space: nowrap;
+            font-family: 'Courier New', monospace;
         }
-        .text-wild { background: linear-gradient(135deg, var(--gold), #ffaa33); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 22px; }
-        .text-scatter { background: linear-gradient(135deg, var(--ender), #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 16px; }
+        .text-wild { color: #ffaa44; font-size: 18px; text-shadow: 0 0 8px #ffaa44; }
+        .text-scatter { color: #aa44ff; font-size: 14px; text-shadow: 0 0 8px #aa44ff; }
 
         .sticky-mult {
-            position: absolute; bottom: 6px; right: 6px; background: linear-gradient(135deg, var(--gold), #ff8800); 
-            color: #1a0a00; font-size: 18px; font-weight: 900; padding: 2px 7px; border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.5); z-index: 20;
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: #ffaa44;
+            color: #1a0a00;
+            font-size: 16px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid white;
+            z-index: 20;
         }
 
-        /* ========== АНІМАЦІЯ ВИГРАШНОЇ КОМІРКИ ========== */
-        @keyframes winSpin3D {
-            0% { transform: rotateX(-18deg) rotateY(-38deg) scale(1); }
-            25% { transform: rotateX(-180deg) rotateY(-38deg) scale(1.2); }
-            50% { transform: rotateX(-18deg) rotateY(-200deg) scale(1.3); filter: drop-shadow(0 0 25px var(--gold)); }
-            75% { transform: rotateX(-180deg) rotateY(-38deg) scale(1.2); }
-            100% { transform: rotateX(-18deg) rotateY(-38deg) scale(1); }
+        /* WINNING ANIMATION - 3D SPIN */
+        @keyframes win3DRotate {
+            0% { transform: rotateX(-25deg) rotateY(-35deg) scale(1); }
+            25% { transform: rotateX(-205deg) rotateY(-35deg) scale(1.15); filter: drop-shadow(0 0 20px #ffaa44); }
+            50% { transform: rotateX(-25deg) rotateY(-215deg) scale(1.3); filter: drop-shadow(0 0 30px #ffaa44); }
+            75% { transform: rotateX(-205deg) rotateY(-35deg) scale(1.15); filter: drop-shadow(0 0 20px #ffaa44); }
+            100% { transform: rotateX(-25deg) rotateY(-35deg) scale(1); }
         }
         
         @keyframes winGlow {
-            0% { filter: drop-shadow(0 0 5px var(--gold)); }
-            50% { filter: drop-shadow(0 0 30px var(--gold)) drop-shadow(0 0 10px #fff); }
-            100% { filter: drop-shadow(0 0 5px var(--gold)); }
+            0%, 100% { filter: drop-shadow(0 0 5px #ffaa44); }
+            50% { filter: drop-shadow(0 0 25px #ffaa44) drop-shadow(0 0 10px white); }
         }
         
-        @keyframes winShake {
-            0%, 100% { transform: translateY(0px); }
-            25% { transform: translateY(-8px); }
-            75% { transform: translateY(8px); }
-        }
-        
-        .winning-cell .iso-block {
-            animation: winSpin3D 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards, winGlow 0.6s ease-in-out;
-        }
-        
-        .winning-cell {
-            animation: winShake 0.3s ease-in-out;
+        .winning-block {
+            animation: win3DRotate 0.7s cubic-bezier(0.34, 1.2, 0.64, 1) forwards, winGlow 0.7s ease-in-out;
         }
 
-        .control-panel { width: 1400px; display: flex; gap: 14px; }
-        .ctrl-box { background: rgba(10,14,22,0.85); backdrop-filter: blur(20px); border-radius: 28px; border: 1px solid rgba(255,215,0,0.15); padding: 12px 16px; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        
-        #status-text { 
-            font-size: 20px; font-weight: 900; background: linear-gradient(135deg, var(--gold), #ffcc44); 
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            text-align: center; cursor: pointer; letter-spacing: 1.5px; 
-            padding: 5px 10px;
+        /* CONTROL PANEL */
+        .control-panel {
+            width: 1300px;
+            display: flex;
+            gap: 12px;
         }
-        .status-hint { font-size: 9px; color: rgba(255,215,0,0.3); margin-top: 4px; text-align: center; }
+        .ctrl-box {
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 2px solid #5a5a3a;
+            padding: 10px 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #status-text {
+            font-size: 18px;
+            font-weight: 900;
+            color: #ffaa44;
+            text-align: center;
+            cursor: pointer;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px rgba(255,170,68,0.5);
+        }
+        .status-hint {
+            font-size: 8px;
+            color: #6a6a4a;
+            margin-top: 3px;
+            text-align: center;
+        }
 
-        .bet-input-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
-        .bet-btn { width: 42px; height: 42px; border-radius: 14px; background: #151b2a; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); font-size: 24px; font-weight: bold; cursor: pointer; }
+        .bet-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .bet-btn {
+            width: 38px;
+            height: 38px;
+            background: #2a2a1a;
+            color: #ffaa44;
+            border: 2px solid #5a5a3a;
+            border-radius: 8px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: monospace;
+        }
         .bet-btn:active { transform: scale(0.95); }
-        .bet-input { background: #0a0e18; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); border-radius: 14px; font-size: 28px; font-weight: 900; text-align: center; width: 110px; height: 42px; outline: none; }
-
-        .toggle-btn { background: #151b2a; color: #8a8a9a; border: 1px solid #2a2a3a; border-radius: 14px; width: 100%; padding: 8px; font-size: 13px; font-weight: 800; cursor: pointer; margin-bottom: 5px; }
-        .toggle-btn.active { background: rgba(0,255,157,0.15); color: var(--emerald); border-color: var(--emerald); }
-
-        .spin-btn { background: linear-gradient(135deg, var(--emerald), #00aa55); color: #0a1a0a; border: none; border-radius: 18px; width: 100%; height: 68px; font-size: 26px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #006633; margin-bottom: 5px; letter-spacing: 3px; }
-        .spin-btn:active:not(:disabled) { transform: translateY(5px); box-shadow: none; }
-        .spin-btn:disabled { background: #2a2a3a; color: #5a5a6a; box-shadow: 0 5px 0 #1a1a2a; cursor: not-allowed; }
-
-        .buy-bonus-btn { background: rgba(155,48,255,0.1); border: 1px solid var(--ender); color: var(--ender); border-radius: 14px; width: 100%; padding: 8px; font-size: 13px; font-weight: 800; cursor: pointer; }
-        .buy-bonus-btn:hover:not(:disabled) { background: var(--ender); color: white; }
-
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); display: none; justify-content: center; align-items: center; z-index: 9999; }
-        
-        .auto-menu { background: #0f1422; border: 1px solid var(--emerald); padding: 25px 30px; border-radius: 35px; text-align: center; }
-        .auto-menu h2 { color: var(--emerald); margin-bottom: 15px; font-size: 26px; }
-        .auto-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .auto-opt { background: #111622; border: 1px solid #2a2a3a; color: #ddd; padding: 10px 15px; font-size: 18px; font-weight: 800; border-radius: 14px; cursor: pointer; }
-        .auto-opt:hover { border-color: var(--emerald); color: var(--emerald); }
-
-        .bonus-menu { background: linear-gradient(135deg, #1a0f2a, #0a0515); border: 2px solid var(--ender); padding: 35px; border-radius: 45px; text-align: center; max-width: 900px; }
-        .bonus-title { font-size: 38px; background: linear-gradient(135deg, var(--ender), #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 10px; }
-        .bonus-subtitle { font-size: 14px; color: #888; margin-bottom: 25px; }
-        .bonus-cards { display: flex; gap: 20px; }
-        .b-card { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid #444; border-radius: 25px; padding: 25px 15px; cursor: pointer; transition: 0.2s; }
-        .b-card:hover { transform: translateY(-5px); }
-        .b-card.sticky:hover { border-color: var(--nether); background: rgba(255,68,51,0.1); }
-        .b-card.sticky h3 { color: var(--nether); font-size: 24px; }
-        .b-card.raining:hover { border-color: var(--diamond); background: rgba(0,242,255,0.1); }
-        .b-card.raining h3 { color: var(--diamond); font-size: 24px; }
-        .b-spins { background: #1a1a2a; display: inline-block; padding: 5px 15px; border-radius: 30px; font-size: 16px; font-weight: 800; margin-bottom: 10px; color: var(--gold); }
-        .b-card p { font-size: 12px; color: #bbb; }
-
-        .win-history {
-            position: fixed; right: 15px; bottom: 15px;
-            background: rgba(8,12,20,0.92); backdrop-filter: blur(15px);
-            border-radius: 20px; border-left: 3px solid var(--emerald);
-            padding: 8px 14px; min-width: 210px; z-index: 50;
+        .bet-input {
+            background: #1a1a0a;
+            color: #ffaa44;
+            border: 2px solid #5a5a3a;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: 900;
+            text-align: center;
+            width: 100px;
+            height: 38px;
+            outline: none;
+            font-family: monospace;
         }
-        .win-history h4 { color: var(--emerald); font-size: 10px; margin-bottom: 5px; }
-        .history-list { max-height: 120px; overflow-y: auto; font-size: 10px; }
-        .history-list div { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .history-list .win { color: var(--emerald); }
-        .history-list .big-win { color: var(--gold); font-weight: 900; }
-        .history-list .bonus { color: var(--ender); }
+
+        .toggle-btn {
+            background: #2a2a1a;
+            color: #8a8a6a;
+            border: 2px solid #5a5a3a;
+            border-radius: 8px;
+            width: 100%;
+            padding: 7px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-bottom: 4px;
+            font-family: monospace;
+        }
+        .toggle-btn.active {
+            background: #1a3a1a;
+            color: #44ffaa;
+            border-color: #44ffaa;
+        }
+
+        .spin-btn {
+            background: linear-gradient(135deg, #44aa44, #228822);
+            color: #0a2a0a;
+            border: none;
+            border-radius: 12px;
+            width: 100%;
+            height: 65px;
+            font-size: 24px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #0a4a0a;
+            margin-bottom: 4px;
+            font-family: 'Rubik', sans-serif;
+            letter-spacing: 3px;
+        }
+        .spin-btn:active:not(:disabled) { transform: translateY(5px); box-shadow: none; }
+        .spin-btn:disabled {
+            background: #3a3a2a;
+            color: #6a6a4a;
+            box-shadow: 0 5px 0 #2a2a1a;
+            cursor: not-allowed;
+        }
+
+        .buy-bonus-btn {
+            background: #2a1a3a;
+            border: 2px solid #aa44ff;
+            color: #aa44ff;
+            border-radius: 8px;
+            width: 100%;
+            padding: 7px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        .buy-bonus-btn:hover:not(:disabled) {
+            background: #aa44ff;
+            color: white;
+        }
+
+        /* MODALS */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(15px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .auto-menu, .bonus-menu {
+            background: #1a1a0f;
+            border: 3px solid #ffaa44;
+            padding: 25px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+        .auto-menu h2, .bonus-title {
+            color: #ffaa44;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-family: 'Rubik', sans-serif;
+        }
+        .auto-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .auto-opt {
+            background: #2a2a1a;
+            border: 2px solid #5a5a3a;
+            color: #ffaa44;
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        .auto-opt:hover {
+            border-color: #44ffaa;
+            color: #44ffaa;
+        }
+
+        .bonus-cards {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .b-card {
+            flex: 1;
+            background: #0a0a05;
+            border: 2px solid #5a5a3a;
+            border-radius: 16px;
+            padding: 20px 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .b-card:hover { transform: translateY(-5px); }
+        .b-card.sticky:hover { border-color: #ff6633; background: rgba(255,102,51,0.1); }
+        .b-card.sticky h3 { color: #ff6633; font-size: 22px; }
+        .b-card.raining:hover { border-color: #33aaff; background: rgba(51,170,255,0.1); }
+        .b-card.raining h3 { color: #33aaff; font-size: 22px; }
+        .b-spins {
+            background: #2a2a1a;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #ffaa44;
+        }
+        .b-card p { font-size: 11px; color: #aaa; }
+
+        /* HISTORY */
+        .win-history {
+            position: fixed;
+            right: 15px;
+            bottom: 15px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border-left: 3px solid #44ffaa;
+            padding: 8px 12px;
+            min-width: 200px;
+            z-index: 50;
+        }
+        .win-history h4 {
+            color: #44ffaa;
+            font-size: 10px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .history-list {
+            max-height: 110px;
+            overflow-y: auto;
+            font-size: 9px;
+            font-family: monospace;
+        }
+        .history-list div {
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .history-list .win { color: #44ffaa; }
+        .history-list .big-win { color: #ffaa44; font-weight: bold; }
+        .history-list .bonus { color: #aa44ff; }
     </style>
 </head>
 <body>
@@ -267,13 +620,13 @@
                     <div class="status-hint">▼ КЛІК ЩОБ ЗУПИНИТИ АВТО ▼</div>
                 </div>
                 
-                <div class="ctrl-box" style="flex: 0.8;">
+                <div class="ctrl-box" style="flex: 0.7;">
                     <button class="toggle-btn" id="turbo-btn" onclick="toggleTurbo()">⚡ ТУРБО: ВИМК</button>
                     <button class="toggle-btn" id="auto-btn" onclick="openAutoModal()">🔄 АВТОГРА</button>
                 </div>
 
-                <div class="ctrl-box" style="flex: 1;">
-                    <div style="color: var(--gold); font-size: 12px; letter-spacing: 2px;">✦ СТАВКА ✦</div>
+                <div class="ctrl-box" style="flex: 0.8;">
+                    <div style="color: #ffaa44; font-size: 11px; letter-spacing: 1px;">✦ СТАВКА ✦</div>
                     <div class="bet-input-row">
                         <button class="bet-btn" onclick="updateBet(-10)">−</button>
                         <input type="number" id="bet-input" class="bet-input" value="10" min="10" max="50000" onchange="manualBetChange()">
@@ -281,9 +634,9 @@
                     </div>
                 </div>
                 
-                <div class="ctrl-box" style="background: transparent; border: none; padding: 0; flex: 1.2;">
+                <div class="ctrl-box" style="background: transparent; border: none; padding: 0; flex: 1.1;">
                     <button class="spin-btn" id="spin-btn" onclick="spin()">🎲 КРУТИТИ</button>
-                    <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">✨ КУПИТИ БОНУС <span id="bonus-price">1000</span></button>
+                    <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">✨ КУПИТИ БОНУС 1000</button>
                 </div>
             </div>
         </div>
@@ -307,23 +660,23 @@
                 <button class="auto-opt" onclick="startAuto(250)">250</button>
                 <button class="auto-opt" onclick="startAuto(999)">∞</button>
             </div>
-            <button class="toggle-btn" style="margin-top: 18px; width: auto; padding: 8px 30px;" onclick="closeAutoModal()">ЗАКРИТИ</button>
+            <button class="toggle-btn" style="margin-top: 15px; width: auto; padding: 6px 25px;" onclick="closeAutoModal()">ЗАКРИТИ</button>
         </div>
     </div>
 
     <div id="bonus-modal" class="overlay">
         <div class="bonus-menu">
             <h2 class="bonus-title">✦ ЗНАЙДЕНО ПОРТАЛ! ✦</h2>
-            <p class="bonus-subtitle">Оберіть свій шлях до могутності</p>
+            <p style="color:#aaa; margin-bottom:20px;">Оберіть свій шлях до могутності</p>
             <div class="bonus-cards">
                 <div class="b-card sticky" onclick="selectBonus('sticky')">
                     <h3>🔥 НЕЗЕР-РЕАКТОР</h3>
-                    <div class="b-spins">10 - 15 СПІНІВ</div>
-                    <p>WILD-блоки залишаються на екрані з множниками</p>
+                    <div class="b-spins">10-15 СПІНІВ</div>
+                    <p>WILD-блоки залишаються з множниками</p>
                 </div>
                 <div class="b-card raining" onclick="selectBonus('raining')">
                     <h3>🌊 ЕНДЕР-ШТОРМ</h3>
-                    <div class="b-spins">15 - 25 СПІНІВ</div>
+                    <div class="b-spins">15-25 СПІНІВ</div>
                     <p>Метеоритний дощ із WILD-блоків</p>
                 </div>
             </div>
@@ -331,16 +684,92 @@
     </div>
 
     <script>
+        // ========== AUDIO SYSTEM (Web Audio API - no external files) ==========
+        let audioContext = null;
+        
+        function initAudio() {
+            if (audioContext) return;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        function playSound(type) {
+            try {
+                initAudio();
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                const now = audioContext.currentTime;
+                const gainNode = audioContext.createGain();
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'spin') {
+                    const osc = audioContext.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.value = 880;
+                    gainNode.gain.value = 0.1;
+                    osc.connect(gainNode);
+                    osc.start();
+                    osc.stop(now + 0.1);
+                } else if (type === 'win') {
+                    const osc1 = audioContext.createOscillator();
+                    const osc2 = audioContext.createOscillator();
+                    osc1.type = 'sine';
+                    osc2.type = 'sine';
+                    osc1.frequency.value = 523.25;
+                    osc2.frequency.value = 659.25;
+                    gainNode.gain.value = 0.15;
+                    osc1.connect(gainNode);
+                    osc2.connect(gainNode);
+                    osc1.start();
+                    osc2.start();
+                    osc1.stop(now + 0.3);
+                    osc2.stop(now + 0.3);
+                } else if (type === 'bigwin') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, i) => {
+                        const osc = audioContext.createOscillator();
+                        const g = audioContext.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        g.gain.value = 0.12;
+                        osc.connect(g);
+                        g.connect(audioContext.destination);
+                        osc.start();
+                        osc.stop(now + 0.2 + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.3 + i * 0.1);
+                    });
+                } else if (type === 'bonus') {
+                    const osc = audioContext.createOscillator();
+                    osc.type = 'triangle';
+                    osc.frequency.value = 440;
+                    gainNode.gain.value = 0.2;
+                    osc.connect(gainNode);
+                    osc.start();
+                    osc.stop(now + 0.4);
+                } else if (type === 'reel') {
+                    const osc = audioContext.createOscillator();
+                    osc.type = 'sawtooth';
+                    osc.frequency.value = 200;
+                    gainNode.gain.value = 0.05;
+                    osc.connect(gainNode);
+                    osc.start();
+                    osc.stop(now + 0.05);
+                }
+            } catch(e) { console.log('Audio error:', e); }
+        }
+
+        // ========== RESIZE ==========
         function resizeGame() {
             const wrapper = document.getElementById('game-wrapper');
             const scene = document.getElementById('game-scene');
-            const scale = Math.min(wrapper.clientWidth / 1600, wrapper.clientHeight / 900);
+            const scale = Math.min(wrapper.clientWidth / 1400, wrapper.clientHeight / 850);
             scene.style.transform = `scale(${scale})`;
         }
         window.addEventListener('resize', resizeGame);
         setTimeout(resizeGame, 100);
 
-        // Firebase
+        // ========== FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -359,17 +788,16 @@
             document.getElementById('balance-amount').innerText = currentBalance;
         });
 
-        // Game vars
-        const symbols = ['tex-dirt', 'tex-wood', 'tex-gold', 'tex-diamond', 'tex-emerald'];
-        const wildSymbol = 'tex-wild';      
-        const scatterSymbol = 'tex-scatter'; 
+        // ========== GAME VARS ==========
+        const blockTypes = ['block-dirt', 'block-wood', 'block-gold', 'block-diamond', 'block-emerald'];
+        const wildBlock = 'block-wild';
+        const scatterBlock = 'block-scatter';
         
         let isSpinning = false;
         let isBonusGame = false;
         let activeBonusType = null;
         let freeSpinsLeft = 0;
         let stickyWilds = {};
-        let stickyMultipliers = {};
         let isTurbo = false;
         let autoSpinsLeft = 0;
         let currentBet = 10;
@@ -443,9 +871,9 @@
             if (autoSpinsLeft > 0 && !isBonusGame) {
                 if (isSpinning) {
                     pendingStopAuto = true;
-                    addToHistory(`⏹ Автогру зупинено після поточного спіну`, 'win');
+                    addToHistory(`⏹ Автогру зупинено після спіну`, 'win');
                 } else {
-                    addToHistory(`⏹ Автогру зупинено (залишилось: ${autoSpinsLeft} спінів)`, 'win');
+                    addToHistory(`⏹ Автогру зупинено`, 'win');
                     autoSpinsLeft = 0;
                     setStatus("✨ ГОТОВИЙ ДО ГРИ");
                 }
@@ -454,16 +882,23 @@
         
         const STRIP_LENGTH = 16;
         
-        function getSymbolDisplay(sym, hasStickyMult = false, multValue = 1) {
-            let isWild = (sym === wildSymbol);
-            let isScatter = (sym === scatterSymbol);
-            let blockClass = sym;
+        function getBlockDisplay(block, hasStickyMult = false, multValue = 1) {
+            let isWild = (block === wildBlock);
+            let isScatter = (block === scatterBlock);
             let textHtml = '';
             if (isWild) textHtml = `<div class="block-text text-wild">⚡WILD⚡</div>`;
             else if (isScatter) textHtml = `<div class="block-text text-scatter">✦СКАРБ✦</div>`;
             let multHtml = '';
             if (hasStickyMult && multValue > 1) multHtml = `<div class="sticky-mult">✧${multValue}✧</div>`;
-            return `<div class="symbol-cell"><div class="iso-block ${blockClass}"><div class="iso-face face-top"></div><div class="iso-face face-front"></div><div class="iso-face face-right"></div></div>${textHtml}${multHtml}</div>`;
+            return `<div class="symbol-cell">
+                        <div class="minecraft-block ${block}">
+                            <div class="block-face face-top"></div>
+                            <div class="block-face face-front"></div>
+                            <div class="block-face face-right"></div>
+                        </div>
+                        ${textHtml}
+                        ${multHtml}
+                    </div>`;
         }
         
         function buildReels(matrix) {
@@ -472,16 +907,16 @@
                 if (!stripDiv) continue;
                 let cellsHtml = '';
                 for (let y = 0; y < 3; y++) {
-                    let sym = matrix[y][x];
+                    let block = matrix[y][x];
                     let hasMult = false, multVal = 1;
                     if (stickyWilds[`${x}-${y}`] && activeBonusType === 'sticky') {
                         hasMult = true;
-                        multVal = stickyMultipliers[`${x}-${y}`] || 2;
+                        multVal = stickyWilds[`${x}-${y}`] || 2;
                     }
-                    cellsHtml += getSymbolDisplay(sym, hasMult, multVal);
+                    cellsHtml += getBlockDisplay(block, hasMult, multVal);
                 }
                 for (let i = 0; i < STRIP_LENGTH - 3; i++) {
-                    cellsHtml += getSymbolDisplay(symbols[Math.floor(Math.random() * symbols.length)]);
+                    cellsHtml += getBlockDisplay(blockTypes[Math.floor(Math.random() * blockTypes.length)]);
                 }
                 stripDiv.innerHTML = cellsHtml;
                 stripDiv.style.transform = 'translateY(0px)';
@@ -494,16 +929,16 @@
             for (let y = 0; y < 3; y++) {
                 for (let x = 0; x < 5; x++) {
                     if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) {
-                        matrix[y][x] = wildSymbol;
+                        matrix[y][x] = wildBlock;
                         continue;
                     }
                     if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.4) {
-                        matrix[y][x] = wildSymbol;
+                        matrix[y][x] = wildBlock;
                         rainingWilds--;
                     } else {
                         let r = Math.random();
-                        if (!isBonusGame && r < 0.1) matrix[y][x] = wildSymbol;
-                        else matrix[y][x] = symbols[Math.floor(Math.random() * symbols.length)];
+                        if (!isBonusGame && r < 0.1) matrix[y][x] = wildBlock;
+                        else matrix[y][x] = blockTypes[Math.floor(Math.random() * blockTypes.length)];
                     }
                 }
             }
@@ -512,37 +947,37 @@
         
         function countScatters(matrix) {
             let count = 0;
-            for (let row of matrix) for (let sym of row) if (sym === scatterSymbol) count++;
+            for (let row of matrix) for (let block of row) if (block === scatterBlock) count++;
             return count;
         }
         
         const payTable = {
-            'tex-dirt': { 3: 10, 4: 25, 5: 60 },
-            'tex-wood': { 3: 15, 4: 35, 5: 80 },
-            'tex-gold': { 3: 30, 4: 70, 5: 150 },
-            'tex-diamond': { 3: 60, 4: 150, 5: 400 },
-            'tex-emerald': { 3: 50, 4: 120, 5: 300 }
+            'block-dirt': { 3: 10, 4: 25, 5: 60 },
+            'block-wood': { 3: 15, 4: 35, 5: 80 },
+            'block-gold': { 3: 30, 4: 70, 5: 150 },
+            'block-diamond': { 3: 60, 4: 150, 5: 400 },
+            'block-emerald': { 3: 50, 4: 120, 5: 300 }
         };
         
         function calculateWin(matrix, bet) {
             let totalWin = 0;
             let winPositions = [];
             const lines = [
-                { name: "Верхня", indices: [[0,0],[0,1],[0,2],[0,3],[0,4]] },
-                { name: "Центральна", indices: [[1,0],[1,1],[1,2],[1,3],[1,4]] },
-                { name: "Нижня", indices: [[2,0],[2,1],[2,2],[2,3],[2,4]] }
+                { indices: [[0,0],[0,1],[0,2],[0,3],[0,4]] },
+                { indices: [[1,0],[1,1],[1,2],[1,3],[1,4]] },
+                { indices: [[2,0],[2,1],[2,2],[2,3],[2,4]] }
             ];
             for (let line of lines) {
-                let firstSym = matrix[line.indices[0][0]][line.indices[0][1]];
-                if (firstSym === wildSymbol) continue;
+                let firstBlock = matrix[line.indices[0][0]][line.indices[0][1]];
+                if (firstBlock === wildBlock) continue;
                 let count = 1;
                 for (let i = 1; i < 5; i++) {
-                    let sym = matrix[line.indices[i][0]][line.indices[i][1]];
-                    if (sym === firstSym || sym === wildSymbol) count++;
+                    let block = matrix[line.indices[i][0]][line.indices[i][1]];
+                    if (block === firstBlock || block === wildBlock) count++;
                     else break;
                 }
-                if (count >= 3 && payTable[firstSym] && payTable[firstSym][count]) {
-                    let winAmount = payTable[firstSym][count] * bet;
+                if (count >= 3 && payTable[firstBlock] && payTable[firstBlock][count]) {
+                    let winAmount = payTable[firstBlock][count] * bet;
                     totalWin += winAmount;
                     for (let i = 0; i < count; i++) {
                         winPositions.push(`${line.indices[i][0]}-${line.indices[i][1]}`);
@@ -568,6 +1003,7 @@
             document.getElementById('buy-bonus-btn').disabled = true;
             betInput.disabled = true;
             setStatus("🌀 КРУТИМО...");
+            playSound('spin');
             
             if (!isBonusGame) await userRef.update({ chips: currentBalance - currentBet });
             else freeSpinsLeft--;
@@ -578,7 +1014,8 @@
             for (let x = 0; x < 5; x++) {
                 const strip = document.getElementById(`strip-${x}`);
                 strip.style.transition = `transform ${animDuration}s cubic-bezier(0.2, 0.95, 0.4, 1.05)`;
-                strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * 147}px)`;
+                strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * 138}px)`;
+                if (isTurbo) playSound('reel');
             }
             
             setTimeout(async () => {
@@ -594,14 +1031,17 @@
                 const winAmount = winResult.totalWin;
                 const winPositions = winResult.winPositions;
                 
-                // Анімація ТІЛЬКИ на виграшних комірках
+                // Анімація ТІЛЬКИ на виграшних блоках
                 if (winAmount > 0) {
+                    if (winAmount >= currentBet * 20) playSound('bigwin');
+                    else playSound('win');
+                    
                     for (let pos of winPositions) {
                         const [y, x] = pos.split('-');
-                        const cell = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${parseInt(y)+1})`);
-                        if (cell) {
-                            cell.classList.add('winning-cell');
-                            setTimeout(() => cell.classList.remove('winning-cell'), 800);
+                        const block = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${parseInt(y)+1}) .minecraft-block`);
+                        if (block) {
+                            block.classList.add('winning-block');
+                            setTimeout(() => block.classList.remove('winning-block'), 700);
                         }
                     }
                 }
@@ -611,6 +1051,7 @@
                     setStatus(`🏆 ВИГРАШ: ${winAmount}`);
                     if (!isBonusGame) await userRef.update({ chips: currentBalance + winAmount });
                 } else if (scatters >= 3) {
+                    playSound('bonus');
                     addToHistory(`✨ АКТИВАЦІЯ БОНУСУ! ✨`, 'bonus');
                     setStatus("✨ БОНУС!");
                     startBonusGame();
@@ -703,13 +1144,20 @@
         
         function initGame() {
             const initMatrix = [
-                [symbols[2], symbols[1], symbols[3], symbols[0], symbols[4]],
-                [symbols[0], symbols[2], symbols[4], symbols[1], symbols[3]],
-                [symbols[3], symbols[4], symbols[0], symbols[2], symbols[1]]
+                [blockTypes[2], blockTypes[1], blockTypes[3], blockTypes[0], blockTypes[4]],
+                [blockTypes[0], blockTypes[2], blockTypes[4], blockTypes[1], blockTypes[3]],
+                [blockTypes[3], blockTypes[4], blockTypes[0], blockTypes[2], blockTypes[1]]
             ];
             buildReels(initMatrix);
         }
         initGame();
+        
+        // Initialize audio on first user interaction
+        document.body.addEventListener('click', function initAudioOnClick() {
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }, { once: true });
     </script>
 </body>
 </html>

@@ -136,6 +136,13 @@ body {
 .risk-btn.active, .rows-btn.active, .rounds-btn.active {
   background: var(--neon-green); border-color: var(--neon-green); color: #000;
 }
+.risk-btn.locked, .rows-btn.locked {
+  opacity: 0.35; cursor: not-allowed; pointer-events: none;
+}
+.difficulty-locked-hint {
+  font-size: 10px; color: var(--neon-red); text-align: center;
+  padding: 2px 12px 6px; letter-spacing: 0.5px; min-height: 16px;
+}
 .rows-btn { width: 38px; padding: 6px 0; text-align: center; }
 .rounds-btn { padding: 7px 16px; }
 
@@ -329,6 +336,7 @@ body {
 
     <div class="section-label">Кількість рядів</div>
     <div class="rows-row" id="rows-row"></div>
+    <div class="difficulty-locked-hint" id="diff-lock-hint"></div>
 
     <div id="auto-content" style="display:none">
       <div class="section-label">Кількість раундів</div>
@@ -467,39 +475,40 @@ let autoRoundsTotal = 10;
 let showMore = false;
 
 // ── MULTIPLIERS ───────────────────────────────────────────
+// House edge ~7%. EV per spin ≈ 0.93x bet. Big wins possible but rare.
 const MULTS = {
   low: {
-    8:  [5.6,2.1,1.1,1.0,0.5,1.0,1.1,2.1,5.6],
-    9:  [5.6,2.0,1.6,1.0,0.7,0.7,1.0,1.6,2.0,5.6],
-    10: [8.9,3.0,1.4,1.1,1.0,0.5,1.0,1.1,1.4,3.0,8.9],
-    11: [8.4,2.0,1.7,1.4,1.1,0.6,0.6,1.1,1.4,1.7,2.0,8.4],
-    12: [10.0,3.0,1.6,1.4,1.1,1.0,0.5,1.0,1.1,1.4,1.6,3.0,10.0],
-    13: [8.1,4.0,3.0,1.9,1.2,0.9,0.7,0.7,0.9,1.2,1.9,3.0,4.0,8.1],
-    14: [7.1,4.0,1.9,1.4,1.3,1.1,1.0,0.5,1.0,1.1,1.3,1.4,1.9,4.0,7.1],
-    15: [15.0,8.0,3.0,2.0,1.5,1.1,1.0,0.7,0.7,1.0,1.1,1.5,2.0,3.0,8.0,15.0],
-    16: [16.0,9.0,2.0,1.4,1.4,1.2,1.1,1.0,0.5,1.0,1.1,1.2,1.4,1.4,2.0,9.0,16.0],
+    8:  [4.8,1.9,1.0,0.9,0.4,0.9,1.0,1.9,4.8],
+    9:  [4.8,1.8,1.4,0.9,0.6,0.6,0.9,1.4,1.8,4.8],
+    10: [7.5,2.6,1.3,1.0,0.9,0.4,0.9,1.0,1.3,2.6,7.5],
+    11: [7.2,1.8,1.5,1.2,1.0,0.5,0.5,1.0,1.2,1.5,1.8,7.2],
+    12: [8.5,2.6,1.4,1.2,1.0,0.9,0.4,0.9,1.0,1.2,1.4,2.6,8.5],
+    13: [7.0,3.4,2.6,1.6,1.0,0.8,0.6,0.6,0.8,1.0,1.6,2.6,3.4,7.0],
+    14: [6.1,3.4,1.6,1.2,1.1,1.0,0.9,0.4,0.9,1.0,1.1,1.2,1.6,3.4,6.1],
+    15: [13.0,7.0,2.6,1.7,1.3,1.0,0.9,0.6,0.6,0.9,1.0,1.3,1.7,2.6,7.0,13.0],
+    16: [14.0,8.0,1.7,1.2,1.2,1.1,1.0,0.9,0.4,0.9,1.0,1.1,1.2,1.2,1.7,8.0,14.0],
   },
   medium: {
-    8:  [13.0,3.0,1.3,0.7,0.4,0.7,1.3,3.0,13.0],
-    9:  [18.0,4.0,1.7,0.9,0.5,0.5,0.9,1.7,4.0,18.0],
-    10: [22.0,5.0,2.0,1.4,0.6,0.4,0.6,1.4,2.0,5.0,22.0],
-    11: [24.0,6.0,3.0,1.8,0.7,0.5,0.5,0.7,1.8,3.0,6.0,24.0],
-    12: [33.0,11.0,4.0,2.0,1.1,0.6,0.3,0.6,1.1,2.0,4.0,11.0,33.0],
-    13: [43.0,13.0,6.0,3.0,1.3,0.7,0.4,0.4,0.7,1.3,3.0,6.0,13.0,43.0],
-    14: [58.0,15.0,7.0,4.0,1.9,1.0,0.5,0.2,0.5,1.0,1.9,4.0,7.0,15.0,58.0],
-    15: [88.0,18.0,11.0,5.0,3.1,1.5,0.8,0.7,0.7,0.8,1.5,3.1,5.0,11.0,18.0,88.0],
-    16: [100.0,15.0,3.1,1.5,1.5,0.9,0.8,0.7,0.7,0.7,0.8,0.9,1.5,1.5,3.1,15.0,100.0],
+    8:  [11.0,2.6,1.1,0.6,0.3,0.6,1.1,2.6,11.0],
+    9:  [15.0,3.4,1.4,0.8,0.4,0.4,0.8,1.4,3.4,15.0],
+    10: [18.0,4.3,1.7,1.2,0.5,0.3,0.5,1.2,1.7,4.3,18.0],
+    11: [20.0,5.1,2.5,1.5,0.6,0.4,0.4,0.6,1.5,2.5,5.1,20.0],
+    12: [28.0,9.4,3.4,1.7,0.9,0.5,0.2,0.5,0.9,1.7,3.4,9.4,28.0],
+    13: [37.0,11.0,5.1,2.5,1.1,0.6,0.3,0.3,0.6,1.1,2.5,5.1,11.0,37.0],
+    14: [50.0,13.0,6.0,3.4,1.6,0.9,0.4,0.2,0.4,0.9,1.6,3.4,6.0,13.0,50.0],
+    15: [75.0,15.0,9.4,4.3,2.6,1.3,0.7,0.6,0.6,0.7,1.3,2.6,4.3,9.4,15.0,75.0],
+    16: [85.0,13.0,2.6,1.3,1.3,0.8,0.7,0.6,0.6,0.6,0.7,0.8,1.3,1.3,2.6,13.0,85.0],
   },
   high: {
-    8:  [29.0,4.0,1.5,0.3,0.2,0.3,1.5,4.0,29.0],
-    9:  [43.0,7.0,2.0,0.6,0.2,0.2,0.6,2.0,7.0,43.0],
-    10: [76.0,10.0,3.0,0.9,0.3,0.2,0.3,0.9,3.0,10.0,76.0],
-    11: [120.0,14.0,5.2,1.4,0.4,0.2,0.2,0.4,1.4,5.2,14.0,120.0],
-    12: [170.0,24.0,8.1,2.0,0.7,0.2,0.2,0.2,0.7,2.0,8.1,24.0,170.0],
-    13: [260.0,37.0,11.0,4.0,1.0,0.2,0.2,0.2,0.2,1.0,4.0,11.0,37.0,260.0],
-    14: [420.0,56.0,18.0,5.0,1.9,0.3,0.2,0.2,0.3,1.9,5.0,18.0,56.0,420.0],
-    15: [620.0,83.0,27.0,8.0,3.0,0.5,0.2,0.2,0.2,0.5,3.0,8.0,27.0,83.0,620.0],
-    16: [1000.0,130.0,26.0,9.0,4.0,2.0,0.2,0.2,0.2,0.2,0.2,2.0,4.0,9.0,26.0,130.0,1000.0],
+    8:  [24.0,3.4,1.3,0.2,0.1,0.2,1.3,3.4,24.0],
+    9:  [36.0,6.0,1.7,0.5,0.1,0.1,0.5,1.7,6.0,36.0],
+    10: [64.0,8.5,2.5,0.8,0.2,0.1,0.2,0.8,2.5,8.5,64.0],
+    11: [100.0,12.0,4.4,1.2,0.3,0.1,0.1,0.3,1.2,4.4,12.0,100.0],
+    12: [140.0,20.0,6.9,1.7,0.6,0.1,0.1,0.1,0.6,1.7,6.9,20.0,140.0],
+    13: [220.0,31.0,9.4,3.4,0.9,0.1,0.1,0.1,0.1,0.9,3.4,9.4,31.0,220.0],
+    14: [350.0,47.0,15.0,4.3,1.6,0.2,0.1,0.1,0.2,1.6,4.3,15.0,47.0,350.0],
+    15: [520.0,70.0,23.0,6.8,2.5,0.4,0.1,0.1,0.1,0.4,2.5,6.8,23.0,70.0,520.0],
+    16: [850.0,110.0,22.0,7.7,3.4,1.7,0.1,0.1,0.1,0.1,0.1,1.7,3.4,7.7,22.0,110.0,850.0],
   }
 };
 
@@ -636,13 +645,16 @@ function spawnBall() {
   balls.push({
     x: canvas.width / 2 + (Math.random() - 0.5) * 6,
     y: 8,
-    vx: (Math.random() - 0.5) * 0.5,   // was 0.6
-    vy: 0.8,                             // was 1.2
+    vx: (Math.random() - 0.5) * 0.5,
+    vy: 0.8,
     r: Math.max(5, Math.min(8, getColSpacing() * 0.14)),
-    col: `hsl(${40 + Math.random() * 20}, 90%, 55%)`,  // gold tones
+    col: `hsl(${40 + Math.random() * 20}, 90%, 55%)`,
     done: false,
-    lastTick: -1
+    lastTick: -1,
+    risk: currentRisk,
+    rows: currentRows
   });
+  updateDifficultyLock();
   if (!raf) loop();
   return true;
 }
@@ -656,6 +668,7 @@ function loop() {
   } else {
     raf = null;
     drawStatic();
+    updateDifficultyLock();
     if (autoPlaying && autoRoundsLeft > 0) {
       setTimeout(() => {
         if (!autoPlaying) return;
@@ -710,13 +723,13 @@ function stepPhysics() {
         const d = Math.abs(b.x - xs[k]);
         if (d < minD) { minD = d; idx = k; }
       }
-      land(idx);
+      land(idx, b.risk, b.rows);
     }
   }
 }
 
-function land(idx) {
-  const mults = MULTS[currentRisk][currentRows];
+function land(idx, ballRisk, ballRows) {
+  const mults = MULTS[ballRisk][ballRows];
   const m = mults[idx];
   const win = Math.floor(betAmount * m);
   // Add winnings back via Firebase
@@ -826,7 +839,17 @@ function setTab(t) {
   document.getElementById('bet-btn').textContent = t === 'auto' ? 'АВТОГРА' : 'ПОСТАВИТИ';
 }
 
+// ── DIFFICULTY LOCK (can't change while balls are in flight) ─────
+function updateDifficultyLock() {
+  const locked = balls.length > 0;
+  const hint = document.getElementById('diff-lock-hint');
+  if (hint) hint.textContent = locked ? '⚠ Зачекайте — шарики ще летять' : '';
+  document.querySelectorAll('.risk-btn').forEach(b => b.classList.toggle('locked', locked));
+  document.querySelectorAll('.rows-btn').forEach(b => b.classList.toggle('locked', locked));
+}
+
 function setRisk(r) {
+  if (balls.length > 0) return;   // blocked while balls in flight
   currentRisk = r;
   document.querySelectorAll('.risk-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('risk-' + r).classList.add('active');
@@ -846,6 +869,7 @@ function buildRowBtns() {
 }
 
 function setRows(r) {
+  if (balls.length > 0) return;   // blocked while balls in flight
   currentRows = r;
   document.querySelectorAll('.rows-btn').forEach(b => b.classList.toggle('active', parseInt(b.textContent) === r));
   buildPins(); renderBuckets(); if (!raf) drawStatic();

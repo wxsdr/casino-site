@@ -33,7 +33,7 @@
         /* ЛЕЙАУТ */
         .game-layout { display: flex; flex: 1; height: calc(100vh - 50px); padding: 10px; gap: 10px; box-sizing: border-box;}
 
-        /* 1. ЛІВА ПАНЕЛЬ (СТАВКИ МУЛЬТИПЛЕЄРА) */
+        /* ЛІВА ПАНЕЛЬ */
         .left-panel { width: 340px; background: var(--bg-panel); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #2a2a2b;}
         
         .total-bets-header { padding: 15px; border-bottom: 1px solid #111; display: flex; justify-content: space-between; align-items: center; background: #161617;}
@@ -49,7 +49,6 @@
         .bets-list { flex: 1; overflow-y: auto; padding: 5px; background: #121212;}
         .bet-item { display: flex; justify-content: space-between; padding: 6px 10px; background: #1b1c1d; margin-bottom: 3px; border-radius: 8px; font-size: 13px; align-items: center; border: 1px solid #1b1c1d; transition: 0.2s;}
         
-        /* Статуси ставок у списку */
         .bet-item.won { border-color: rgba(40, 167, 69, 0.5); background: rgba(40, 167, 69, 0.1);}
         .bet-item.won .bet-multi { color: var(--aviator-green); background: rgba(40,167,69,0.15); font-weight: bold;}
         .bet-item.won .bet-win { color: var(--aviator-green); font-weight: 900;}
@@ -58,40 +57,40 @@
         .bet-item.lost .bet-amount { color: var(--aviator-red); text-decoration: line-through;}
         
         .bet-user { display: flex; align-items: center; gap: 8px; width: 40%; overflow: hidden; color: #ccc; font-size: 12px;}
-        .avatar { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;}
+        .avatar { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; background: #333;}
         .bet-amount { color: #fff; width: 20%; text-align: left; font-weight: bold;}
         .bet-multi { color: var(--text-gray); width: 15%; text-align: center; background: rgba(255,255,255,0.05); padding: 2px 4px; border-radius: 6px; font-size: 12px;}
         .bet-win { color: white; font-weight: bold; width: 25%; text-align: right;}
 
-        /* 2. ПРАВА ПАНЕЛЬ (ГРА + КЕРУВАННЯ) */
+        /* ПРАВА ПАНЕЛЬ */
         .right-panel { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 600px;}
 
-        /* ІСТОРІЯ ІКСІВ (ЗВЕРХУ ЕКРАНУ) */
+        /* ІСТОРІЯ ІКСІВ */
         .history-bar { display: flex; align-items: center; background: #121414; padding: 5px 15px; border-radius: 12px; border: 1px solid #2a2a2b; height: 35px; gap: 8px; overflow-x: auto;}
         .history-bar::-webkit-scrollbar { display: none; }
-        .hist-bubble { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 900; background: rgba(0,0,0,0.4); border: 1px solid transparent; flex-shrink: 0;}
+        .hist-bubble { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 900; background: rgba(0,0,0,0.4); border: 1px solid transparent; flex-shrink: 0; cursor: pointer; transition: 0.2s;}
+        .hist-bubble:hover { background: rgba(255,255,255,0.1); }
         .hist-blue { color: var(--hist-blue); border-color: rgba(52, 180, 255, 0.3);}
         .hist-purple { color: var(--hist-purple); border-color: rgba(145, 63, 234, 0.3);}
         .hist-pink { color: var(--hist-pink); border-color: rgba(192, 31, 92, 0.3);}
 
         /* ЕКРАН ГРИ */
-        .game-screen { flex: 1; background: #121414; border-radius: 12px; border: 1px solid #2a2a2b; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background 2s ease;}
+        .game-screen { flex: 1; background: #121414; border-radius: 12px; border: 1px solid #2a2a2b; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background 1.5s ease;}
         
-        .sunburst { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.02) 0deg 10deg, transparent 10deg 20deg); animation: rotate-bg 120s linear infinite; z-index: 1;}
+        .sunburst { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.02) 0deg 10deg, transparent 10deg 20deg); animation: rotate-bg 90s linear infinite; z-index: 1;}
         @keyframes rotate-bg { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         #gameCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;}
 
         /* Текст множника */
-        .multiplier-text { position: absolute; z-index: 10; font-size: 130px; font-weight: 900; color: white; text-shadow: 0 0 20px rgba(0,0,0,0.8); pointer-events: none; font-family: 'Arial Black', sans-serif; letter-spacing: -2px;}
-        .crashed-text { position: absolute; z-index: 10; font-size: 40px; font-weight: 900; color: var(--aviator-red); top: 25%; text-shadow: 0 0 10px rgba(0,0,0,0.8); opacity: 0; transition: 0.3s;}
+        .multiplier-text { position: absolute; z-index: 10; font-size: 140px; font-weight: 900; color: white; text-shadow: 0 0 30px rgba(0,0,0,0.9); pointer-events: none; font-family: 'Arial Black', sans-serif; letter-spacing: -3px;}
+        .crashed-text { position: absolute; z-index: 10; font-size: 45px; font-weight: 900; color: var(--aviator-red); top: 25%; text-shadow: 0 0 20px rgba(0,0,0,0.9); opacity: 0; transition: 0.3s; letter-spacing: 2px;}
         
         /* Смужка очікування */
-        .loading-container { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 10px; display: none;}
-        .loading-text { font-size: 28px; font-weight: 900; color: var(--aviator-red); animation: pulse 1.5s infinite; text-shadow: 0 0 10px rgba(229,5,58,0.5);}
-        .loading-bar { width: 350px; height: 8px; background: #333; border-radius: 4px; overflow: hidden;}
-        .loading-fill { height: 100%; background: var(--aviator-red); width: 100%; box-shadow: 0 0 10px var(--aviator-red);}
-        @keyframes pulse { 0% { opacity: 1;} 50% { opacity: 0.5;} 100% { opacity: 1;} }
+        .loading-container { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 15px; display: none;}
+        .loading-text { font-size: 32px; font-weight: 900; color: var(--aviator-red); text-shadow: 0 0 15px rgba(229,5,58,0.5);}
+        .loading-bar { width: 400px; height: 10px; background: #222; border-radius: 5px; overflow: hidden; box-shadow: inset 0 0 5px rgba(0,0,0,0.8);}
+        .loading-fill { height: 100%; background: var(--aviator-red); width: 100%; box-shadow: 0 0 15px var(--aviator-red);}
 
         /* ПАНЕЛЬ КЕРУВАННЯ */
         .controls-area { display: flex; gap: 10px; height: 160px;}
@@ -164,8 +163,7 @@
 
         <div class="right-panel">
             
-            <div class="history-bar" id="history-bar">
-                </div>
+            <div class="history-bar" id="history-bar"></div>
 
             <div class="game-screen" id="game-screen">
                 <div class="sunburst"></div>
@@ -188,7 +186,7 @@
                         <div class="bet-inputs">
                             <div class="amount-control">
                                 <button class="amt-btn" onclick="adjustBet(1, -10)">-</button>
-                                <input type="number" class="amt-input" id="input-1" value="10" min="10" step="10">
+                                <input type="number" class="amt-input" id="input-1" value="10" min="10" step="10" readonly>
                                 <button class="amt-btn" onclick="adjustBet(1, 10)">+</button>
                             </div>
                             <div class="quick-bets">
@@ -212,7 +210,7 @@
                         <div class="bet-inputs">
                             <div class="amount-control">
                                 <button class="amt-btn" onclick="adjustBet(2, -10)">-</button>
-                                <input type="number" class="amt-input" id="input-2" value="10" min="10" step="10">
+                                <input type="number" class="amt-input" id="input-2" value="10" min="10" step="10" readonly>
                                 <button class="amt-btn" onclick="adjustBet(2, 10)">+</button>
                             </div>
                             <div class="quick-bets">
@@ -236,7 +234,7 @@
 
     <script>
         // ==========================================
-        // FIREBASE ТА АВТОРИЗАЦІЯ
+        // ІНІЦІАЛІЗАЦІЯ FIREBASE
         // ==========================================
         const username = localStorage.getItem('casino_user');
         if (!username) window.location.href = '../index.html';
@@ -256,13 +254,16 @@
         const userRef = database.ref('users_by_name/' + myName);
         userRef.on('value', snap => {
             const data = snap.val();
-            if (data && data.in_casino === false) window.location.href = '../index.html';
+            if (data && data.in_casino === false) {
+                alert("Ви вийшли з казино!");
+                window.location.href = '../index.html';
+            }
             currentBalance = data ? (data.chips || 0) : 0;
             document.getElementById('balance-amount').innerText = currentBalance;
         });
 
         // ==========================================
-        // СИНХРОНІЗАЦІЯ КІМНАТИ
+        // БЕЗЛАГОВИЙ РУШІЙ КІМНАТИ (TRANSACTIONS)
         // ==========================================
         const roomRef = database.ref('tables/aviator_1');
         const betsRef = database.ref('tables/aviator_1/bets');
@@ -272,11 +273,7 @@
         let flightStartTime = 0;
         let currentMultiplier = 1.00;
         let waitingEndTime = 0;
-
-        // Ініціалізація та Хост
-        roomRef.once('value', snap => {
-            if(!snap.exists() || Date.now() - snap.val().lastUpdate > 15000) startNewRound();
-        });
+        let lastUpdate = 0;
 
         roomRef.on('value', snap => {
             const data = snap.val();
@@ -286,68 +283,68 @@
             crashPoint = data.crashPoint;
             flightStartTime = data.startTime;
             waitingEndTime = data.waitingEndTime;
+            lastUpdate = data.lastUpdate;
             
-            // Рендер історії іксів
             renderHistory(data.history || []);
 
-            // Хост логіка
+            // Логіка Хоста (Захищена Транзакціями)
             if (gameState === 'waiting' && Date.now() > waitingEndTime) {
-                if (!window.hostLocked) {
-                    window.hostLocked = true;
-                    setTimeout(() => {
-                        roomRef.once('value', s => {
-                            if(s.val().status === 'waiting') {
-                                roomRef.update({ status: 'flying', startTime: Date.now(), lastUpdate: Date.now() });
-                            }
-                        });
-                    }, Math.random() * 500);
-                }
+                roomRef.transaction((currentData) => {
+                    if (currentData && currentData.status === 'waiting') {
+                        currentData.status = 'flying';
+                        currentData.startTime = Date.now();
+                        currentData.lastUpdate = Date.now();
+                    }
+                    return currentData;
+                });
             }
             
             if (gameState === 'flying') {
-                window.hostLocked = false;
                 let m = calculateMultiplier(Date.now() - flightStartTime);
                 if (m >= crashPoint) {
-                    if (!window.isCrashing) {
-                        window.isCrashing = true;
-                        roomRef.update({ status: 'crashed', lastUpdate: Date.now() }).then(() => { 
-                            setTimeout(() => { startNewRound(crashPoint); window.isCrashing = false; }, 3000); 
-                        });
-                    }
+                    roomRef.transaction((currentData) => {
+                        if (currentData && currentData.status === 'flying') {
+                            currentData.status = 'crashed';
+                            currentData.lastUpdate = Date.now();
+                        }
+                        return currentData;
+                    });
                 }
             }
 
-            updateUIVisuals();
+            // Якщо розбився і пройшло 3.5 секунди - новий раунд
+            if (gameState === 'crashed' && Date.now() - lastUpdate > 3500) {
+                roomRef.transaction((currentData) => {
+                    if (currentData && currentData.status === 'crashed') {
+                        let crash = 0.99 / Math.random();
+                        if (crash < 1.01) crash = 1.00; 
+
+                        currentData.status = 'waiting';
+                        currentData.waitingEndTime = Date.now() + 10000; // Рівно 10 секунд
+                        currentData.crashPoint = parseFloat(crash.toFixed(2));
+                        currentData.lastUpdate = Date.now();
+                        
+                        let hist = currentData.history || [];
+                        hist.unshift(parseFloat(currentData.crashPoint.toFixed(2)));
+                        if(hist.length > 20) hist.pop();
+                        currentData.history = hist;
+                    }
+                    return currentData;
+                }).then((res) => {
+                    if(res.committed) {
+                        betsRef.remove(); // Тільки один клієнт очищає ставки
+                        resetMyBets();
+                    }
+                });
+            }
         });
 
-        function startNewRound(lastCrash = null) {
-            let crash = 0.99 / Math.random();
-            if (crash < 1.01) crash = 1.00; 
-            
-            roomRef.once('value', snap => {
-                let hist = snap.val()?.history || [];
-                if (lastCrash) {
-                    hist.unshift(parseFloat(lastCrash.toFixed(2)));
-                    if(hist.length > 20) hist.pop();
-                }
-                
-                roomRef.update({
-                    status: 'waiting',
-                    waitingEndTime: Date.now() + 10000, // Рівно 10 секунд
-                    crashPoint: parseFloat(crash.toFixed(2)),
-                    lastUpdate: Date.now(),
-                    history: hist
-                });
-                betsRef.remove(); // Очищуємо гравців зліва
-            });
-
-            // Обробка моїх локальних ставок
+        function resetMyBets() {
             for(let i=1; i<=2; i++) {
                 if(window.myBets[i].state === 'cashed_out' || window.myBets[i].state === 'lost') {
                     window.myBets[i].state = 'none';
                     window.myBets[i].amount = 0;
                 }
-                // Якщо була відкладена ставка на цей раунд
                 if(window.myBets[i].state === 'queued') {
                     window.myBets[i].state = 'bet_placed';
                     placeBetToFirebase(i, window.myBets[i].amount);
@@ -357,7 +354,7 @@
         }
 
         // ==========================================
-        // ЛІВА ПАНЕЛЬ СТАВОК (МУЛЬТИПЛЕЄР)
+        // МУЛЬТИПЛЕЄР СТАВКИ (ЛІВА ПАНЕЛЬ)
         // ==========================================
         let allBets = {};
         betsRef.on('value', snap => {
@@ -374,7 +371,6 @@
             let totalAmount = 0;
             let totalCount = 0;
 
-            // Малюємо ставки (Спочатку переможці, потім інші)
             Object.keys(allBets).sort((a,b) => allBets[b].win - allBets[a].win).forEach(key => {
                 let bet = allBets[key];
                 totalAmount += bet.amount;
@@ -392,9 +388,9 @@
                         <div class="avatar" style="background:${color}">${initial}</div>
                         ${isMe ? bet.user : bet.user.substring(0,3)+'***'}
                     </div>
-                    <div class="bet-amount">${bet.amount}</div>
+                    <div class="bet-amount">${bet.amount.toFixed(2)}</div>
                     <div class="bet-multi">${bet.multi > 0 ? bet.multi.toFixed(2)+'x' : '-'}</div>
-                    <div class="bet-win">${bet.win > 0 ? bet.win : ''}</div>
+                    <div class="bet-win">${bet.win > 0 ? bet.win.toFixed(2) : ''}</div>
                 `;
                 list.appendChild(div);
             });
@@ -413,15 +409,12 @@
         }
 
         // ==========================================
-        // ЛОГІКА КНОПОК
+        // ЛОГІКА МОЇХ СТАВОК
         // ==========================================
         window.myBets = {
             1: { state: 'none', amount: 0, fbKey: null }, 
             2: { state: 'none', amount: 0, fbKey: null }
         };
-
-        document.getElementById('input-1').addEventListener('input', (e) => { document.getElementById('subtext-1').innerText = e.target.value + ' 🪙'; });
-        document.getElementById('input-2').addEventListener('input', (e) => { document.getElementById('subtext-2').innerText = e.target.value + ' 🪙'; });
 
         window.adjustBet = function(box, amount) {
             if (window.myBets[box].state !== 'none' && window.myBets[box].state !== 'lost' && window.myBets[box].state !== 'cashed_out') return;
@@ -457,7 +450,6 @@
                     betObj.amount = inputAmt;
                     placeBetToFirebase(box, inputAmt);
                 } else {
-                    // Якщо летить - ставимо в чергу на наступний раунд
                     betObj.state = 'queued';
                     betObj.amount = inputAmt;
                 }
@@ -499,23 +491,19 @@
                     btn.className = "action-btn btn-bet";
                     btn.innerHTML = `СТАВКА<div class="btn-text-small" id="subtext-${i}">${input.value} 🪙</div>`;
                     btn.disabled = false;
-                    input.disabled = false;
                 } else if (state === 'queued') {
                     btn.className = "action-btn btn-cancel";
                     btn.innerHTML = `СКАСУВАТИ<div class="btn-text-small" style="font-size:10px;">Очікуємо на новий раунд</div>`;
                     btn.disabled = false;
-                    input.disabled = true;
                 } else if (state === 'bet_placed') {
                     btn.className = "action-btn btn-cancel";
                     btn.innerHTML = `СКАСУВАТИ<div class="btn-text-small">Очікування старту</div>`;
                     btn.disabled = false;
-                    input.disabled = true;
                 } else if (state === 'playing') {
                     btn.className = "action-btn btn-cashout";
                     let win = Math.floor(window.myBets[i].amount * currentMultiplier);
                     btn.innerHTML = `ЗАБРАТИ<div class="cashout-amount">${win} 🪙</div>`;
                     btn.disabled = false;
-                    input.disabled = true;
                 } else if (state === 'cashed_out') {
                     btn.className = "action-btn btn-disabled";
                     btn.innerHTML = "ЗАБРАВ";
@@ -529,7 +517,7 @@
         }
 
         // ==========================================
-        // CANVAS АНІМАЦІЯ
+        // ІДЕАЛЬНИЙ 3D CANVAS (АВІАТОР)
         // ==========================================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -550,7 +538,12 @@
             return Math.max(1.00, Math.pow(Math.E, 0.06 * (ms / 1000)));
         }
 
-        let crashedPlaneXOffset = 0;
+        // Завантажуємо якісний літачок (Червоний SVG)
+        const planeImage = new Image();
+        planeImage.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'><path fill='%23e5053a' d='M20,30 Q20,20 40,20 L90,20 Q110,20 110,28 Q110,36 90,36 L40,36 Q20,40 20,30 Z'/><path fill='%23e5053a' d='M25,25 L10,5 L35,20 Z'/><path fill='%23c20431' d='M50,30 L30,55 L60,55 L75,30 Z'/><path fill='%23fff' d='M100,23 L105,23 L105,33 L100,33 Z'/><path fill='%23e5053a' d='M108,18 L112,18 L112,38 L108,38 Z'/></svg>";
+
+        let crashedPlaneX = 0;
+        let crashedPlaneY = 0;
 
         function drawGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -559,31 +552,31 @@
                 if (gameState === 'flying') {
                     currentMultiplier = calculateMultiplier(Date.now() - flightStartTime);
                     if (currentMultiplier > crashPoint) currentMultiplier = crashPoint;
-                    crashedPlaneXOffset = 0; 
+                    crashedPlaneX = 0;
+                    crashedPlaneY = 0;
                 }
 
+                // Плавна крива
                 let progress = Math.min(1, Math.log10(currentMultiplier) / 1.5); 
                 
                 let startX = 0;
                 let startY = canvas.height;
-                let endX = 50 + (canvas.width * 0.7) * progress;
-                let endY = canvas.height - 50 - (canvas.height * 0.7) * progress;
+                let endX = 80 + (canvas.width * 0.7) * progress;
+                let endY = canvas.height - 80 - (canvas.height * 0.7) * progress;
 
                 if (gameState === 'crashed') {
-                    crashedPlaneXOffset += 30; 
-                    endX += crashedPlaneXOffset;
+                    // Літак різко відлітає вгору і вправо
+                    crashedPlaneX += 40; 
+                    crashedPlaneY -= 15;
                 }
 
                 if (gameState === 'flying') {
-                    // Динамічний фон (Перехід в фіолетовий на 10x)
-                    if (currentMultiplier >= 10) {
-                        gameScreen.style.background = "#2b0a1a"; // Малиновий
-                    } else {
-                        gameScreen.style.background = "#121414"; // Стандартний
-                    }
+                    // Зміна фону на фіолетовий, якщо X > 10
+                    if (currentMultiplier >= 10) gameScreen.style.background = "#2b0a1a";
+                    else gameScreen.style.background = "#121414";
 
                     let gradient = ctx.createLinearGradient(0, endY, 0, canvas.height);
-                    gradient.addColorStop(0, 'rgba(229, 5, 58, 0.5)');
+                    gradient.addColorStop(0, 'rgba(229, 5, 58, 0.4)');
                     gradient.addColorStop(1, 'rgba(229, 5, 58, 0.0)');
 
                     ctx.beginPath();
@@ -594,39 +587,27 @@
                     ctx.fillStyle = gradient;
                     ctx.fill();
 
+                    // Малювання червоної лінії з світінням
                     ctx.beginPath();
                     ctx.moveTo(startX, startY);
                     ctx.quadraticCurveTo(startX + (endX - startX)*0.5, canvas.height, endX, endY);
                     ctx.strokeStyle = '#e5053a';
-                    ctx.lineWidth = 5;
+                    ctx.lineWidth = 6;
+                    ctx.lineCap = 'round';
+                    ctx.shadowColor = '#e5053a';
+                    ctx.shadowBlur = 10;
                     ctx.stroke();
+                    ctx.shadowBlur = 0; // Скидання
                 }
 
+                // Малювання Літака
                 ctx.save();
-                ctx.translate(endX, endY);
-                ctx.rotate(-Math.PI / 12); 
+                ctx.translate(endX + crashedPlaneX, endY + crashedPlaneY);
+                ctx.rotate(-Math.PI / 10); 
                 
-                ctx.fillStyle = '#e5053a';
-                ctx.beginPath();
-                ctx.moveTo(35, 0); 
-                ctx.lineTo(10, -5); 
-                ctx.lineTo(-15, -20); 
-                ctx.lineTo(-5, -5); 
-                ctx.lineTo(-25, -10); 
-                ctx.lineTo(-25, 10); 
-                ctx.lineTo(-5, 5); 
-                ctx.lineTo(-15, 20); 
-                ctx.lineTo(10, 5); 
-                ctx.closePath();
-                ctx.fill();
-                
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(-20, -5); ctx.lineTo(-15, 5);
-                ctx.moveTo(-15, -5); ctx.lineTo(-20, 5);
-                ctx.stroke();
-
+                if (planeImage.complete) {
+                    ctx.drawImage(planeImage, -60, -30, 120, 60);
+                }
                 ctx.restore();
             }
 
@@ -634,16 +615,23 @@
         }
         drawGame();
 
+        function updateLoadingBar() {
+            if(gameState === 'waiting') {
+                let timeLeft = waitingEndTime - Date.now();
+                let pct = Math.max(0, (timeLeft / 10000) * 100);
+                loadingFill.style.width = pct + '%';
+                requestAnimationFrame(updateLoadingBar);
+            }
+        }
+
         function updateUIVisuals() {
             if (gameState === 'waiting') {
                 multiDisplay.style.display = "none";
                 crashMsg.style.opacity = 0;
                 loadingContainer.style.display = "flex";
-                gameScreen.style.background = "#121414"; // Скидання фону
+                gameScreen.style.background = "#121414"; 
                 
-                let timeLeft = waitingEndTime - Date.now();
-                if(timeLeft < 0) timeLeft = 0;
-                loadingFill.style.width = `${(timeLeft / 10000) * 100}%`; // 10 Секунд!
+                requestAnimationFrame(updateLoadingBar);
 
             } else if (gameState === 'flying') {
                 multiDisplay.style.display = "block";

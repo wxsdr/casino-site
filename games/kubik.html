@@ -125,7 +125,7 @@
             margin-top: 5px;
         }
 
-        /* DICE AREA - тільки емодзі */
+        /* DICE AREA */
         .dice-area {
             flex: 1;
             display: flex;
@@ -168,6 +168,7 @@
             margin-top: 10px;
             text-align: center;
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            min-height: 60px;
         }
         
         .bet-options {
@@ -215,6 +216,7 @@
             cursor: not-allowed;
         }
         
+        /* ФІКСОВАНА ВИСОТА ДЛЯ РЕЗУЛЬТАТУ, ЩОБ КНОПКА НЕ СТРИБАЛА */
         .result-area {
             text-align: center;
             margin: 15px 0;
@@ -222,6 +224,11 @@
             background: rgba(0, 0, 0, 0.6);
             border-radius: 50px;
             backdrop-filter: blur(10px);
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
         
         .result-text {
@@ -396,8 +403,9 @@
                     </div>
                 </div>
                 
-                <div class="result-area" id="result-area" style="display: none;">
-                    <div class="result-text" id="result-text"></div>
+                <!-- result-area завжди видимий, але з прозорим текстом коли немає результату -->
+                <div class="result-area" id="result-area">
+                    <div class="result-text" id="result-text" style="opacity: 0;">&nbsp;</div>
                 </div>
             </div>
             
@@ -542,7 +550,18 @@
             return names[betType] || betType;
         }
         
-        // Анімація кубиків (тільки емодзі)
+        function showResult(message, type) {
+            resultText.style.opacity = '1';
+            resultText.className = `result-text result-${type}`;
+            resultText.innerHTML = message;
+        }
+        
+        function clearResult() {
+            resultText.style.opacity = '0';
+            resultText.innerHTML = '&nbsp;';
+        }
+        
+        // Анімація кубиків
         async function animateDice(finalValue1, finalValue2) {
             return new Promise((resolve) => {
                 let rolls = 0;
@@ -584,22 +603,21 @@
         async function rollDice() {
             if (isRolling) return;
             if (selectedBet === null) {
-                resultArea.style.display = 'block';
-                resultText.className = 'result-text result-lose';
-                resultText.innerHTML = `❌ ОБЕРІТЬ СТАВКУ!`;
+                showResult('❌ ОБЕРІТЬ СТАВКУ!', 'lose');
                 return;
             }
             if (currentBet > currentBalance) {
-                resultArea.style.display = 'block';
-                resultText.className = 'result-text result-lose';
-                resultText.innerHTML = `❌ НЕДОСТАТНЬО КОШТІВ! ПОТРІБНО ${currentBet}, Є ${currentBalance}`;
+                showResult(`❌ НЕДОСТАТНЬО КОШТІВ! ПОТРІБНО ${currentBet}, Є ${currentBalance}`, 'lose');
                 return;
             }
             
             isRolling = true;
             rollBtn.disabled = true;
             betOptions.forEach(opt => opt.style.pointerEvents = 'none');
-            resultArea.style.display = 'none';
+            
+            // Очищаємо старий результат (але блок залишається на місці)
+            clearResult();
+            sumDisplay.innerHTML = '';
             
             // Знімаємо ставку
             await updateBalance(-currentBet);
@@ -667,9 +685,7 @@
                 addToHistory(`🎲 -${currentBet} 🪙 (НЕПАРНЕ, випало ${sum})`, 'lose');
             }
             
-            resultArea.style.display = 'block';
-            resultText.className = `result-text result-${resultType}`;
-            resultText.innerHTML = resultMessage;
+            showResult(resultMessage, resultType);
             
             isRolling = false;
             rollBtn.disabled = false;

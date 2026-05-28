@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курахівка РП | Піксельний Слот</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        body {
+            margin: 0; padding: 0; height: 100vh;
+            background-color: #515151;
+            background-image: 
+                linear-gradient(45deg, #444 25%, transparent 25%, transparent 75%, #444 75%, #444), 
+                linear-gradient(45deg, #444 25%, #515151 25%, #515151 75%, #444 75%, #444);
+            background-size: 64px 64px; background-position: 0 0, 32px 32px;
+            font-family: 'VT323', monospace;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; user-select: none;
+        }
+
+        /* ІНТЕРФЕЙС MINECRAFT GUI */
+        .mc-gui {
+            background-color: #c6c6c6;
+            border-top: 6px solid #ffffff; border-left: 6px solid #ffffff;
+            border-bottom: 6px solid #555555; border-right: 6px solid #555555;
+            padding: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .mc-header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #8b8b8b; padding: 10px 20px;
+            border-top: 4px solid #555; border-left: 4px solid #555;
+            border-bottom: 4px solid #fff; border-right: 4px solid #fff;
+        }
+
+        .mc-title { font-size: 40px; color: #333; text-shadow: 2px 2px 0px #fff; margin: 0; }
+        .mc-balance { font-size: 32px; color: #55ff55; text-shadow: 2px 2px 0px #000; }
+
+        /* КНОПКИ MINECRAFT */
+        .mc-btn {
+            background-color: #c6c6c6;
+            border-top: 4px solid #ffffff; border-left: 4px solid #ffffff;
+            border-bottom: 4px solid #555555; border-right: 4px solid #555555;
+            color: #222; font-family: 'VT323', monospace; font-size: 28px;
+            padding: 10px 20px; cursor: pointer; text-shadow: 2px 2px 0px #fff;
+            transition: 0.1s;
+        }
+        .mc-btn:active:not(:disabled) {
+            border-top: 4px solid #555555; border-left: 4px solid #555555;
+            border-bottom: 4px solid #ffffff; border-right: 4px solid #ffffff;
+            padding-top: 14px; padding-bottom: 6px; color: #000;
+        }
+        .mc-btn:disabled { color: #888; cursor: not-allowed; text-shadow: none; }
+        .mc-btn.green { color: #00aa00; font-size: 36px; padding: 15px 40px; }
+        .mc-btn.red { color: #aa0000; }
+
+        .mc-input {
+            background: #000; color: #fff; border: 4px solid #888;
+            font-family: 'VT323', monospace; font-size: 32px; text-align: center;
+            width: 120px; height: 50px; outline: none;
+        }
+        .mc-input::-webkit-outer-spin-button, .mc-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+        .controls-row { display: flex; justify-content: space-between; gap: 30px; align-items: center; margin-top: 10px;}
+        .bet-box { display: flex; align-items: center; gap: 10px; }
+
+        /* СІТКА БАРАБАНІВ */
+        .slot-grid-wrapper {
+            background-color: #8b8b8b;
+            border-top: 6px solid #555555; border-left: 6px solid #555555;
+            border-bottom: 6px solid #ffffff; border-right: 6px solid #ffffff;
+            padding: 15px;
+        }
+        
+        .slot-grid {
+            display: grid; grid-template-columns: repeat(5, 90px); grid-template-rows: repeat(3, 90px);
+            gap: 8px; background: #222; padding: 8px;
+        }
+
+        .slot-cell {
+            width: 90px; height: 90px; background: #c6c6c6;
+            display: flex; justify-content: center; align-items: center;
+            position: relative; overflow: hidden;
+            box-shadow: inset 6px 6px 0 #555, inset -6px -6px 0 #fff;
+        }
+
+        .win-glow { animation: mcWinGlow 0.5s infinite alternate; }
+        @keyframes mcWinGlow {
+            from { box-shadow: inset 0 0 0 4px #55ff55; background: #c6c6c6; }
+            to { box-shadow: inset 0 0 0 8px #55ff55; background: #aaffaa; }
+        }
+
+        /* БЛОКИ (Малюємо кодом) */
+        .mc-block { width: 70px; height: 70px; box-sizing: border-box; position: relative; }
+        
+        .blk-dirt { background: #79553a; border: 4px solid #533824; box-shadow: inset 4px 4px 0 #966a47, inset -4px -4px 0 #412b1a; }
+        .blk-wood { background: #9c7b4d; border: 4px solid #594222; box-shadow: inset 4px 4px 0 #bca075, inset -4px -4px 0 #755933; }
+        .blk-gold { background: #fce029; border: 4px solid #e2a813; box-shadow: inset 4px 4px 0 #fdf06a, inset -4px -4px 0 #c28811; }
+        .blk-diamond { background: #51eeea; border: 4px solid #20a3a3; box-shadow: inset 4px 4px 0 #95fffe, inset -4px -4px 0 #1b8585; }
+        .blk-emerald { background: #41f384; border: 4px solid #1a9e4d; box-shadow: inset 4px 4px 0 #8df9b3, inset -4px -4px 0 #14803d; }
+
+        .blk-crafting { background: #d08d38; border: 4px solid #4a3018; box-shadow: inset 4px 4px 0 #f0a84d, inset -4px -4px 0 #a36920; }
+        .blk-crafting::before { content: 'WILD'; position: absolute; color: #fff; text-shadow: 2px 2px 0 #000; font-size: 24px; top: 18px; left: 8px; font-weight: bold; }
+
+        .blk-chest { background: #a6702d; border: 4px solid #111; box-shadow: inset 4px 4px 0 #d08d38, inset -4px -4px 0 #7b511f; }
+        .blk-chest::after { content: ''; position: absolute; width: 14px; height: 20px; background: #fff; border: 4px solid #000; top: 20px; left: 24px; }
+        .blk-chest::before { content: 'BONUS'; position: absolute; color: #ffdf00; text-shadow: 2px 2px 0 #000; font-size: 20px; top: 44px; left: 10px; z-index: 2; }
+
+        .sticky-mult { position: absolute; bottom: 0; right: 0; background: #000; color: #fff; padding: 0 6px; font-size: 26px; border-top: 4px solid #555; border-left: 4px solid #555; z-index: 10; }
+
+        .spinning { filter: blur(4px); transform: translateY(15px); }
+
+        #status-text { font-size: 36px; text-align: center; text-shadow: 2px 2px 0 #fff; margin-top: 10px; }
+
+        /* Модалка повідомлень */
+        #msg-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .msg-box { max-width: 600px; text-align: center; }
+        .msg-text { font-size: 38px; margin-bottom: 30px; color: #fff; text-shadow: 3px 3px 0 #000; line-height: 1.2; }
+    </style>
+</head>
+<body>
+
+    <button onclick="window.location.href='../index.html'" class="mc-btn" style="position: absolute; top: 20px; left: 20px;">⬅ В Лобі</button>
+
+    <div class="mc-gui">
+        <div class="mc-header">
+            <h1 class="mc-title">СЛОТ КУРАХІВКА</h1>
+            <div class="mc-balance" id="balance-display">БАЛАНС: 0</div>
+        </div>
+
+        <div class="slot-grid-wrapper">
+            <div class="slot-grid" id="slot-grid"></div>
+        </div>
+
+        <div id="status-text">ГОТОВИЙ ДО КРАФТУ</div>
+
+        <div class="controls-row">
+            <div class="bet-box">
+                <button class="mc-btn" id="btn-minus" onclick="updateBet(-10)">-</button>
+                <input type="number" id="bet-input" class="mc-input" value="10" min="10" max="50000" onchange="manualBetChange()">
+                <button class="mc-btn" id="btn-plus" onclick="updateBet(10)">+</button>
+            </div>
+            
+            <button class="mc-btn green" id="spin-btn" onclick="spin()">КРУТИТИ</button>
+            
+            <button class="mc-btn red" id="buy-bonus-btn" onclick="buyBonus()">
+                БОНУС ЗА <br><span id="bonus-price">1000</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="msg-modal">
+        <div class="mc-gui msg-box">
+            <div class="msg-text" id="msg-content">Текст</div>
+            <button class="mc-btn" onclick="document.getElementById('msg-modal').style.display='none'">ЗРОЗУМІЛО</button>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
+            authDomain: "kurahivka-casino.firebaseapp.com",
+            databaseURL: "https://kurahivka-casino-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "kurahivka-casino"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const username = localStorage.getItem('casino_user');
+        
+        if (!username) window.location.href = '../index.html';
+
+        let currentBalance = 0;
+        const userRef = database.ref('users_by_name/' + username.toLowerCase());
+        
+        userRef.on('value', snap => {
+            const data = snap.val();
+            currentBalance = data ? (data.chips || 0) : 0;
+            document.getElementById('balance-display').innerText = `БАЛАНС: ${currentBalance}`;
+        });
+
+        const symbols = ['blk-dirt', 'blk-wood', 'blk-gold', 'blk-diamond', 'blk-emerald'];
+        const wildSymbol = 'blk-crafting';
+        const scatterSymbol = 'blk-chest';
+
+        let currentBet = 10;
+        let isSpinning = false;
+        let isBonusGame = false;
+        let freeSpinsLeft = 0;
+        let stickyWilds = {};
+
+        const gridElement = document.getElementById('slot-grid');
+        function initGrid() {
+            gridElement.innerHTML = '';
+            for (let y = 0; y < 3; y++) {
+                for (let x = 0; x < 5; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'slot-cell';
+                    cell.id = `cell-${x}-${y}`;
+                    
+                    const block = document.createElement('div');
+                    block.className = `mc-block ${symbols[Math.floor(Math.random() * symbols.length)]}`;
+                    block.id = `block-${x}-${y}`;
+                    
+                    cell.appendChild(block);
+                    gridElement.appendChild(cell);
+                }
+            }
+        }
+        initGrid();
+
+        const betInput = document.getElementById('bet-input');
+        function updateBet(amount) {
+            if (isSpinning || isBonusGame) return;
+            let newBet = parseInt(betInput.value) + amount;
+            if (newBet >= 10 && newBet <= 50000) {
+                currentBet = newBet; betInput.value = currentBet;
+                document.getElementById('bonus-price').innerText = currentBet * 100;
+            }
+        }
+        function manualBetChange() {
+            if (isSpinning || isBonusGame) { betInput.value = currentBet; return; }
+            let val = parseInt(betInput.value);
+            if (isNaN(val) || val < 10) val = 10;
+            currentBet = val; betInput.value = currentBet;
+            document.getElementById('bonus-price').innerText = currentBet * 100;
+        }
+
+        function showMsg(text) {
+            document.getElementById('msg-content').innerText = text;
+            document.getElementById('msg-modal').style.display = 'flex';
+        }
+
+        function setStatus(text, color = '#333') {
+            const el = document.getElementById('status-text');
+            el.innerText = text; el.style.color = color;
+        }
+
+        function lockButtons(lock) {
+            document.getElementById('spin-btn').disabled = lock;
+            document.getElementById('buy-bonus-btn').disabled = lock;
+            document.getElementById('btn-minus').disabled = lock;
+            document.getElementById('btn-plus').disabled = lock;
+            betInput.disabled = lock;
+        }
+
+        async function buyBonus() {
+            const cost = currentBet * 100;
+            if (isSpinning || isBonusGame) return;
+            if (currentBalance < cost) return showMsg("Недостатньо блоків (фішок)!");
+            
+            isSpinning = true; lockButtons(true);
+            await userRef.update({ chips: currentBalance - cost });
+            executeSpin(true); 
+        }
+
+        async function spin() {
+            if (isSpinning) return;
+            if (!isBonusGame && currentBalance < currentBet) return showMsg("Недостатньо блоків!");
+            
+            isSpinning = true; lockButtons(true);
+            setStatus("КРАФТИМО...", "#555");
+            document.querySelectorAll('.win-glow').forEach(el => el.classList.remove('win-glow'));
+
+            if (!isBonusGame) await userRef.update({ chips: currentBalance - currentBet });
+            else freeSpinsLeft--;
+
+            executeSpin(false);
+        }
+
+        function executeSpin(forceBonus) {
+            let spinsCount = 0;
+            let spinInterval = setInterval(() => {
+                for (let y = 0; y < 3; y++) {
+                    for (let x = 0; x < 5; x++) {
+                        if (isBonusGame && stickyWilds[`${x}-${y}`]) continue;
+                        const block = document.getElementById(`block-${x}-${y}`);
+                        block.className = `mc-block ${symbols[Math.floor(Math.random() * symbols.length)]} spinning`;
+                        block.innerHTML = ''; 
+                    }
+                }
+                spinsCount++;
+                if (spinsCount > 15) { clearInterval(spinInterval); finalizeSpin(forceBonus); }
+            }, 60);
+        }
+
+        async function finalizeSpin(forceBonus) {
+            let finalMatrix = [[], [], []];
+            let scatterCount = 0;
+
+            for (let y = 0; y < 3; y++) {
+                for (let x = 0; x < 5; x++) {
+                    const block = document.getElementById(`block-${x}-${y}`);
+                    block.classList.remove('spinning');
+                    
+                    if (isBonusGame && stickyWilds[`${x}-${y}`]) {
+                        finalMatrix[y][x] = wildSymbol; continue; 
+                    }
+
+                    if (forceBonus && y === 1 && (x === 0 || x === 2 || x === 4)) {
+                        block.className = `mc-block ${scatterSymbol}`;
+                        finalMatrix[y][x] = scatterSymbol; scatterCount++; continue;
+                    }
+
+                    let isScatterReel = (x === 0 || x === 2 || x === 4);
+                    let symbolClass = '';
+                    block.innerHTML = ''; 
+
+                    if (!isBonusGame && !forceBonus && isScatterReel && Math.random() < 0.05) {
+                        symbolClass = scatterSymbol; scatterCount++;
+                    } else if ((x === 1 || x === 2 || x === 3) && Math.random() < 0.12) {
+                        symbolClass = wildSymbol;
+                        if (isBonusGame) {
+                            stickyWilds[`${x}-${y}`] = Math.random() > 0.5 ? 2 : 3;
+                            block.innerHTML = `<div class="sticky-mult">x${stickyWilds[`${x}-${y}`]}</div>`;
+                        }
+                    } else {
+                        symbolClass = symbols[Math.floor(Math.random() * symbols.length)];
+                    }
+
+                    block.className = `mc-block ${symbolClass}`;
+                    finalMatrix[y][x] = symbolClass;
+                }
+            }
+            checkWin(finalMatrix, scatterCount);
+        }
+
+        async function checkWin(matrix, scatterCount) {
+            let winAmount = 0;
+            for (let y = 0; y < 3; y++) {
+                if (matrix[y][0] === matrix[y][1] || matrix[y][1] === wildSymbol) {
+                    if (Math.random() > 0.4) {
+                        document.getElementById(`cell-0-${y}`).classList.add('win-glow');
+                        document.getElementById(`cell-1-${y}`).classList.add('win-glow');
+                        document.getElementById(`cell-2-${y}`).classList.add('win-glow');
+                        
+                        let lineWin = currentBet * (Math.floor(Math.random() * 5) + 1);
+                        let multiplier = 1;
+                        for(let x = 1; x <= 3; x++) if(stickyWilds[`${x}-${y}`]) multiplier += stickyWilds[`${x}-${y}`];
+                        winAmount += (lineWin * (multiplier > 1 ? multiplier : 1));
+                    }
+                }
+            }
+
+            if (winAmount > 0) {
+                setStatus(`ЗДОБИЧ: +${winAmount}`, "#00aa00");
+                await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + winAmount }); });
+            } else if (!isBonusGame) {
+                setStatus("ПУСТО", "#888");
+            }
+
+            setTimeout(() => {
+                if (!isBonusGame && scatterCount >= 3) startBonusGame();
+                else if (isBonusGame && freeSpinsLeft <= 0) endBonusGame();
+                else if (isBonusGame && freeSpinsLeft > 0) {
+                    setStatus(`КРАФТІВ ЗАЛИШИЛОСЬ: ${freeSpinsLeft}`, "#aa0000");
+                    isSpinning = false; lockButtons(false); document.getElementById('buy-bonus-btn').disabled = true;
+                } else {
+                    isSpinning = false; lockButtons(false); setStatus("ГОТОВИЙ ДО КРАФТУ", "#333");
+                }
+            }, 1200);
+        }
+
+        function startBonusGame() {
+            isBonusGame = true; freeSpinsLeft = Math.floor(Math.random() * 8) + 7; stickyWilds = {}; 
+            showMsg(`ЗНАЙДЕНО СКАРБ!\nБезкоштовних крафтів: ${freeSpinsLeft}\nВсі верстаки залипають!`);
+            setStatus(`КРАФТІВ ЗАЛИШИЛОСЬ: ${freeSpinsLeft}`, "#aa0000");
+            isSpinning = false; lockButtons(false); document.getElementById('buy-bonus-btn').disabled = true;
+        }
+
+        function endBonusGame() {
+            showMsg("Безкоштовні крафти завершені!");
+            isBonusGame = false; stickyWilds = {};
+            document.querySelectorAll('.sticky-mult').forEach(el => el.remove());
+            isSpinning = false; lockButtons(false); setStatus("ГОТОВИЙ ДО КРАФТУ", "#333");
+        }
+    </script>
+</body>
+</html>

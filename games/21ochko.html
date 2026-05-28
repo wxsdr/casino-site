@@ -516,8 +516,7 @@
         let dealerCards = [];
         let gameActive = false;
         let currentBet = 10;
-        let gameResult = null;
-        let isProcessing = false;
+        let betPlacedThisRound = false;  // Запобігає подвійному списанню ставки
         
         const betInput = document.getElementById('bet-input');
         const playerCardsDiv = document.getElementById('player-cards');
@@ -538,7 +537,7 @@
         }
         
         function updateBet(delta) {
-            if (gameActive || isProcessing) return;
+            if (gameActive) return;
             let newVal = currentBet + delta;
             if (newVal >= 10 && newVal <= Math.min(50000, currentBalance)) {
                 currentBet = newVal;
@@ -548,7 +547,7 @@
         }
         
         function manualBetChange() {
-            if (gameActive || isProcessing) return;
+            if (gameActive) return;
             let val = parseInt(betInput.value);
             if (isNaN(val)) val = 10;
             if (val < 10) val = 10;
@@ -609,7 +608,7 @@
             playerCardsDiv.innerHTML = playerCards.map(c => renderCard(c, false)).join('');
             playerScoreSpan.innerText = calculateScore(playerCards);
             
-            if (hideDealerSecond && gameActive && !gameResult && dealerCards.length === 2) {
+            if (hideDealerSecond && gameActive && !resultArea.style.display === 'block' && dealerCards.length === 2) {
                 const visibleCards = dealerCards.map((c, i) => renderCard(c, i === 1));
                 dealerCardsDiv.innerHTML = visibleCards.join('');
                 const visibleScore = calculateScore(dealerCards.slice(0, 1));
@@ -621,10 +620,12 @@
         }
         
         async function placeBet() {
+            if (betPlacedThisRound) return true;
             if (currentBet > currentBalance) return false;
             await userRef.update({ chips: currentBalance - currentBet });
             currentBalance -= currentBet;
             document.getElementById('balance-amount').innerText = currentBalance;
+            betPlacedThisRound = true;
             return true;
         }
         
@@ -654,17 +655,7 @@
             let resultType = '';
             let resultMessage = '';
             
-            // Блекджек (21 з двох карт)
-            const isPlayerBlackjack = playerCards.length === 2 && playerScore === 21;
-            const isDealerBlackjack = dealerCards.length === 2 && dealerScore === 21;
-            
-            if (isPlayerBlackjack && !isDealerBlackjack) {
-                winAmount = currentBet * 2.5; // Блекджек виплачує 3:2 (ставка 10 → виграш 25)
-                resultType = 'win';
-                resultMessage = `🃏 БЛЕКДЖЕК! ВИ ВИГРАЛИ ${Math.floor(winAmount)} 🪙`;
-                await addWin(winAmount);
-                playSound('blackjack');
-            } else if (playerScore > 21) {
+            if (playerScore > 21) {
                 resultType = 'lose';
                 resultMessage = `❌ ПЕРЕБІР! ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 playSound('lose');
@@ -692,7 +683,6 @@
                 playSound('win');
             }
             
-            gameResult = { type: resultType, message: resultMessage };
             resultArea.style.display = 'block';
             resultText.className = `result-text result-${resultType}`;
             resultText.innerHTML = resultMessage;
@@ -701,12 +691,10 @@
             
             hitBtn.disabled = true;
             standBtn.disabled = true;
-            isProcessing = false;
         }
         
         async function hit() {
-            if (!gameActive || isProcessing) return;
-            isProcessing = true;
+            if (!gameActive) return;
             playSound('card');
             const newCard = deck.pop();
             playerCards.push(newCard);
@@ -714,15 +702,11 @@
             
             if (calculateScore(playerCards) > 21) {
                 await endGame();
-            } else {
-                isProcessing = false;
             }
         }
         
         async function stand() {
-            if (!gameActive || isProcessing) return;
-            isProcessing = true;
-            playSound('card');
+            if (!gameActive) return;
             hitBtn.disabled = true;
             standBtn.disabled = true;
             
@@ -731,22 +715,19 @@
         }
         
         async function startNewGame() {
-            if (gameActive || isProcessing) return;
-            if (currentBet > currentBalance) return;
+            if (gameActive) return;
             
-            isProcessing = true;
-            
-            gameResult = null;
+            // Скидаємо стан
+            betPlacedThisRound = false;
             resultArea.style.display = 'none';
             hitBtn.disabled = false;
             standBtn.disabled = false;
             
+            // Ставимо ставку
             const betPlaced = await placeBet();
-            if (!betPlaced) {
-                isProcessing = false;
-                return;
-            }
+            if (!betPlaced) return;
             
+            // Нова колода
             deck = createDeck();
             playerCards = [deck.pop(), deck.pop()];
             dealerCards = [deck.pop(), deck.pop()];
@@ -754,11 +735,9 @@
             gameActive = true;
             updateUI(true);
             
-            const playerScore = calculateScore(playerCards);
-            if (playerScore === 21) {
+            // Перевірка на блекджек
+            if (calculateScore(playerCards) === 21) {
                 await stand();
-            } else {
-                isProcessing = false;
             }
         }
         

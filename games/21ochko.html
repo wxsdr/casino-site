@@ -86,7 +86,6 @@
             padding: 20px;
         }
 
-        /* GAME TABLE - CASINO STYLE */
         .game-table {
             background: linear-gradient(145deg, #0a5a3a, #064a2a);
             border-radius: 80px;
@@ -119,7 +118,6 @@
         .table-title {
             text-align: center;
             margin-bottom: 20px;
-            position: relative;
         }
         .table-title h1 {
             font-family: 'Rubik', sans-serif;
@@ -137,7 +135,6 @@
             margin-top: 5px;
         }
 
-        /* CARDS AREA */
         .cards-area {
             flex: 1;
             display: flex;
@@ -186,7 +183,6 @@
             min-height: 140px;
         }
         
-        /* CARDS */
         .card {
             width: 90px;
             height: 126px;
@@ -228,7 +224,6 @@
             font-weight: 900;
         }
         
-        /* Card back (hidden dealer card) */
         .card-back {
             background: linear-gradient(135deg, #1a3a5a, #0a2a4a);
             border: 2px solid #d4af37;
@@ -248,7 +243,6 @@
             display: none;
         }
 
-        /* RESULT AREA */
         .result-area {
             text-align: center;
             margin: 15px 0;
@@ -274,7 +268,6 @@
         .result-push { color: #d4af37; }
         .result-blackjack { color: #9b30ff; }
 
-        /* BETTING PANEL */
         .bet-panel {
             display: flex;
             align-items: center;
@@ -372,12 +365,6 @@
             transform: scale(1.02);
             filter: brightness(1.05);
         }
-        
-        /* FLOATING CHIPS ANIMATION */
-        @keyframes chipFloat {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-        }
     </style>
 </head>
 <body>
@@ -434,7 +421,6 @@
     </div>
 
     <script>
-        // ========== AUDIO ==========
         let audioContext = null;
         
         function initAudio() {
@@ -508,7 +494,6 @@
             } catch(e) { console.log('Audio error:', e); }
         }
 
-        // ========== FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
             authDomain: "kurahivka-casino.firebaseapp.com",
@@ -527,7 +512,6 @@
             document.getElementById('balance-amount').innerText = currentBalance;
         });
 
-        // ========== BLACKJACK GAME ==========
         let deck = [];
         let playerCards = [];
         let dealerCards = [];
@@ -535,6 +519,7 @@
         let currentBet = 10;
         let gameResult = null;
         let isDoubled = false;
+        let isProcessing = false;  // блокування повторних викликів
         
         const betInput = document.getElementById('bet-input');
         const playerCardsDiv = document.getElementById('player-cards');
@@ -556,7 +541,7 @@
         }
         
         function updateBet(delta) {
-            if (gameActive) return;
+            if (gameActive || isProcessing) return;
             let newVal = currentBet + delta;
             if (newVal >= 10 && newVal <= Math.min(50000, currentBalance)) {
                 currentBet = newVal;
@@ -566,7 +551,7 @@
         }
         
         function manualBetChange() {
-            if (gameActive) return;
+            if (gameActive || isProcessing) return;
             let val = parseInt(betInput.value);
             if (isNaN(val)) val = 10;
             if (val < 10) val = 10;
@@ -678,13 +663,13 @@
                 resultMessage = `❌ ПЕРЕБІР! ВИ ПРОГРАЛИ ${finalBet} 🪙`;
                 playSound('lose');
             } else if (dealerScore > 21) {
-                winAmount = finalBet;
+                winAmount = finalBet * 2;  // повертаємо ставку + виграш = 2x ставки
                 resultType = 'win';
                 resultMessage = `🎉 ДИЛЕР ПЕРЕБРАВ! ВИ ВИГРАЛИ ${winAmount} 🪙`;
                 await addWin(winAmount);
                 playSound('win');
             } else if (playerScore > dealerScore) {
-                winAmount = finalBet;
+                winAmount = finalBet * 2;
                 resultType = 'win';
                 resultMessage = `🎉 ВИ ВИГРАЛИ! ${winAmount} 🪙`;
                 await addWin(winAmount);
@@ -694,10 +679,10 @@
                 resultMessage = `❌ ВИ ПРОГРАЛИ ${finalBet} 🪙`;
                 playSound('lose');
             } else {
-                winAmount = finalBet;
+                winAmount = finalBet;  // повертаємо тільки ставку
                 resultType = 'push';
                 resultMessage = `🤝 НІЧИЯ! СТАВКУ ПОВЕРНЕНО ${finalBet} 🪙`;
-                await addWin(finalBet);
+                await addWin(winAmount);
                 playSound('win');
             }
             
@@ -712,10 +697,12 @@
             standBtn.disabled = true;
             doubleBtn.disabled = true;
             isDoubled = false;
+            isProcessing = false;
         }
         
         async function hit() {
-            if (!gameActive) return;
+            if (!gameActive || isProcessing) return;
+            isProcessing = true;
             playSound('card');
             const newCard = deck.pop();
             playerCards.push(newCard);
@@ -723,11 +710,14 @@
             
             if (calculateScore(playerCards) > 21) {
                 await endGame();
+            } else {
+                isProcessing = false;
             }
         }
         
         async function stand() {
-            if (!gameActive) return;
+            if (!gameActive || isProcessing) return;
+            isProcessing = true;
             playSound('card');
             hitBtn.disabled = true;
             standBtn.disabled = true;
@@ -738,9 +728,10 @@
         }
         
         async function doubleDown() {
-            if (!gameActive || playerCards.length !== 2) return;
+            if (!gameActive || playerCards.length !== 2 || isProcessing) return;
             if (currentBalance < currentBet) return;
             
+            isProcessing = true;
             playSound('chip');
             await userRef.update({ chips: currentBalance - currentBet });
             currentBalance -= currentBet;
@@ -764,8 +755,10 @@
         }
         
         async function startNewGame() {
-            if (gameActive) return;
+            if (gameActive || isProcessing) return;
             if (currentBet > currentBalance) return;
+            
+            isProcessing = true;
             
             gameResult = null;
             resultArea.style.display = 'none';
@@ -775,7 +768,10 @@
             isDoubled = false;
             
             const betPlaced = await placeBet();
-            if (!betPlaced) return;
+            if (!betPlaced) {
+                isProcessing = false;
+                return;
+            }
             
             deck = createDeck();
             playerCards = [deck.pop(), deck.pop()];
@@ -788,6 +784,8 @@
             if (playerScore === 21) {
                 playSound('blackjack');
                 await stand();
+            } else {
+                isProcessing = false;
             }
         }
         

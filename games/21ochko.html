@@ -10,12 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
             background: radial-gradient(ellipse at 30% 40%, #0d1117 0%, #05080f 100%);
@@ -47,10 +42,7 @@
             cursor: pointer;
             font-size: 13px;
         }
-        .btn-exit:hover {
-            background: #ff4433;
-            border-color: #ff4433;
-        }
+        .btn-exit:hover { background: #ff4433; border-color: #ff4433; }
         
         .balance-badge {
             font-size: 22px;
@@ -61,19 +53,9 @@
             border: 1px solid rgba(0, 255, 157, 0.35);
             color: #00ff9d;
         }
-        .balance-badge span {
-            color: #00ff88;
-            font-size: 28px;
-            margin-left: 10px;
-        }
+        .balance-badge span { color: #00ff88; font-size: 28px; margin-left: 10px; }
 
-        #game-wrapper {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        #game-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
 
         .game-table {
             background: linear-gradient(145deg, #0a5a3a, #064a2a);
@@ -99,62 +81,16 @@
             animation: tableGlow 3s infinite alternate;
         }
         
-        @keyframes tableGlow {
-            0% { opacity: 0.2; filter: blur(15px); }
-            100% { opacity: 0.5; filter: blur(25px); }
-        }
+        @keyframes tableGlow { 0% { opacity: 0.2; filter: blur(15px); } 100% { opacity: 0.5; filter: blur(25px); } }
 
-        .table-title {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .table-title h1 {
-            font-family: 'Rubik', sans-serif;
-            font-size: 28px;
-            background: linear-gradient(135deg, #d4af37, #ffd700);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+        .table-title { text-align: center; margin-bottom: 20px; }
+        .table-title h1 { font-family: 'Rubik', sans-serif; font-size: 28px; background: linear-gradient(135deg, #d4af37, #ffd700); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-        .cards-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 30px;
-        }
-        
-        .dealer-area, .player-area {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            padding: 15px 20px;
-        }
-        
-        .area-label {
-            font-size: 16px;
-            font-weight: 800;
-            color: #d4af37;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .score-badge {
-            background: #1a1a2a;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            color: #00ff88;
-        }
-        
-        .cards-container {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            min-height: 140px;
-        }
+        .cards-area { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 30px; }
+        .dealer-area, .player-area { background: rgba(0, 0, 0, 0.3); border-radius: 20px; padding: 15px 20px; }
+        .area-label { font-size: 16px; font-weight: 800; color: #d4af37; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; }
+        .score-badge { background: #1a1a2a; padding: 4px 12px; border-radius: 20px; font-size: 14px; color: #00ff88; }
+        .cards-container { display: flex; gap: 12px; flex-wrap: wrap; min-height: 140px; }
         
         .card {
             width: 90px;
@@ -169,10 +105,7 @@
             animation: cardDeal 0.25s ease-out;
         }
         
-        @keyframes cardDeal {
-            from { transform: translateY(-100px) rotate(-10deg); opacity: 0; }
-            to { transform: translateY(0) rotate(0); opacity: 1; }
-        }
+        @keyframes cardDeal { from { transform: translateY(-100px) rotate(-10deg); opacity: 0; } to { transform: translateY(0) rotate(0); opacity: 1; } }
         
         .card.red { color: #e33; }
         .card.black { color: #222; }
@@ -184,29 +117,10 @@
             border: 2px solid #d4af37;
             position: relative;
         }
-        .card-back::before {
-            content: "?";
-            font-size: 42px;
-            color: #d4af37;
-            font-weight: 900;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
+        .card-back::before { content: "?"; font-size: 42px; color: #d4af37; font-weight: 900; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        .result-area {
-            text-align: center;
-            margin: 15px 0;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 50px;
-        }
-        
-        .result-text {
-            font-size: 24px;
-            font-weight: 900;
-        }
+        .result-area { text-align: center; margin: 15px 0; padding: 12px; background: rgba(0, 0, 0, 0.6); border-radius: 50px; }
+        .result-text { font-size: 24px; font-weight: 900; }
         .result-win { color: #00ff88; }
         .result-lose { color: #ff4433; }
         .result-push { color: #d4af37; }
@@ -250,12 +164,7 @@
             outline: none;
         }
         
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 15px;
-        }
+        .action-buttons { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
         
         .action-btn {
             background: linear-gradient(135deg, #1a1a2a, #0f0f1a);
@@ -267,10 +176,7 @@
             font-weight: 800;
             cursor: pointer;
         }
-        .action-btn:hover:not(:disabled) {
-            background: #d4af37;
-            color: #0a0e18;
-        }
+        .action-btn:hover:not(:disabled) { background: #d4af37; color: #0a0e18; }
         .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         
         .action-btn.primary {
@@ -354,27 +260,14 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const username = localStorage.getItem('casino_user');
-        
-        let currentBalance = 0;
         const userRef = database.ref('users_by_name/' + (username ? username.toLowerCase() : 'guest'));
         
-        function updateBalanceDisplay() {
-            document.getElementById('balance-amount').innerText = currentBalance;
-        }
-        
-        userRef.on('value', snap => {
-            const data = snap.val();
-            currentBalance = data ? (data.chips || 1000) : 1000;
-            updateBalanceDisplay();
-        });
-
-        // Ігрові змінні
+        let currentBalance = 0;
+        let gameInProgress = false;
+        let currentBet = 10;
         let deck = [];
         let playerCards = [];
         let dealerCards = [];
-        let gameInProgress = false;
-        let currentBet = 10;
-        let betAlreadyTaken = false;  // КЛЮЧОВА ЗМІННА - чи вже зняли ставку
         
         // DOM елементи
         const betInput = document.getElementById('bet-input');
@@ -388,9 +281,18 @@
         const standBtn = document.getElementById('stand-btn');
         const newGameBtn = document.getElementById('new-game-btn');
         
-        function updateBetUI() {
-            betInput.value = currentBet;
+        function updateBalanceDisplay() {
+            document.getElementById('balance-amount').innerText = currentBalance;
         }
+        
+        // Отримуємо баланс з Firebase
+        userRef.on('value', snap => {
+            const data = snap.val();
+            currentBalance = data ? (data.chips || 1000) : 1000;
+            updateBalanceDisplay();
+        });
+        
+        function updateBetUI() { betInput.value = currentBet; }
         
         function updateBet(delta) {
             if (gameInProgress) return;
@@ -449,9 +351,7 @@
         }
         
         function renderCard(card, isHidden = false) {
-            if (isHidden) {
-                return `<div class="card card-back"></div>`;
-            }
+            if (isHidden) return `<div class="card card-back"></div>`;
             const isRed = card.suit === '♥' || card.suit === '♦';
             return `<div class="card ${isRed ? 'red' : 'black'}">
                         <div class="card-value">${card.value}</div>
@@ -460,11 +360,9 @@
         }
         
         function updateUI(hideDealerCard = true) {
-            // Гравець
             playerCardsDiv.innerHTML = playerCards.map(c => renderCard(c, false)).join('');
             playerScoreSpan.innerText = calculateScore(playerCards);
             
-            // Дилер
             if (hideDealerCard && gameInProgress && dealerCards.length === 2) {
                 const visibleCards = dealerCards.map((c, i) => renderCard(c, i === 1));
                 dealerCardsDiv.innerHTML = visibleCards.join('');
@@ -476,23 +374,17 @@
             }
         }
         
-        // Функція зняття ставки - ТІЛЬКИ ОДИН РАЗ
-        async function takeBet() {
-            if (betAlreadyTaken) return true;
-            if (currentBet > currentBalance) return false;
-            
-            await userRef.update({ chips: currentBalance - currentBet });
-            currentBalance -= currentBet;
+        // Функція для безпечного оновлення балансу через Firebase
+        async function updateBalance(changeAmount) {
+            // Отримуємо актуальний баланс з Firebase
+            const snap = await userRef.once('value');
+            const currentData = snap.val();
+            const freshBalance = currentData ? (currentData.chips || 1000) : 1000;
+            const newBalance = freshBalance + changeAmount;
+            await userRef.update({ chips: newBalance });
+            currentBalance = newBalance;
             updateBalanceDisplay();
-            betAlreadyTaken = true;
-            return true;
-        }
-        
-        // Функція виплати виграшу
-        async function payout(amount) {
-            await userRef.update({ chips: currentBalance + amount });
-            currentBalance += amount;
-            updateBalanceDisplay();
+            return newBalance;
         }
         
         async function dealerPlay() {
@@ -512,29 +404,36 @@
             const playerScore = calculateScore(playerCards);
             const dealerScore = calculateScore(dealerCards);
             
-            let resultMessage = '';
             let resultType = '';
+            let resultMessage = '';
+            let balanceChange = 0;
             
             if (playerScore > 21) {
                 resultType = 'lose';
                 resultMessage = `❌ ПЕРЕБІР! ВИ ПРОГРАЛИ ${currentBet} 🪙`;
+                balanceChange = 0; // Гроші вже зняті при старті
             } else if (dealerScore > 21) {
                 resultType = 'win';
                 const winAmount = currentBet * 2;
                 resultMessage = `🎉 ДИЛЕР ПЕРЕБРАВ! ВИ ВИГРАЛИ ${winAmount} 🪙`;
-                await payout(winAmount);
+                balanceChange = winAmount;
             } else if (playerScore > dealerScore) {
                 resultType = 'win';
                 const winAmount = currentBet * 2;
                 resultMessage = `🎉 ВИ ВИГРАЛИ! ${winAmount} 🪙`;
-                await payout(winAmount);
+                balanceChange = winAmount;
             } else if (playerScore < dealerScore) {
                 resultType = 'lose';
                 resultMessage = `❌ ВИ ПРОГРАЛИ ${currentBet} 🪙`;
+                balanceChange = 0;
             } else {
                 resultType = 'push';
                 resultMessage = `🤝 НІЧИЯ! СТАВКУ ПОВЕРНЕНО ${currentBet} 🪙`;
-                await payout(currentBet);
+                balanceChange = currentBet;
+            }
+            
+            if (balanceChange !== 0) {
+                await updateBalance(balanceChange);
             }
             
             resultArea.style.display = 'block';
@@ -568,19 +467,16 @@
         async function startNewGame() {
             if (gameInProgress) return;
             
-            // Скидаємо стан
-            resultArea.style.display = 'none';
-            hitBtn.disabled = false;
-            standBtn.disabled = false;
-            
-            // Знімаємо ставку (ТІЛЬКИ ОДИН РАЗ)
-            const success = await takeBet();
-            if (!success) {
+            // Перевіряємо чи вистачає коштів
+            if (currentBet > currentBalance) {
                 resultArea.style.display = 'block';
                 resultText.className = 'result-text result-lose';
-                resultText.innerHTML = `❌ НЕДОСТАТНЬО КОШТІВ ДЛЯ СТАВКИ ${currentBet}!`;
+                resultText.innerHTML = `❌ НЕДОСТАТНЬО КОШТІВ! ПОТРІБНО ${currentBet}, Є ${currentBalance}`;
                 return;
             }
+            
+            // Знімаємо ставку ОДИН РАЗ
+            await updateBalance(-currentBet);
             
             // Нова гра
             deck = createDeck();
@@ -588,6 +484,9 @@
             dealerCards = [deck.pop(), deck.pop()];
             
             gameInProgress = true;
+            resultArea.style.display = 'none';
+            hitBtn.disabled = false;
+            standBtn.disabled = false;
             updateUI(true);
             
             // Перевірка на блекджек (21 відразу)
@@ -609,7 +508,7 @@
         standBtn.disabled = true;
         updateBetUI();
         
-        // Аудіо (опціонально)
+        // Аудіо
         let audioContext = null;
         document.body.addEventListener('click', () => {
             if (audioContext) return;

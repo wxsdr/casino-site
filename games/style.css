@@ -1,0 +1,191 @@
+/* =========================================
+   БАЗОВІ НАЛАШТУВАННЯ ТА ШРИФТИ
+   ========================================= */
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+
+body {
+    background-color: #111; /* Колір за межами сцени, якщо екран дуже широкий */
+    font-family: 'Montserrat', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================
+   ВЕРХНЯ ПАНЕЛЬ (НАВІГАЦІЯ)
+   ========================================= */
+.top-bar {
+    position: relative; z-index: 100;
+    height: 70px; background: rgba(0, 0, 0, 0.8);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 30px; border-bottom: 2px solid #ffdf00;
+}
+.btn-exit {
+    background: #c1121f; color: white; border: 2px solid #780000;
+    padding: 10px 20px; border-radius: 8px; font-weight: 900;
+    cursor: pointer; text-transform: uppercase;
+}
+.balance-display {
+    color: white; font-size: 24px; font-weight: 900;
+}
+#balance-amount { color: #00ff9d; }
+
+/* =========================================
+   ІГРОВА СЦЕНА ТА МАСШТАБУВАННЯ
+   ========================================= */
+#game-wrapper {
+    flex: 1; display: flex; justify-content: center; align-items: center;
+    width: 100%; position: relative; overflow: hidden;
+}
+
+/* ЦЕЙ БЛОК ЗАВЖДИ 1920x1080. JS БУДЕ ЙОГО ЗМЕНШУВАТИ (transform: scale) */
+#game-scene {
+    position: absolute;
+    width: 1920px; height: 1080px;
+    background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
+    transform-origin: center center;
+    display: flex; flex-direction: column; align-items: center;
+}
+
+/* =========================================
+   ФОН (Небо, хмари, паркан)
+   ========================================= */
+.background-layers { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.grass { position: absolute; bottom: 0; width: 100%; height: 250px; background: linear-gradient(to bottom, #7cbd44, #4a7c24); border-top: 10px solid #8add4f; }
+.fence { position: absolute; bottom: 250px; width: 100%; height: 150px; background-image: repeating-linear-gradient(90deg, #fff 0px, #fff 40px, transparent 40px, transparent 60px); background-size: 60px 100%; opacity: 0.9; }
+
+.cloud { position: absolute; background: white; border-radius: 100px; opacity: 0.8; }
+.cloud::before, .cloud::after { content: ''; position: absolute; background: white; border-radius: 50%; }
+.cloud-1 { width: 300px; height: 100px; top: 100px; left: -300px; animation: moveClouds 60s linear infinite; }
+.cloud-1::before { width: 150px; height: 150px; top: -70px; left: 50px; }
+.cloud-1::after { width: 120px; height: 120px; top: -50px; right: 50px; }
+
+@keyframes moveClouds { to { transform: translateX(2200px); } }
+
+/* =========================================
+   БУДКА (ІГРОВИЙ АПАРАТ)
+   ========================================= */
+.dog-house-machine {
+    position: relative; z-index: 10; margin-top: 120px;
+    display: flex; flex-direction: column; align-items: center;
+    filter: drop-shadow(0 30px 40px rgba(0,0,0,0.6));
+}
+
+/* Вивіска (Кістка) */
+.bone-sign {
+    position: absolute; top: -80px; z-index: 20;
+    width: 800px; height: 160px; background: #fff;
+    border: 8px solid #8b4513; border-radius: 80px;
+    display: flex; justify-content: center; align-items: center;
+    box-shadow: inset 0 -10px 20px rgba(0,0,0,0.2);
+}
+.bone-sign::before, .bone-sign::after {
+    content: ''; position: absolute; width: 100px; height: 100px; background: #fff;
+    border: 8px solid #8b4513; border-radius: 50%; z-index: -1;
+}
+.bone-sign::before { left: -25px; top: -20px; box-shadow: 0 60px 0 0 #fff, 0 60px 0 8px #8b4513; }
+.bone-sign::after { right: -25px; top: -20px; box-shadow: 0 60px 0 0 #fff, 0 60px 0 8px #8b4513; }
+
+.sign-text {
+    font-family: 'Luckiest Guy', cursive; font-size: 90px; color: #ffdf00;
+    -webkit-text-stroke: 4px #8b0000; text-shadow: 5px 5px 0px #8b0000;
+    letter-spacing: 5px;
+}
+
+/* Дах */
+.roof {
+    width: 1400px; height: 180px;
+    background: linear-gradient(to bottom, #ff4d4d, #b30000);
+    border: 12px solid #4a0000; border-bottom: 20px solid #2e0000;
+    border-radius: 90px 90px 10px 10px;
+    position: relative; z-index: 15;
+}
+
+/* Контейнер барабанів (Дерев'яна основа) */
+.reels-container {
+    width: 1300px; height: 650px;
+    background: repeating-linear-gradient(to right, #d4a373 0%, #d4a373 5%, #c28d59 5%, #c28d59 10%);
+    border: 25px solid #5c3a21; border-top: none;
+    border-radius: 0 0 30px 30px;
+    padding: 30px;
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.8);
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* Вікно, де видно символи */
+.reel-window {
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    border: 10px solid #111; border-radius: 15px;
+    display: flex; gap: 15px; padding: 15px;
+    overflow: hidden; /* Ховаємо символи, які виходять за межі */
+}
+
+/* Стовпчик барабана */
+.reel {
+    flex: 1; height: 100%;
+    position: relative;
+}
+
+/* Стрічка символів (Вона буде рухатись в JS) */
+.reel-strip {
+    width: 100%;
+    position: absolute; top: 0; left: 0;
+    display: flex; flex-direction: column; gap: 15px;
+}
+
+/* Сам символ (Осередок) */
+.symbol-cell {
+    width: 100%; height: 165px; /* (540px висоти вікна - 2*15 gap) / 3 = ~165px */
+    background: linear-gradient(180deg, #ffffff 0%, #d3e3f0 100%);
+    border-radius: 12px; border: 3px solid #a4b4c4;
+    display: flex; justify-content: center; align-items: center;
+    box-shadow: inset 0 -10px 20px rgba(0,0,0,0.2);
+    position: relative;
+}
+.symbol-cell img { width: 85%; height: 85%; object-fit: contain; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); }
+
+/* =========================================
+   ПАНЕЛЬ УПРАВЛІННЯ
+   ========================================= */
+.control-panel {
+    position: absolute; bottom: 30px; z-index: 20;
+    width: 1400px; height: 140px;
+    background: rgba(10, 10, 15, 0.9); border-radius: 25px;
+    border: 3px solid #5c3a21; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    display: flex; justify-content: space-between; align-items: center; padding: 0 40px;
+}
+
+.status-screen {
+    width: 350px; background: #000; color: #ffdf00;
+    padding: 20px; border-radius: 15px; border: 3px solid #333;
+    font-size: 24px; font-weight: 900; text-align: center; text-transform: uppercase;
+}
+
+.bet-controls { display: flex; align-items: center; gap: 20px; }
+.bet-btn { width: 70px; height: 70px; background: #333; color: white; border: 2px solid #555; border-radius: 15px; font-size: 40px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #111; }
+.bet-btn:active { transform: translateY(5px); box-shadow: none; }
+.current-bet { display: flex; flex-direction: column; align-items: center; }
+.bet-label { color: #aaa; font-size: 18px; font-weight: 700; }
+.bet-value { color: white; font-size: 45px; font-weight: 900; }
+
+.spin-btn {
+    width: 250px; height: 90px;
+    background: linear-gradient(to bottom, #00ff9d, #00b347);
+    border: none; border-radius: 45px;
+    font-size: 38px; font-weight: 900; font-family: 'Montserrat', sans-serif;
+    color: black; cursor: pointer; box-shadow: 0 10px 0 #004d1a;
+    transition: 0.1s;
+}
+.spin-btn:active { transform: translateY(10px); box-shadow: none; }
+
+.buy-bonus-btn {
+    width: 250px; height: 90px;
+    background: linear-gradient(to bottom, #ff3366, #b30000);
+    border: 2px solid #ff9999; border-radius: 20px;
+    color: white; font-size: 24px; font-weight: 900;
+    cursor: pointer; box-shadow: 0 8px 0 #4a0000;
+    text-transform: uppercase;
+}
+.buy-bonus-btn:active { transform: translateY(8px); box-shadow: none; }

@@ -95,7 +95,6 @@
             justify-content: center;
         }
         
-        /* HISTORY - зліва від слотів */
         .win-history {
             background: rgba(8, 12, 20, 0.9);
             backdrop-filter: blur(15px);
@@ -132,20 +131,9 @@
             font-weight: 600;
             font-family: 'Montserrat', sans-serif;
         }
-        .history-list .win { 
-            color: #00ff88; 
-            border-left-color: #00ff88;
-        }
-        .history-list .big-win { 
-            color: #ffd700; 
-            border-left-color: #ffd700;
-            font-weight: 900;
-            background: rgba(255, 215, 0, 0.1);
-        }
-        .history-list .bonus { 
-            color: #9b30ff; 
-            border-left-color: #9b30ff;
-        }
+        .history-list .win { color: #00ff88; border-left-color: #00ff88; }
+        .history-list .big-win { color: #ffd700; border-left-color: #ffd700; font-weight: 900; background: rgba(255, 215, 0, 0.1); }
+        .history-list .bonus { color: #9b30ff; border-left-color: #9b30ff; }
 
         #game-scene {
             display: flex;
@@ -155,7 +143,6 @@
             gap: 20px;
         }
 
-        /* SLOT MACHINE */
         .slot-machine {
             background: linear-gradient(145deg, rgba(18, 22, 35, 0.95), rgba(8, 10, 20, 0.98));
             border-radius: 50px;
@@ -191,14 +178,8 @@
             animation: waterGlow 0.4s infinite alternate;
             opacity: 0.7;
         }
-        @keyframes fireGlow {
-            0% { filter: blur(12px); opacity: 0.5; }
-            100% { filter: blur(32px); opacity: 0.9; }
-        }
-        @keyframes waterGlow {
-            0% { filter: blur(12px); opacity: 0.5; }
-            100% { filter: blur(32px); opacity: 0.9; }
-        }
+        @keyframes fireGlow { 0% { filter: blur(12px); opacity: 0.5; } 100% { filter: blur(32px); opacity: 0.9; } }
+        @keyframes waterGlow { 0% { filter: blur(12px); opacity: 0.5; } 100% { filter: blur(32px); opacity: 0.9; } }
 
         .slot-title {
             text-align: center;
@@ -230,7 +211,6 @@
             margin-bottom: 10px;
         }
 
-        /* REELS */
         .reels-window {
             background: #07090f;
             padding: 12px;
@@ -260,7 +240,12 @@
             transition: transform 0s ease;
         }
         
-        /* SYMBOL CELL */
+        /* Blur effect for spinning reels */
+        .reel-spinning {
+            filter: blur(12px);
+            transition: filter 0.1s ease;
+        }
+        
         .symbol-cell {
             width: 148px;
             height: 138px;
@@ -270,7 +255,6 @@
             position: relative;
         }
 
-        /* 3D MINECRAFT BLOCK */
         .minecraft-block {
             width: 85px;
             height: 85px;
@@ -292,18 +276,9 @@
             background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.06) 75%);
         }
 
-        .face-top {
-            transform: rotateX(90deg) translateZ(42.5px);
-            background-color: var(--c-top);
-        }
-        .face-front {
-            transform: translateZ(42.5px);
-            background-color: var(--c-front);
-        }
-        .face-right {
-            transform: rotateY(90deg) translateZ(42.5px);
-            background-color: var(--c-right);
-        }
+        .face-top { transform: rotateX(90deg) translateZ(42.5px); background-color: var(--c-top); }
+        .face-front { transform: translateZ(42.5px); background-color: var(--c-front); }
+        .face-right { transform: rotateY(90deg) translateZ(42.5px); background-color: var(--c-right); }
 
         .block-dirt { --c-top: #6b4c3b; --c-front: #8b5e3c; --c-right: #5a3d2a; }
         .block-wood { --c-top: #8b6b4a; --c-front: #ab8b5a; --c-right: #6b4b3a; }
@@ -334,20 +309,8 @@
             white-space: nowrap;
             pointer-events: none;
         }
-        .text-wild {
-            background: linear-gradient(135deg, #ffd700, #ffaa33);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 20px;
-        }
-        .text-scatter {
-            background: linear-gradient(135deg, #9b30ff, #cc66ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 14px;
-        }
+        .text-wild { background: linear-gradient(135deg, #ffd700, #ffaa33); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 20px; }
+        .text-scatter { background: linear-gradient(135deg, #9b30ff, #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 14px; }
 
         .sticky-mult {
             position: absolute;
@@ -516,16 +479,8 @@
             border-radius: 35px;
             text-align: center;
         }
-        .auto-menu h2 {
-            color: #00ff88;
-            margin-bottom: 15px;
-            font-size: 26px;
-        }
-        .auto-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
+        .auto-menu h2 { color: #00ff88; margin-bottom: 15px; font-size: 26px; }
+        .auto-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .auto-opt {
             background: #111622;
             border: 1px solid #2a2a3a;
@@ -536,10 +491,7 @@
             border-radius: 14px;
             cursor: pointer;
         }
-        .auto-opt:hover {
-            border-color: #00ff88;
-            color: #00ff88;
-        }
+        .auto-opt:hover { border-color: #00ff88; color: #00ff88; }
 
         .bonus-menu {
             background: linear-gradient(135deg, #1a0f2a, #0a0515);
@@ -549,23 +501,9 @@
             text-align: center;
             max-width: 900px;
         }
-        .bonus-title {
-            font-size: 38px;
-            background: linear-gradient(135deg, #9b30ff, #cc66ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 10px;
-        }
-        .bonus-subtitle {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 25px;
-        }
-        .bonus-cards {
-            display: flex;
-            gap: 20px;
-        }
+        .bonus-title { font-size: 38px; background: linear-gradient(135deg, #9b30ff, #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 10px; }
+        .bonus-subtitle { font-size: 14px; color: #888; margin-bottom: 25px; }
+        .bonus-cards { display: flex; gap: 20px; }
         .b-card {
             flex: 1;
             background: rgba(0, 0, 0, 0.4);
@@ -580,16 +518,7 @@
         .b-card.sticky h3 { color: #ff4433; font-size: 24px; }
         .b-card.raining:hover { border-color: #00f2ff; background: rgba(0, 242, 255, 0.1); }
         .b-card.raining h3 { color: #00f2ff; font-size: 24px; }
-        .b-spins {
-            background: #1a1a2a;
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: #ffd700;
-        }
+        .b-spins { background: #1a1a2a; display: inline-block; padding: 5px 15px; border-radius: 30px; font-size: 16px; font-weight: 800; margin-bottom: 10px; color: #ffd700; }
         .b-card p { font-size: 12px; color: #bbb; }
     </style>
 </head>
@@ -705,15 +634,31 @@
                 gainNode.connect(audioContext.destination);
                 
                 if (type === 'spin') {
+                    gainNode.gain.value = 0.06;
                     const osc = audioContext.createOscillator();
-                    osc.type = 'square';
-                    osc.frequency.value = 200;
-                    gainNode.gain.value = 0.08;
+                    osc.type = 'sine';
+                    osc.frequency.value = 220;
                     osc.connect(gainNode);
                     osc.start();
-                    osc.stop(now + 0.15);
+                    osc.stop(now + 0.12);
                 } else if (type === 'win') {
-                    const notes = [523.25, 659.25, 783.99];
+                    gainNode.gain.value = 0.08;
+                    const notes = [523.25, 659.25];
+                    notes.forEach((freq, i) => {
+                        const osc = audioContext.createOscillator();
+                        const g = audioContext.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        g.gain.value = 0.08;
+                        osc.connect(g);
+                        g.connect(audioContext.destination);
+                        osc.start();
+                        osc.stop(now + 0.2 + i * 0.15);
+                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.25 + i * 0.15);
+                    });
+                } else if (type === 'bigwin') {
+                    gainNode.gain.value = 0.1;
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
                     notes.forEach((freq, i) => {
                         const osc = audioContext.createOscillator();
                         const g = audioContext.createGain();
@@ -723,45 +668,31 @@
                         osc.connect(g);
                         g.connect(audioContext.destination);
                         osc.start();
-                        osc.stop(now + 0.2 + i * 0.12);
-                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.25 + i * 0.12);
-                    });
-                } else if (type === 'bigwin') {
-                    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.52];
-                    notes.forEach((freq, i) => {
-                        const osc = audioContext.createOscillator();
-                        const g = audioContext.createGain();
-                        osc.type = 'triangle';
-                        osc.frequency.value = freq;
-                        g.gain.value = 0.12;
-                        osc.connect(g);
-                        g.connect(audioContext.destination);
-                        osc.start();
-                        osc.stop(now + 0.15 + i * 0.1);
-                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.2 + i * 0.1);
+                        osc.stop(now + 0.15 + i * 0.12);
+                        g.gain.exponentialRampToValueAtTime(0.00001, now + 0.2 + i * 0.12);
                     });
                 } else if (type === 'bonus') {
+                    gainNode.gain.value = 0.12;
                     const osc = audioContext.createOscillator();
                     osc.type = 'sine';
-                    osc.frequency.value = 440;
-                    gainNode.gain.value = 0.15;
+                    osc.frequency.value = 329.63;
                     osc.connect(gainNode);
                     osc.start();
                     osc.stop(now + 0.3);
                     const osc2 = audioContext.createOscillator();
                     osc2.type = 'sine';
-                    osc2.frequency.value = 880;
+                    osc2.frequency.value = 659.25;
                     const g2 = audioContext.createGain();
-                    g2.gain.value = 0.1;
+                    g2.gain.value = 0.08;
                     osc2.connect(g2);
                     g2.connect(audioContext.destination);
                     osc2.start();
                     osc2.stop(now + 0.25);
                 } else if (type === 'reel') {
-                    const osc = audioContext.createOscillator();
-                    osc.type = 'sawtooth';
-                    osc.frequency.value = 150;
                     gainNode.gain.value = 0.04;
+                    const osc = audioContext.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.value = 164.81;
                     osc.connect(gainNode);
                     osc.start();
                     osc.stop(now + 0.05);
@@ -926,6 +857,7 @@
                 }
                 stripDiv.innerHTML = cellsHtml;
                 stripDiv.style.transform = 'translateY(0px)';
+                stripDiv.classList.remove('reel-spinning');
             }
         }
         
@@ -1015,23 +947,51 @@
             else freeSpinsLeft--;
             
             const targetMatrix = generateMatrix();
-            const animDuration = isTurbo ? 0.2 : 0.85;
+            const spinDuration = isTurbo ? 200 : 450;
+            const reelDelay = isTurbo ? 30 : 60;
             
+            // Запускаємо рядки по черзі
             for (let x = 0; x < 5; x++) {
-                const strip = document.getElementById(`strip-${x}`);
-                strip.style.transition = `transform ${animDuration}s cubic-bezier(0.2, 0.95, 0.4, 1.05)`;
-                strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * 138}px)`;
-                if (isTurbo) playSound('reel');
+                setTimeout(() => {
+                    const strip = document.getElementById(`strip-${x}`);
+                    strip.classList.add('reel-spinning');
+                    const distance = (STRIP_LENGTH - 3) * 138;
+                    strip.style.transition = `transform ${spinDuration / 1000}s cubic-bezier(0.2, 0.95, 0.4, 1.05)`;
+                    strip.style.transform = `translateY(-${distance}px)`;
+                    playSound('reel');
+                }, x * reelDelay);
             }
             
-            setTimeout(async () => {
-                buildReels(targetMatrix);
+            // Зупиняємо рядки по черзі та оновлюємо їх вміст
+            const totalSpinTime = spinDuration + (4 * reelDelay);
+            
+            setTimeout(() => {
                 for (let x = 0; x < 5; x++) {
-                    const strip = document.getElementById(`strip-${x}`);
-                    strip.style.transition = 'none';
-                    strip.style.transform = 'translateY(0px)';
+                    setTimeout(() => {
+                        const strip = document.getElementById(`strip-${x}`);
+                        strip.style.transition = 'none';
+                        // Оновлюємо вміст рядка
+                        let cellsHtml = '';
+                        for (let y = 0; y < 3; y++) {
+                            let block = targetMatrix[y][x];
+                            let hasMult = false, multVal = 1;
+                            if (stickyWilds[`${x}-${y}`] && activeBonusType === 'sticky') {
+                                hasMult = true;
+                                multVal = stickyWilds[`${x}-${y}`] || 2;
+                            }
+                            cellsHtml += getBlockDisplay(block, hasMult, multVal);
+                        }
+                        for (let i = 0; i < STRIP_LENGTH - 3; i++) {
+                            cellsHtml += getBlockDisplay(blockTypes[Math.floor(Math.random() * blockTypes.length)]);
+                        }
+                        strip.innerHTML = cellsHtml;
+                        strip.style.transform = 'translateY(0px)';
+                        strip.classList.remove('reel-spinning');
+                    }, x * 50);
                 }
-                
+            }, totalSpinTime + 50);
+            
+            setTimeout(async () => {
                 const scatters = countScatters(targetMatrix);
                 const winResult = calculateWin(targetMatrix, currentBet);
                 const winAmount = winResult.totalWin;
@@ -1106,7 +1066,7 @@
                         setStatus("✨ ГОТОВИЙ ДО ГРИ");
                     }
                 }, 300);
-            }, animDuration * 1000 + 30);
+            }, totalSpinTime + 150);
         }
         
         async function buyBonus() {

@@ -26,7 +26,12 @@
             background: radial-gradient(circle at center, #181822 0%, var(--bg-dark) 100%);
             color: white; font-family: 'Montserrat', sans-serif;
             height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+            transition: background 1s ease; /* Плавна зміна фону при бонусах */
         }
+
+        /* --- ВІЗУАЛЬНІ ЗМІНИ ПРИ БОНУСАХ --- */
+        body.bonus-sticky { background: radial-gradient(circle at center, #301000 0%, #0a0200 100%); }
+        body.bonus-raining { background: radial-gradient(circle at center, #150030 0%, #05000a 100%); }
 
         .top-bar {
             position: relative; z-index: 100; display: flex; justify-content: space-between; align-items: center;
@@ -54,6 +59,7 @@
         #game-scene { 
             width: 1600px; height: 900px; transform-origin: center; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; 
+            transition: filter 1s ease;
         }
 
         .slot-machine {
@@ -62,19 +68,30 @@
             box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8);
             position: relative;
         }
-        .slot-machine::before { 
-            content: ''; position: absolute; inset: -4px; border-radius: 30px; 
+        
+        /* ДИНАМІЧНИЙ НЕОН АВТОМАТА */
+        .machine-neon {
+            position: absolute; inset: -5px; border-radius: 30px; z-index: -1; 
+            filter: blur(15px); opacity: 0.5; transition: 1s ease;
             background: linear-gradient(45deg, var(--neon-gold), var(--neon-purple), var(--neon-green)); 
-            z-index: -1; filter: blur(15px); opacity: 0.4; animation: neonBreathe 4s infinite alternate;
+            animation: neonBreathe 4s infinite alternate;
         }
-        @keyframes neonBreathe { 0% { opacity: 0.3; } 100% { opacity: 0.6; } }
+        body.bonus-sticky .machine-neon { background: linear-gradient(45deg, #ff3300, #ffdf00, #ff8800); animation: neonFire 1s infinite alternate; opacity: 0.8;}
+        body.bonus-raining .machine-neon { background: linear-gradient(45deg, #00ffff, #b500ff, #0000ff); animation: neonRain 1s infinite alternate; opacity: 0.8;}
+        
+        @keyframes neonBreathe { 0% { opacity: 0.4; } 100% { opacity: 0.7; } }
+        @keyframes neonFire { 0% { filter: blur(15px); } 100% { filter: blur(25px); box-shadow: 0 0 50px #ff3300; } }
+        @keyframes neonRain { 0% { filter: blur(15px); } 100% { filter: blur(25px); box-shadow: 0 0 50px #b500ff; } }
 
         .slot-title { 
             font-family: 'Rubik', sans-serif; font-size: 55px; color: #fff; 
             text-align: center; text-transform: uppercase; letter-spacing: 10px; margin-bottom: 30px; 
-            text-shadow: 0 10px 20px rgba(0,0,0,0.8);
+            text-shadow: 0 10px 20px rgba(0,0,0,0.8); transition: color 1s;
         }
-        .slot-title span { color: var(--neon-gold); }
+        .slot-title span { color: var(--neon-gold); transition: color 1s; }
+        
+        body.bonus-sticky .slot-title span { color: #ff3300; }
+        body.bonus-raining .slot-title span { color: #00ffff; }
 
         .reels-window {
             background: #050505; padding: 10px; border-radius: 20px;
@@ -93,58 +110,67 @@
         .symbol-cell { width: 160px; height: 160px; display: flex; justify-content: center; align-items: center; position: relative; perspective: 1200px; }
 
         /* ==========================================================
-           3. НОВІ 3D БЛОКИ (Генеративна CSS Текстура)
+           3. ІДЕАЛЬНИЙ 100% CSS ISOMETRIC 3D
            ========================================================== */
         .iso-block {
             width: 90px; height: 90px; position: relative; transform-style: preserve-3d;
-            transform: rotateX(-22deg) rotateY(45deg); transition: transform 0.3s, filter 0.3s;
+            /* ПРАВИЛЬНА МАТЕМАТИКА: Показує Топ, Фронт і ПРАВУ грань */
+            transform: rotateX(-25deg) rotateY(-45deg); 
+            transition: transform 0.3s, filter 0.3s;
         }
 
+        /* Налаштування граней та піксельної CSS сітки */
         .iso-face {
             position: absolute; width: 90px; height: 90px; box-sizing: border-box; 
-            border: 2px solid rgba(0,0,0,0.6); box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-            /* МАГІЯ: Цей градієнт створює ідеальну піксельну сітку на кожному блоці */
+            border: 2px solid rgba(0,0,0,0.3); box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
             background-image: 
-                linear-gradient(45deg, rgba(0,0,0,0.15) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0.15)),
-                linear-gradient(45deg, rgba(0,0,0,0.15) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0.15)) !important;
+                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1)),
+                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1)) !important;
             background-size: 18px 18px !important; background-position: 0 0, 9px 9px !important;
+            background-color: var(--c-front); /* Колір за замовчуванням */
         }
         
-        .face-top   { transform: rotateX(90deg) translateZ(45px); }
-        .face-front { transform: translateZ(45px); }
-        .face-right { transform: rotateY(90deg) translateZ(45px); }
+        .face-top   { transform: rotateX(90deg) translateZ(45px); background-color: var(--c-top); }
+        .face-front { transform: translateZ(45px); background-color: var(--c-front); }
+        .face-right { transform: rotateY(90deg) translateZ(45px); background-color: var(--c-right); }
 
-        /* Кольори блоків */
-        .tex-diamond .face-top { background-color: #51eeea; } .tex-diamond .face-front { background-color: #35c4c4; } .tex-diamond .face-right { background-color: #229494; }
-        .tex-gold .face-top { background-color: #fce029; } .tex-gold .face-front { background-color: #d4b51c; } .tex-gold .face-right { background-color: #a3890f; }
-        .tex-emerald .face-top { background-color: #41f384; } .tex-emerald .face-front { background-color: #27c964; } .tex-emerald .face-right { background-color: #189647; }
-        .tex-wood .face-top { background-color: #a68453; } .tex-wood .face-front { background-color: #85663d; } .tex-wood .face-right { background-color: #614a2b; }
+        /* --- ЗМІННІ КОЛЬОРІВ ДЛЯ КОЖНОГО БЛОКУ --- */
+        .tex-diamond { --c-top: #51eeea; --c-front: #35c4c4; --c-right: #229494; }
+        .tex-gold    { --c-top: #fce029; --c-front: #d4b51c; --c-right: #a3890f; }
+        .tex-emerald { --c-top: #41f384; --c-front: #27c964; --c-right: #189647; }
+        .tex-wood    { --c-top: #a68453; --c-front: #85663d; --c-right: #614a2b; }
         
         /* ЗЕМЛЯ (Верх зелений, боки коричневі) */
-        .tex-dirt .face-top { background-color: #5cb85c; }
-        .tex-dirt .face-front { background-color: #79553a; }
-        .tex-dirt .face-right { background-color: #533824; }
+        .tex-dirt { --c-top: #5cb85c; --c-front: #79553a; --c-right: #533824; }
 
         /* WILD (Обсидіан Неон) */
+        .tex-wild { --c-top: #2f1d40; --c-front: #1f122b; --c-right: #130a1c; }
         .tex-wild .iso-face { border: 2px solid var(--neon-gold); box-shadow: inset 0 0 20px var(--neon-gold); }
-        .tex-wild .face-top { background-color: #2f1d40; } .tex-wild .face-front { background-color: #1f122b; } .tex-wild .face-right { background-color: #130a1c; }
         
         /* SCATTER (Скриня / Портал) */
+        .tex-scatter { --c-top: #4a1763; --c-front: #320d45; --c-right: #20062e; }
         .tex-scatter .iso-face { border: 2px solid var(--neon-purple); box-shadow: inset 0 0 20px var(--neon-purple); }
-        .tex-scatter .face-top { background-color: #4a1763; } .tex-scatter .face-front { background-color: #320d45; } .tex-scatter .face-right { background-color: #20062e; }
         
-        /* Тексти поверх 3D Блоків */
-        .block-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(70px); font-size: 32px; font-weight: 900; z-index: 10; }
-        .tex-wild .block-text { color: var(--neon-gold); text-shadow: 0 0 15px var(--neon-gold); transform: translate(-50%, -50%) translateZ(70px) rotate(-15deg); font-size: 28px; }
-        .tex-scatter .block-text { color: var(--neon-purple); text-shadow: 0 0 15px var(--neon-purple); transform: translate(-50%, -50%) translateZ(70px) rotate(-15deg); font-size: 24px; }
+        /* 3D Текст поверх блоків (Коригує нахил куба) */
+        .block-text { 
+            position: absolute; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%) translateZ(60px) rotateX(25deg) rotateY(45deg); 
+            font-size: 26px; font-weight: 900; z-index: 10; text-align: center;
+        }
+        .tex-wild .block-text { color: var(--neon-gold); text-shadow: 0 0 15px var(--neon-gold); }
+        .tex-scatter .block-text { color: var(--neon-purple); text-shadow: 0 0 15px var(--neon-purple); font-size: 20px;}
 
+        /* Неоновий множник на липких будках */
         .sticky-mult {
-            position: absolute; bottom: -20px; right: -20px; background: var(--neon-green); color: black; font-size: 24px; font-weight: 900; padding: 5px 12px;
-            border-radius: 8px; border: 2px solid black; box-shadow: 0 5px 15px rgba(0,255,157,0.5); z-index: 20; transform: translateZ(80px);
+            position: absolute; bottom: -30px; right: -30px; background: var(--neon-green); color: black; 
+            font-size: 26px; font-weight: 900; padding: 5px 15px; border-radius: 8px; border: 3px solid black; 
+            box-shadow: 0 5px 15px rgba(0,255,157,0.5); z-index: 20; 
+            transform: translateZ(80px) rotateX(25deg) rotateY(45deg); 
         }
 
+        /* Анімація перемоги */
         .win-pop .iso-block { animation: popOut 1s infinite alternate; z-index: 100; filter: drop-shadow(0 0 25px var(--neon-gold)); }
-        @keyframes popOut { from { transform: rotateX(-22deg) rotateY(45deg) scale(1); } to { transform: rotateX(-10deg) rotateY(25deg) scale(1.4); } }
+        @keyframes popOut { from { transform: rotateX(-25deg) rotateY(-45deg) scale(1); } to { transform: rotateX(-15deg) rotateY(-25deg) scale(1.3); } }
         .blur { filter: blur(5px); }
 
         /* ==========================================================
@@ -159,7 +185,6 @@
         .bet-input-row { display: flex; align-items: center; gap: 15px; margin-top: 15px; }
         .bet-btn { width: 60px; height: 60px; border-radius: 12px; background: #1a1a1a; color: white; border: 1px solid #333; font-size: 30px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 8px 0 #0a0a0a; }
         .bet-btn:active { transform: translateY(8px); box-shadow: none; }
-        
         .bet-input { background: #000; color: white; border: 2px solid #444; border-radius: 12px; font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight: 900; text-align: center; width: 180px; height: 60px; outline: none; box-shadow: inset 0 5px 15px rgba(0,0,0,0.9); transition: 0.3s; }
         .bet-input:focus { border-color: var(--neon-green); box-shadow: 0 0 20px rgba(0,255,157,0.3); color: var(--neon-green); }
 
@@ -171,7 +196,7 @@
         .buy-bonus-btn:hover:not(:disabled) { background: var(--neon-purple); color: white; box-shadow: 0 0 25px rgba(181,0,255,0.5); }
 
         /* ==========================================================
-           5. НОВЕ: МЕНЮ ВИБОРУ БОНУСУ
+           5. МЕНЮ ВИБОРУ БОНУСУ
            ========================================================== */
         #bonus-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; justify-content: center; align-items: center; z-index: 9999; }
         .bonus-menu { background: linear-gradient(135deg, #1f0f2e, #0a050f); border: 4px solid var(--neon-purple); padding: 50px; border-radius: 30px; text-align: center; box-shadow: 0 0 80px rgba(181,0,255,0.4); max-width: 1000px; }
@@ -183,12 +208,12 @@
         .b-card:hover { transform: translateY(-10px); }
         
         .b-card.sticky { border-color: #444; }
-        .b-card.sticky:hover { border-color: var(--neon-gold); box-shadow: 0 20px 50px rgba(255,223,0,0.3); }
-        .b-card.sticky h3 { color: var(--neon-gold); font-size: 30px; margin-bottom: 15px; text-shadow: 0 0 10px var(--neon-gold); }
+        .b-card.sticky:hover { border-color: #ff3300; box-shadow: 0 20px 50px rgba(255,51,0,0.3); background: rgba(255,51,0,0.1); }
+        .b-card.sticky h3 { color: #ff3300; font-size: 30px; margin-bottom: 15px; text-shadow: 0 0 10px #ff3300; }
         
         .b-card.raining { border-color: #444; }
-        .b-card.raining:hover { border-color: var(--neon-green); box-shadow: 0 20px 50px rgba(0,255,157,0.3); }
-        .b-card.raining h3 { color: var(--neon-green); font-size: 30px; margin-bottom: 15px; text-shadow: 0 0 10px var(--neon-green); }
+        .b-card.raining:hover { border-color: #00ffff; box-shadow: 0 20px 50px rgba(0,255,255,0.3); background: rgba(0,255,255,0.1); }
+        .b-card.raining h3 { color: #00ffff; font-size: 30px; margin-bottom: 15px; text-shadow: 0 0 10px #00ffff; }
         
         .b-spins { background: #222; display: inline-block; padding: 10px 20px; border-radius: 10px; font-size: 24px; font-weight: 900; margin-bottom: 20px; color: white; }
         .b-card p { font-size: 16px; color: #ccc; line-height: 1.5; font-weight: bold; }
@@ -204,6 +229,7 @@
     <div id="game-wrapper">
         <div id="game-scene">
             <div class="slot-machine">
+                <div class="machine-neon"></div>
                 <div class="slot-title">VIP <span>3D</span> СЛОТ</div>
                 <div class="reels-window">
                     <div class="reel"><div class="reel-strip" id="strip-0"></div></div>
@@ -238,14 +264,14 @@
             <p class="bonus-subtitle">Оберіть свій шлях видобутку ресурсів</p>
             <div class="bonus-cards">
                 <div class="b-card sticky" onclick="selectBonus('sticky')">
-                    <h3>⛏️ ЛИПКІ ВЕРСТАКИ</h3>
+                    <h3>🔥 ЛИПКІ ВЕРСТАКИ</h3>
                     <div class="b-spins">7 - 15 СПІНІВ</div>
-                    <p>Всі WILD-блоки (Верстаки) залишаються на своїх місцях з множниками до самого кінця гри.</p>
+                    <p>Всі WILD-блоки залишаються на екрані з множниками. Автомат переходить у вогняний режим!</p>
                 </div>
                 <div class="b-card raining" onclick="selectBonus('raining')">
                     <h3>🌧 МЕТЕОРИТНИЙ ДОЩ</h3>
                     <div class="b-spins">15 - 30 СПІНІВ</div>
-                    <p>Кожного спіну з неба падають від 1 до 4 нових WILD-блоків. Більше спінів, більше шансів!</p>
+                    <p>З неба постійно падають нові WILD-блоки. Автомат переходить у неоновий портальний режим!</p>
                 </div>
             </div>
         </div>
@@ -287,7 +313,7 @@
             document.getElementById('balance-amount').innerText = currentBalance;
         });
 
-        // --- 3. НАЛАШТУВАННЯ СЛОТА ТА 3D БЛОКІВ ---
+        // --- 3. НАЛАШТУВАННЯ СЛОТА ---
         const symbols = ['tex-dirt', 'tex-wood', 'tex-gold', 'tex-diamond', 'tex-emerald'];
         const wildSymbol = 'tex-wild';      
         const scatterSymbol = 'tex-scatter'; 
@@ -302,13 +328,14 @@
         let freeSpinsLeft = 0;
         let stickyWilds = {}; 
         
+        // Початкова картинка
         let currentMatrix = [
             [symbols[0], symbols[1], symbols[2], symbols[3], symbols[4]],
             [symbols[4], symbols[3], symbols[2], symbols[1], symbols[0]],
             [symbols[1], symbols[2], symbols[4], symbols[0], symbols[3]]
         ];
 
-        // Функція створення 3D Блоку (використовуємо CSS-класи з Part 1)
+        // Функція створення Isometric 3D Блоку
         function createIsoBlock(type, mult = null) {
             let multHTML = mult ? `<div class="sticky-mult">x${mult}</div>` : '';
             let textHTML = '';
@@ -326,7 +353,7 @@
             `;
         }
 
-        // --- 4. ГЕНЕРАЦІЯ БАРАБАНІВ ---
+        // --- 4. БУДІВНИЦТВО БАРАБАНІВ ---
         function buildReels(targetMatrix) {
             for (let x = 0; x < 5; x++) {
                 const strip = document.getElementById(`strip-${x}`);
@@ -340,23 +367,25 @@
                     let sym = '';
                     let mult = null;
 
+                    // Останні 3 блоки — це фінальний результат
                     if (i >= STRIP_LENGTH - 3) {
                         let y = i - (STRIP_LENGTH - 3);
                         sym = targetMatrix[y][x];
                         
-                        // Відмальовуємо множники
                         if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) {
                             mult = stickyWilds[`${x}-${y}`];
                         } else if (sym === wildSymbol && (!isBonusGame || activeBonusType === 'raining')) {
                             mult = Math.random() > 0.5 ? 2 : 3;
                         }
                     } 
+                    // Перші 3 блоки — це попередній результат (для плавності)
                     else if (i < 3) {
                         sym = currentMatrix[i][x];
                         if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${i}`]) {
                             mult = stickyWilds[`${x}-${i}`];
                         }
                     } 
+                    // Все, що між ними — розмитий рандом
                     else {
                         sym = symbols[Math.floor(Math.random() * symbols.length)];
                         cell.classList.add('blur');
@@ -366,6 +395,7 @@
                     strip.appendChild(cell);
                 }
                 
+                // Скидаємо позицію стрічки на самий верх (0px)
                 strip.style.transition = 'none';
                 strip.style.transform = `translateY(0px)`;
             }
@@ -401,6 +431,7 @@
             document.getElementById('spin-btn').disabled = lock;
             document.getElementById('buy-bonus-btn').disabled = lock;
             betInput.disabled = lock;
+            document.querySelectorAll('.bet-btn').forEach(b => b.disabled = lock);
         }
 
         // --- 6. ЛОГІКА ОБЕРТАННЯ ---
@@ -411,7 +442,7 @@
             
             isSpinning = true; lockButtons(true);
             await userRef.update({ chips: currentBalance - cost });
-            executeSpin(true); 
+            executeSpin(true); // Запускаємо форсовані 3 скатери
         }
 
         async function spin() {
@@ -421,6 +452,7 @@
             isSpinning = true; lockButtons(true);
             setStatus("ШУКАЄМО РУДУ...", "#fff");
 
+            // Прибираємо ефекти перемоги з минулого спіну
             document.querySelectorAll('.win-pop').forEach(el => el.classList.remove('win-pop'));
 
             if (!isBonusGame) await userRef.update({ chips: currentBalance - currentBet });
@@ -433,15 +465,15 @@
             let targetMatrix = [[], [], []];
             let scatterCount = 0;
 
-            // Спеціальна логіка для "Метеоритного дощу"
             let rainingWilds = 0;
             if (isBonusGame && activeBonusType === 'raining') {
-                rainingWilds = Math.floor(Math.random() * 4) + 1; // 1-4 випадкові будки
+                rainingWilds = Math.floor(Math.random() * 4) + 1; // 1-4 випадкові будки падають з неба
             }
 
+            // 1. Формуємо фінальну матрицю
             for (let y = 0; y < 3; y++) {
                 for (let x = 0; x < 5; x++) {
-                    // Зберігаємо липкі будки, якщо активний режим 'sticky'
+                    // Липкі верстаки залишаються на місці
                     if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) {
                         targetMatrix[y][x] = wildSymbol; continue; 
                     }
@@ -456,12 +488,10 @@
                     if (!isBonusGame && !forceBonus && isScatterReel && Math.random() < 0.05) {
                         symbolClass = scatterSymbol; scatterCount++;
                     } 
-                    // Додаємо випадкові будки для Raining режиму
                     else if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && (x === 1 || x === 2 || x === 3) && Math.random() < 0.3) {
                         symbolClass = wildSymbol;
                         rainingWilds--;
                     }
-                    // Звичайні будки (тільки в основній грі або якщо Raining)
                     else if (!isBonusGame && (x === 1 || x === 2 || x === 3) && Math.random() < 0.12) {
                         symbolClass = wildSymbol;
                         if (isBonusGame && activeBonusType === 'sticky') {
@@ -471,7 +501,7 @@
                         symbolClass = symbols[Math.floor(Math.random() * symbols.length)];
                     }
                     
-                    // Якщо впала нова липка будка в 'sticky' режимі, запам'ятовуємо
+                    // Якщо впала нова липка будка в 'sticky' режимі, запам'ятовуємо множник
                     if (isBonusGame && activeBonusType === 'sticky' && symbolClass === wildSymbol && !stickyWilds[`${x}-${y}`] && (x === 1 || x === 2 || x === 3)) {
                         stickyWilds[`${x}-${y}`] = Math.random() > 0.5 ? 2 : 3;
                     }
@@ -480,9 +510,10 @@
                 }
             }
 
+            // 2. Будуємо довгі стрічки барабанів
             buildReels(targetMatrix);
 
-            // Анімація падіння
+            // 3. Анімація падіння (з розмиттям і пружинним відскоком)
             setTimeout(() => {
                 for (let x = 0; x < 5; x++) {
                     setTimeout(() => {
@@ -490,6 +521,7 @@
                         strip.style.transition = 'transform 2.5s cubic-bezier(0.15, 0.9, 0.2, 1.05)';
                         strip.style.transform = `translateY(-${(STRIP_LENGTH - 3) * SYMBOL_HEIGHT}px)`;
                         
+                        // Знімаємо блюр під кінець зупинки
                         setTimeout(() => {
                             strip.querySelectorAll('.blur').forEach(el => el.classList.remove('blur'));
                         }, 1200);
@@ -498,6 +530,7 @@
                 }
             }, 50);
 
+            // 4. Перевірка після зупинки всього
             setTimeout(() => {
                 currentMatrix = targetMatrix; 
                 checkWin(targetMatrix, scatterCount);
@@ -511,6 +544,7 @@
             for (let y = 0; y < 3; y++) {
                 if (matrix[y][0] === matrix[y][1] || matrix[y][1] === wildSymbol) {
                     if (Math.random() > 0.4) {
+                        // Активація поп-ап ефекту для виграшних блоків
                         document.getElementById(`cell-0-${STRIP_LENGTH-3+y}`).classList.add('win-pop');
                         document.getElementById(`cell-1-${STRIP_LENGTH-3+y}`).classList.add('win-pop');
                         document.getElementById(`cell-2-${STRIP_LENGTH-3+y}`).classList.add('win-pop');
@@ -521,7 +555,7 @@
                             if(isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) {
                                 multiplier += stickyWilds[`${x}-${y}`];
                             } else if (matrix[y][x] === wildSymbol) {
-                                multiplier += 2; // Базовий множник для Raining або основної гри
+                                multiplier += 2; 
                             }
                         }
                         winAmount += (lineWin * (multiplier > 1 ? multiplier : 1));
@@ -530,7 +564,8 @@
             }
 
             if (winAmount > 0) {
-                setStatus(`ВЕЛИКИЙ КУШ: +${winAmount} 🪙`, "var(--neon-green)");
+                let color = activeBonusType === 'sticky' ? '#ff3300' : (activeBonusType === 'raining' ? '#00ffff' : 'var(--neon-green)');
+                setStatus(`ВЕЛИКИЙ КУШ: +${winAmount} 🪙`, color);
                 await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + winAmount }); });
                 if (winAmount >= currentBet * 15) hasBigWin = true;
             } else if (!isBonusGame) {
@@ -541,12 +576,11 @@
 
             setTimeout(() => {
                 if (!isBonusGame && scatterCount >= 3) {
-                    // Відкриваємо меню вибору бонусу
-                    document.getElementById('bonus-modal').style.display = 'flex';
+                    document.getElementById('bonus-modal').style.display = 'flex'; // Відкриваємо меню бонусу
                 } else if (isBonusGame && freeSpinsLeft <= 0) {
                     endBonusGame();
                 } else if (isBonusGame && freeSpinsLeft > 0) {
-                    let color = activeBonusType === 'sticky' ? 'var(--neon-gold)' : 'var(--neon-green)';
+                    let color = activeBonusType === 'sticky' ? '#ff3300' : '#00ffff';
                     setStatus(`КРАФТІВ ЗАЛИШИЛОСЬ: ${freeSpinsLeft}`, color);
                     isSpinning = false; lockButtons(false); document.getElementById('buy-bonus-btn').disabled = true;
                 } else {
@@ -555,7 +589,7 @@
             }, delay);
         }
 
-        // Функція, яка викликається кнопками в меню бонусу
+        // --- 7. БОНУСНІ РЕЖИМИ ---
         window.selectBonus = function(type) {
             document.getElementById('bonus-modal').style.display = 'none';
             
@@ -563,12 +597,15 @@
             activeBonusType = type;
             stickyWilds = {}; 
             
+            // ЗМІНА ТЕМИ АВТОМАТА (запускає зміну кольору фону та неону через CSS класи)
+            document.body.className = `bonus-${type}`;
+            
             if (type === 'sticky') {
                 freeSpinsLeft = Math.floor(Math.random() * 9) + 7; // 7 - 15 спінів
-                setStatus(`⛏️ ЛИПКІ ВЕРСТАКИ: ${freeSpinsLeft}`, "var(--neon-gold)");
+                setStatus(`🔥 ЛИПКІ ВЕРСТАКИ: ${freeSpinsLeft}`, "#ff3300");
             } else {
                 freeSpinsLeft = Math.floor(Math.random() * 16) + 15; // 15 - 30 спінів
-                setStatus(`🌧 МЕТЕОРИТНИЙ ДОЩ: ${freeSpinsLeft}`, "var(--neon-green)");
+                setStatus(`🌧 МЕТЕОРИТНИЙ ДОЩ: ${freeSpinsLeft}`, "#00ffff");
             }
             
             isSpinning = false; lockButtons(false); document.getElementById('buy-bonus-btn').disabled = true;
@@ -580,6 +617,7 @@
             activeBonusType = null;
             stickyWilds = {};
             
+            document.body.className = ''; // Повертаємо стандартний дизайн
             document.querySelectorAll('.win-pop').forEach(el => el.classList.remove('win-pop'));
             isSpinning = false; lockButtons(false); setStatus("ОЧІКУВАННЯ СТАВКИ", "var(--neon-gold)");
         }

@@ -249,12 +249,11 @@
             position: relative;
         }
         
-        /* Horizontal blur animation for each symbol cell */
         @keyframes spinBlur {
             0% { filter: blur(0px); transform: translateX(0px); }
-            25% { filter: blur(10px) blur(5px); transform: translateX(5px); }
-            50% { filter: blur(15px) blur(8px); transform: translateX(-5px); }
-            75% { filter: blur(10px) blur(5px); transform: translateX(3px); }
+            25% { filter: blur(10px); transform: translateX(5px); }
+            50% { filter: blur(15px); transform: translateX(-5px); }
+            75% { filter: blur(10px); transform: translateX(3px); }
             100% { filter: blur(0px); transform: translateX(0px); }
         }
         
@@ -333,7 +332,6 @@
             z-index: 20;
         }
 
-        /* FULL 3D WINNING ANIMATION */
         @keyframes full3DRotate {
             0% { transform: rotateX(-20deg) rotateY(-35deg) scale(1); filter: drop-shadow(0 0 0px #ffd700); }
             20% { transform: rotateX(-20deg) rotateY(325deg) scale(1.15); filter: drop-shadow(0 0 20px #ffd700); }
@@ -607,12 +605,12 @@
             <div class="bonus-cards">
                 <div class="b-card sticky" onclick="selectBonus('sticky')">
                     <h3>🔥 НЕЗЕР-РЕАКТОР</h3>
-                    <div class="b-spins">10-15 СПІНІВ</div>
+                    <div class="b-spins">8-12 СПІНІВ</div>
                     <p>WILD-блоки залишаються з множниками</p>
                 </div>
                 <div class="b-card raining" onclick="selectBonus('raining')">
                     <h3>🌊 ЕНДЕР-ШТОРМ</h3>
-                    <div class="b-spins">15-25 СПІНІВ</div>
+                    <div class="b-spins">10-15 СПІНІВ</div>
                     <p>Метеоритний дощ із WILD-блоків</p>
                 </div>
             </div>
@@ -746,6 +744,15 @@
         const betInput = document.getElementById('bet-input');
         const bonusPriceSpan = document.getElementById('bonus-price');
         
+        // Оновлена таблиця виплат з реалістичними коефіцієнтами
+        const payTable = {
+            'block-dirt': { 3: 5, 4: 15, 5: 40 },
+            'block-wood': { 3: 8, 4: 20, 5: 60 },
+            'block-gold': { 3: 15, 4: 40, 5: 100 },
+            'block-diamond': { 3: 30, 4: 80, 5: 200 },
+            'block-emerald': { 3: 25, 4: 60, 5: 150 }
+        };
+        
         function updateBonusPrice() {
             let bonusPrice = currentBet * 100;
             bonusPriceSpan.innerText = bonusPrice;
@@ -848,7 +855,7 @@
                     </div>`;
         }
         
-        function buildReels(matrix, addBlur = false) {
+        function buildReels(matrix) {
             for (let x = 0; x < 5; x++) {
                 let stripDiv = document.getElementById(`strip-${x}`);
                 if (!stripDiv) continue;
@@ -870,7 +877,6 @@
             }
         }
         
-        // Apply blur animation to individual symbols
         function applyBlurToSymbols(reelIndex, duration) {
             const stripDiv = document.getElementById(`strip-${reelIndex}`);
             if (!stripDiv) return;
@@ -885,20 +891,29 @@
         
         function generateMatrix() {
             let matrix = [[], [], []];
-            let rainingWilds = (isBonusGame && activeBonusType === 'raining') ? Math.floor(Math.random() * 4) + 2 : 0;
+            let rainingWilds = (isBonusGame && activeBonusType === 'raining') ? Math.floor(Math.random() * 3) + 1 : 0;
             for (let y = 0; y < 3; y++) {
                 for (let x = 0; x < 5; x++) {
                     if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) {
                         matrix[y][x] = wildBlock;
                         continue;
                     }
-                    if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.4) {
+                    if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.3) {
                         matrix[y][x] = wildBlock;
                         rainingWilds--;
                     } else {
                         let r = Math.random();
-                        if (!isBonusGame && r < 0.1) matrix[y][x] = wildBlock;
-                        else matrix[y][x] = blockTypes[Math.floor(Math.random() * blockTypes.length)];
+                        // Зменшений шанс випадання WILD (4% замість 10%)
+                        if (!isBonusGame && r < 0.04) {
+                            matrix[y][x] = wildBlock;
+                        } 
+                        // Зменшений шанс випадання SCATTER (2%)
+                        else if (!isBonusGame && r < 0.06) {
+                            matrix[y][x] = scatterBlock;
+                        }
+                        else {
+                            matrix[y][x] = blockTypes[Math.floor(Math.random() * blockTypes.length)];
+                        }
                     }
                 }
             }
@@ -910,14 +925,6 @@
             for (let row of matrix) for (let block of row) if (block === scatterBlock) count++;
             return count;
         }
-        
-        const payTable = {
-            'block-dirt': { 3: 10, 4: 25, 5: 60 },
-            'block-wood': { 3: 15, 4: 35, 5: 80 },
-            'block-gold': { 3: 30, 4: 70, 5: 150 },
-            'block-diamond': { 3: 60, 4: 150, 5: 400 },
-            'block-emerald': { 3: 50, 4: 120, 5: 300 }
-        };
         
         function calculateWin(matrix, bet) {
             let totalWin = 0;
@@ -974,7 +981,6 @@
             const spinDuration = isTurbo ? 200 : 450;
             const reelDelay = isTurbo ? 30 : 60;
             
-            // Запускаємо рядки по черзі з blur на кожному символі
             for (let x = 0; x < 5; x++) {
                 setTimeout(() => {
                     const strip = document.getElementById(`strip-${x}`);
@@ -1019,7 +1025,7 @@
                 const winPositions = winResult.winPositions;
                 
                 if (winAmount > 0) {
-                    if (winAmount >= currentBet * 20) playSound('bigwin');
+                    if (winAmount >= currentBet * 50) playSound('bigwin');
                     else playSound('win');
                     
                     for (let pos of winPositions) {
@@ -1033,7 +1039,7 @@
                 }
                 
                 if (winAmount > 0) {
-                    addToHistory(`🏆 +${winAmount} 🪙`, winAmount >= currentBet * 20 ? 'big-win' : 'win');
+                    addToHistory(`🏆 +${winAmount} 🪙`, winAmount >= currentBet * 50 ? 'big-win' : 'win');
                     setStatus(`🏆 ВИГРАШ: ${winAmount}`);
                     if (!isBonusGame) await userRef.update({ chips: currentBalance + winAmount });
                 } else if (scatters >= 3) {
@@ -1108,12 +1114,11 @@
         
         function startBonusGame() {
             isBonusGame = true;
-            freeSpinsLeft = Math.floor(Math.random() * 12) + 10;
+            freeSpinsLeft = Math.floor(Math.random() * 8) + 8;
             activeBonusType = Math.random() > 0.5 ? 'sticky' : 'raining';
             document.body.className = activeBonusType === 'sticky' ? 'bonus-sticky' : 'bonus-raining';
             if (activeBonusType === 'sticky') stickyWilds = {};
             addToHistory(`${activeBonusType === 'sticky' ? '🔥 НЕЗЕР-РЕАКТОР' : '🌊 ЕНДЕР-ШТОРМ'}! ${freeSpinsLeft} ФРІСПІНІВ`, 'bonus');
-            // Блокуємо кнопки ставки під час бонусу
             document.getElementById('bet-minus').disabled = true;
             document.getElementById('bet-plus').disabled = true;
             betInput.disabled = true;
@@ -1126,7 +1131,6 @@
             freeSpinsLeft = 0;
             stickyWilds = {};
             document.body.className = '';
-            // Розблоковуємо кнопки ставки
             document.getElementById('bet-minus').disabled = false;
             document.getElementById('bet-plus').disabled = false;
             betInput.disabled = false;
@@ -1137,10 +1141,9 @@
             isBonusGame = true;
             activeBonusType = type;
             document.body.className = type === 'sticky' ? 'bonus-sticky' : 'bonus-raining';
-            freeSpinsLeft = type === 'sticky' ? 12 : 18;
+            freeSpinsLeft = type === 'sticky' ? 10 : 12;
             if (type === 'sticky') stickyWilds = {};
             addToHistory(`${type === 'sticky' ? '🔥' : '🌊'} ВИБРАНО БОНУС: ${type === 'sticky' ? 'НЕЗЕР-РЕАКТОР' : 'ЕНДЕР-ШТОРМ'} (${freeSpinsLeft} СПІНІВ)`, 'bonus');
-            // Блокуємо кнопки ставки під час бонусу
             document.getElementById('bet-minus').disabled = true;
             document.getElementById('bet-plus').disabled = true;
             betInput.disabled = true;

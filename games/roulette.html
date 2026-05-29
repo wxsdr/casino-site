@@ -887,9 +887,11 @@
                 statusText.innerHTML = `ВИПАЛО: ${winningNumber}. ВИГРАШ: +${winAmount} 🪙`;
                 SoundEngine.play('win');
                 await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + winAmount }); });
+                await saveGameResult("Рулетка", totalBetAmount, winAmount - totalBetAmount);
             } else if (totalBetAmount > 0) {
                 statusText.innerHTML = `ВИПАЛО: ${winningNumber}. СТАВКИ ЗГОРІЛИ.`;
                 SoundEngine.play('lose');
+                await saveGameResult("Рулетка", totalBetAmount, -totalBetAmount);
             } else {
                 statusText.innerHTML = `ВИПАЛО: ${winningNumber}.`;
             }

@@ -75,7 +75,7 @@ body{
 .auth-btn{ width:100%;padding:18px;margin-top:12px; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:#000;border:none;border-radius:14px; font-weight:800;font-size:15px;letter-spacing:2px; cursor:pointer;transition:all 0.3s cubic-bezier(0.16,1,0.3,1); text-transform:uppercase;font-family:'Rajdhani',sans-serif; }
 .auth-btn:hover{ box-shadow:0 0 30px var(--gold-glow),0 10px 30px rgba(212,175,55,0.4); transform:translateY(-3px) scale(1.02); }
 .auth-btn:active{ transform:translateY(0) scale(0.98); }
-.auth-btn:disabled{ background:#222;color:#555;cursor:not-allowed;transform:none;box-shadow:none; }
+.auth-btn:disabled{ background:#222;color:#555;cursor:not-allowed;transform:none;box-shadow:none;}
 
 /* ══════════════════════════════════════════════════════════
    LOBBY LAYOUT & HEADER
@@ -95,6 +95,8 @@ body{
 .avatar-btn{ width:46px;height:46px;border-radius:50%; border:2px solid rgba(255,255,255,0.1); cursor:pointer;overflow:hidden; background:var(--bg2); display:flex;align-items:center;justify-content:center; transition:all 0.3s; }
 .avatar-btn img{width:100%;height:100%;object-fit:cover;}
 .avatar-btn:hover{border-color:var(--gold);box-shadow:0 0 20px rgba(249,217,118,0.3); transform:scale(1.05);}
+.logout-btn{ background:transparent; color:var(--text-muted); border:1px solid var(--border); padding:10px 18px; border-radius:12px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.logout-btn:hover{ background:rgba(255,51,102,0.1); color:var(--neon-red); border-color:rgba(255,51,102,0.4); box-shadow:0 0 15px rgba(255,51,102,0.2); transform:translateY(-2px); }
 
 /* ══════════════════════════════════════════════════════════
    GAMES PAGE
@@ -161,7 +163,7 @@ body{
 .lb-games{color:var(--text-muted);font-size:14px; font-weight: 600;}
 
 /* ══════════════════════════════════════════════════════════
-   PROFILE PAGE & BONUSES
+   PROFILE PAGE & FIXED BONUSES SECTION STYLE
 ══════════════════════════════════════════════════════════ */
 .profile-layout{display:grid;grid-template-columns:360px 1fr;gap:32px;}
 .profile-card{ background:var(--panel);border:1px solid var(--border); border-radius:28px;padding:40px 32px;text-align:center; position:relative;overflow:hidden;height:fit-content; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
@@ -175,7 +177,7 @@ body{
 .profile-avatar{ width:120px;height:120px;border-radius:50%; border:4px solid var(--gold); background:var(--bg2);overflow:hidden; display:flex;align-items:center;justify-content:center; font-size:48px;position:relative;z-index:1; cursor:pointer;transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
 .profile-avatar img{width:100%;height:100%;object-fit:cover;}
 .profile-avatar:hover{box-shadow:0 0 40px rgba(249,217,118,0.4); transform:scale(1.05);}
-.avatar-edit-badge{ position:absolute;bottom:4px;right:4px; width:32px;height:32px;border-radius:50%; background:var(--gold);color:#000; display:flex;align-items:center;justify-content:center; font-size:14px;cursor:pointer;z-index:2; box-shadow:0 4px 12px rgba(0,0,0,0.5); transition:transform 0.2s; }
+.avatar-edit-badge{ position:absolute;bottom:4px;right:4px; width:32px;height:32px;border-radius:50%; background:var(--gold);color:#000; display:flex;align-items:center; justify-content:center; font-size:14px;cursor:pointer;z-index:2; box-shadow:0 4px 12px rgba(0,0,0,0.5); transition:transform 0.2s; }
 .avatar-edit-badge:hover{transform:scale(1.15) rotate(10deg);}
 
 .profile-name-wrap { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:4px; z-index:1; position:relative;}
@@ -198,134 +200,128 @@ body{
 .vip-progress-bar { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
 .vip-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold)); width: 0%; transition: width 1s ease; box-shadow: 0 0 10px var(--gold);}
 
-/* ФІКС: Кнопки халявних фішок і промокоду */
-.bonuses-section { background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:24px; padding:24px; margin-bottom:24px; text-align:left; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index:1; position:relative; }
-.bonuses-title { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:800; margin-bottom:16px; color:var(--gold); }
-.bonus-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-.bonus-btn { background: linear-gradient(135deg, rgba(0,255,157,0.1), rgba(0,255,157,0.02)); border: 1px solid rgba(0,255,157,0.3); border-radius: 16px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: hidden; }
-.bonus-btn:hover { background: rgba(0,255,157,0.15); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,255,157,0.15); }
-.bonus-btn:active { transform: translateY(0); }
-.bonus-btn.disabled { background: rgba(255,255,255,0.03); border-color: var(--border); cursor: not-allowed; transform: none; box-shadow: none; filter: grayscale(1); opacity: 0.6;}
-.bonus-btn .b-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px; }
-.bonus-btn .b-val { font-size: 20px; font-weight: 900; color: var(--neon-green); font-family: 'Rajdhani', sans-serif; margin-bottom: 6px; display:flex; align-items:center; justify-content:center; gap:4px;}
-.bonus-btn .b-time { font-size: 11px; color: white; font-weight: 700; background:rgba(0,0,0,0.5); display:inline-block; padding:4px 8px; border-radius:20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;}
-.bonus-btn.hourly { background: linear-gradient(135deg, rgba(79,142,255,0.1), rgba(79,142,255,0.02)); border-color: rgba(79,142,255,0.3); }
+/* ФІКСИ ДИЗАЙНУ БОНУСІВ ТА ПРОМОКОДУ */
+.bonuses-section { background:rgba(0,0,0,0.4); border:1px solid var(--border); border-radius:24px; padding:20px; margin-bottom:24px; text-align:left; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index:1; position:relative; }
+.bonuses-title { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:800; margin-bottom:14px; color:var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+.bonus-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-bottom:14px; }
+.bonus-btn { background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border: 1px solid var(--border); border-radius: 16px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.16,1,0.3,1); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90px; }
+.bonus-btn:hover:not(:disabled) { border-color: var(--neon-green); background: rgba(0, 255, 157, 0.05); transform: translateY(-2px); }
+.bonus-btn.hourly:hover:not(:disabled) { border-color: var(--blue-accent); background: rgba(79, 142, 255, 0.05); }
+.bonus-btn:disabled { opacity: 0.5; cursor: not-allowed; background: rgba(0,0,0,0.2); border-color: var(--border); }
+.bonus-btn .b-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+.bonus-btn .b-val { font-size: 18px; font-weight: 800; color: var(--neon-green); font-family: 'Rajdhani', sans-serif; margin-bottom: 6px; display:flex; align-items:center; justify-content:center; gap:4px;}
 .bonus-btn.hourly .b-val { color: var(--blue-accent); }
-.bonus-btn.hourly:hover { background: rgba(79,142,255,0.15); box-shadow: 0 10px 25px rgba(79,142,255,0.15); }
+.bonus-btn .b-time { font-size: 11px; color: white; font-weight: 700; background:rgba(0,0,0,0.4); display:inline-block; padding:3px 10px; border-radius:20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;}
 
-/* ФІКС: Рівна кнопка промокоду */
-.promo-wrap { display: flex; gap: 8px; align-items: stretch; height: 48px; }
-.promo-input { flex: 1; padding: 0 16px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; outline: none; font-family: 'Inter', sans-serif; font-weight: 600; text-transform: uppercase; font-size: 13px; margin: 0;}
-.promo-input:focus { border-color: var(--blue-accent); box-shadow: 0 0 15px rgba(79,142,255,0.2);}
-.promo-btn { padding: 0 20px; border-radius: 12px; background: var(--blue-accent); color: white; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; font-family: 'Rajdhani', sans-serif; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 5px 15px rgba(79,142,255,0.3); margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap;}
-.promo-btn:hover { background: #6b9fff; transform: translateY(-2px); }
+/* Геометрія промокоду */
+.promo-wrap { display: flex; gap: 10px; align-items: stretch; }
+.promo-input { flex: 1; padding: 12px 16px; border-radius: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); color: white; outline: none; font-family: 'Inter', sans-serif; font-weight: 600; text-transform: uppercase; font-size: 14px; transition: all 0.3s; margin: 0; }
+.promo-input:focus { border-color: var(--blue-accent); background: rgba(0, 0, 0, 0.5); }
+.promo-btn { padding: 0 24px; border-radius: 12px; background: var(--blue-accent); color: white; border: none; font-weight: 800; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; white-space: nowrap; margin: 0; }
+.promo-btn:hover { background: #3b7fff; box-shadow: 0 0 15px rgba(79, 142, 255, 0.4); transform: translateY(-1px); }
 
-/* Profile Stats */
-.profile-stats{ display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px; z-index:1; position:relative;}
-.pstat{ background:rgba(0,0,0,0.6);border:1px solid var(--border); border-radius:16px;padding:20px 12px; transition: transform 0.3s; cursor: default;}
+.profile-stats { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; z-index:1; position:relative;}
+.pstat { background:rgba(0,0,0,0.6); border:1px solid var(--border); border-radius:16px; padding:20px 12px; transition: transform 0.3s; cursor: default;}
 .pstat:hover { transform: translateY(-5px); background:rgba(255,255,255,0.03); }
-.pstat-val{ font-family:'Orbitron',monospace; font-size:22px;font-weight:800; margin-bottom:6px; }
-.pstat-lbl{font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase; font-weight:700;}
-.pstat.green .pstat-val{color:var(--neon-green);}
-.pstat.gold .pstat-val{color:var(--gold);}
-.pstat.red .pstat-val{color:var(--neon-red);}
-.pstat.blue .pstat-val{color:var(--blue-accent);}
+.pstat-val { font-family:'Orbitron',monospace; font-size:22px; font-weight:800; margin-bottom:6px; }
+.pstat-lbl { font-size:11px; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; font-weight:700;}
+.pstat.green .pstat-val { color:var(--neon-green); }
+.pstat.gold .pstat-val { color:var(--gold); }
+.pstat.red .pstat-val { color:var(--neon-red); }
+.pstat.blue .pstat-val { color:var(--blue-accent); }
 
-/* History */
-.history-panel{background:var(--panel);border:1px solid var(--border);border-radius:28px;overflow:hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
-.history-header{ padding:28px 32px;border-bottom:1px solid var(--border); display:flex;align-items:center;justify-content:space-between; }
-.history-title{ font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:800; }
-.history-filter{display:flex;gap:8px;}
-.hf-btn{ padding:8px 18px;border-radius:30px;border:1px solid var(--border); background:transparent;color:var(--text-muted); font-size:12px;font-weight:700;cursor:pointer;transition:all 0.3s; font-family:'Inter',sans-serif; }
+.history-panel { background:var(--panel); border:1px solid var(--border); border-radius:28px; overflow:hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
+.history-header { padding:28px 32px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.history-title { font-family:'Rajdhani',sans-serif; font-size:26px; font-weight:800; }
+.history-filter { display:flex; gap:8px;}
+.hf-btn { padding:8px 18px; border-radius:30px; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:12px; font-weight:700; cursor:pointer; transition:all 0.3s; font-family:'Inter',sans-serif; }
 .hf-btn:hover { background: rgba(255,255,255,0.05); color: white;}
-.hf-btn.active{background:var(--gold);border-color:var(--gold);color:#000;}
+.hf-btn.active { background:var(--gold); border-color:var(--gold); color:#000;}
 
-.history-list{max-height:600px;overflow-y:auto;}
-.hist-row{ display:grid;grid-template-columns:48px 1fr 120px 140px 100px; padding:18px 32px;border-bottom:1px solid var(--border); align-items:center;gap:16px;transition:all 0.2s; animation:slideIn 0.4s ease both; }
-@keyframes slideIn{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
-.hist-row:last-child{border-bottom:none;}
-.hist-row:hover{background:rgba(255,255,255,0.03); padding-left:40px; }
-.hist-icon{ width:48px;height:48px;border-radius:14px; display:flex;align-items:center;justify-content:center; font-size:24px;flex-shrink:0; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);}
-.hist-game{font-weight:700;font-size:15px; font-family:'Rajdhani', sans-serif; font-size: 18px;}
-.hist-date{color:var(--text-muted);font-size:12px;margin-top:2px;}
-.hist-bet{color:var(--text-muted);font-size:15px;font-family:'Rajdhani',sans-serif; font-weight:600;}
-.hist-result{ font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:800; letter-spacing:0.5px; }
-.hist-result.win{color:var(--neon-green);}
-.hist-result.loss{color:var(--text-muted);}
-.hist-mult{ font-size:13px;font-weight:800;padding:6px 12px;border-radius:30px; text-align:center;letter-spacing:0.5px; }
-.hist-mult.win{background:rgba(0,255,157,0.1);color:var(--neon-green); border:1px solid rgba(0,255,157,0.3);}
-.hist-mult.loss{background:rgba(255,255,255,0.05);color:var(--text-muted); border:1px solid var(--border);}
+.history-list { max-height:600px; overflow-y:auto;}
+.hist-row { display:grid; grid-template-columns:48px 1fr 120px 140px 100px; padding:18px 32px; border-bottom:1px solid var(--border); align-items:center; gap:16px; transition:all 0.2s; animation:slideIn 0.4s ease both; }
+@keyframes slideIn { from{opacity:0;transform:translateX(-20px);} to{opacity:1;transform:translateX(0);} }
+.hist-row:last-child { border-bottom:none;}
+.hist-row:hover { background:rgba(255,255,255,0.03); padding-left:40px; }
+.hist-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);}
+.hist-game { font-weight:700; font-family:'Rajdhani', sans-serif; font-size: 18px;}
+.hist-date { color:var(--text-muted); font-size:12px; margin-top:2px;}
+.hist-bet { color:var(--text-muted); font-size:15px; font-family:'Rajdhani',sans-serif; font-weight:600;}
+.hist-result { font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:800; letter-spacing:0.5px; }
+.hist-result.win { color:var(--neon-green); }
+.hist-result.loss { color:var(--text-muted); }
+.hist-mult { font-size:13px; font-weight:800; padding:6px 12px; border-radius:30px; text-align:center; letter-spacing:0.5px; }
+.hist-mult.win { background:rgba(0,255,157,0.1); color:var(--neon-green); border:1px solid rgba(0,255,157,0.3);}
+.hist-mult.loss { background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid var(--border);}
 
-.profile-chart-section{ background:var(--panel);border:1px solid var(--border); border-radius:28px;padding:32px;margin-top:32px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
-.chart-title{ font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:800; margin-bottom:24px; }
-#profit-chart{width:100%;height:160px;position:relative;}
-.chart-svg{width:100%;height:100%;}
+.profile-chart-section { background:var(--panel); border:1px solid var(--border); border-radius:28px; padding:32px; margin-top:32px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
+.chart-title { font-family:'Rajdhani',sans-serif; font-size:24px; font-weight:800; margin-bottom:24px; }
+#profit-chart { width:100%; height:160px; position:relative;}
+.chart-svg { width:100%; height:100%;}
 
 /* ══════════════════════════════════════════════════════════
    LIVE TICKER
 ══════════════════════════════════════════════════════════ */
-.live-ticker{ background:rgba(0,0,0,0.6);border-bottom:1px solid var(--border); overflow:hidden;height:44px;display:flex;align-items:center; }
-.ticker-label{ background:var(--gold);color:#000; font-size:11px;font-weight:900;letter-spacing:2px;padding:0 20px; height:100%;display:flex;align-items:center;flex-shrink:0; text-transform:uppercase; box-shadow: 5px 0 15px rgba(0,0,0,0.5); z-index:2;}
-.ticker-wrap{overflow:hidden;flex:1;position:relative;}
-.ticker-inner{ display:flex;gap:64px;align-items:center; animation:ticker 35s linear infinite; white-space:nowrap;padding:0 32px; }
-@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-.ticker-item{ font-size:13px;color:var(--text-muted); display:flex;align-items:center;gap:10px;flex-shrink:0; font-weight: 500;}
+.live-ticker { background:rgba(0,0,0,0.6); border-bottom:1px solid var(--border); overflow:hidden; height:44px; display:flex; align-items:center; }
+.ticker-label { background:var(--gold); color:#000; font-size:11px; font-weight:900; letter-spacing:2px; padding:0 20px; height:100%; display:flex; align-items:center; flex-shrink:0; text-transform:uppercase; box-shadow: 5px 0 15px rgba(0,0,0,0.5); z-index:2;}
+.ticker-wrap { overflow:hidden; flex:1; position:relative;}
+.ticker-inner { display:flex; gap:64px; align-items:center; animation:ticker 35s linear infinite; white-space:nowrap; padding:0 32px; }
+@keyframes ticker { from{transform:translateX(0);} to{transform:translateX(-50%);}}
+.ticker-item { font-size:13px; color:var(--text-muted); display:flex; align-items:center; gap:10px; flex-shrink:0; font-weight: 500;}
 .ticker-item strong { color: white; cursor:pointer;}
 .ticker-item strong:hover { color: var(--gold); text-decoration: underline;}
-.ticker-item .win-tag{color:var(--neon-green);font-weight:800; background:rgba(0,255,157,0.1); padding: 4px 10px; border-radius: 20px;}
-.ticker-item .loss-tag{color:var(--neon-red);font-weight:800; background:rgba(255,51,102,0.1); padding: 4px 10px; border-radius: 20px;}
+.ticker-item .win-tag { color:var(--neon-green); font-weight:800; background:rgba(0,255,157,0.1); padding: 4px 10px; border-radius: 20px;}
+.ticker-item .loss-tag { color:var(--neon-red); font-weight:800; background:rgba(255,51,102,0.1); padding: 4px 10px; border-radius: 20px;}
 
 /* ══════════════════════════════════════════════════════════
-   MODALS, TOASTS & BLOCKED OVERLAY
+   MODALS & BLOCKED OVERLAY
 ══════════════════════════════════════════════════════════ */
-#out-of-casino-overlay{
-  display:none !important; position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(7,7,10,0.98);z-index:2147483647; pointer-events:all;
-  flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;backdrop-filter:blur(25px);
+#out-of-casino-overlay {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(7,7,10,0.98); z-index:2147483647; pointer-events:all;
+  flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; backdrop-filter:blur(25px);
 }
 #out-of-casino-overlay.show-overlay { display:flex !important; }
-#out-of-casino-overlay h1{
-  font-family:'Orbitron',monospace; color:var(--neon-red);font-size:56px;
+#out-of-casino-overlay h1 {
+  font-family:'Orbitron',monospace; color:var(--neon-red); font-size:56px;
   text-shadow:0 0 50px var(--neon-red),0 0 100px rgba(255,51,102,0.4); animation:flickerRed 2s ease-in-out infinite;
 }
-@keyframes flickerRed{ 0%,100%{opacity:1;}50%{opacity:0.7;} }
+@keyframes flickerRed { 0%,100%{opacity:1;} 50%{opacity:0.7;} }
 
-.modal-overlay{ display:none;position:fixed;inset:0; background:rgba(0,0,0,0.85);backdrop-filter:blur(15px); z-index:5000;align-items:center;justify-content:center; }
-.modal-overlay.open{display:flex;animation:fadeIn 0.3s ease;}
-.modal{ background:var(--panel);border:1px solid var(--border-bright); border-radius:28px;padding:48px;width:480px; position:relative;animation:slideUp 0.4s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 40px 100px rgba(0,0,0,0.8); text-align:center;}
-.modal-title{ font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:800; margin-bottom:8px; }
-.modal-sub{color:var(--text-muted);font-size:14px;margin-bottom:32px;}
-.modal-close{ position:absolute;top:24px;right:24px; width:36px;height:36px;border-radius:50%; background:rgba(255,255,255,0.05);border:1px solid var(--border); color:var(--text-muted);cursor:pointer; display:flex;align-items:center;justify-content:center; font-size:18px;transition:all 0.3s; }
-.modal-close:hover{background:var(--neon-red);color:white; border-color:var(--neon-red); transform:rotate(90deg);}
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(15px); z-index:5000; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; animation:fadeIn 0.3s ease; }
+.modal { background:var(--panel); border:1px solid var(--border-bright); border-radius:28px; padding:48px; width:480px; position:relative; animation:slideUp 0.4s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 40px 100px rgba(0,0,0,0.8); text-align:center;}
+.modal-title { font-family:'Rajdhani',sans-serif; font-size:32px; font-weight:800; margin-bottom:8px; }
+.modal-sub { color:var(--text-muted); font-size:14px; margin-bottom:32px; }
+.modal-close { position:absolute; top:24px; right:24px; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:all 0.3s; }
+.modal-close:hover { background:var(--neon-red); color:white; border-color:var(--neon-red); transform:rotate(90deg);}
 
-.upload-zone{ border:2px dashed rgba(249,217,118,0.3);border-radius:20px; padding:48px;text-align:center;cursor:pointer; transition:all 0.3s;background:rgba(249,217,118,0.02); margin-bottom:24px; }
-.upload-zone:hover{ border-color:var(--gold); background:rgba(249,217,118,0.05); transform:scale(1.02); }
-.upload-zone-icon{font-size:48px;margin-bottom:16px; animation:floatIcon 3s ease-in-out infinite;}
-.upload-zone-text{font-size:15px;color:var(--text-muted); line-height:1.5;}
-.upload-zone-text strong{color:var(--gold);}
-.upload-preview{ width:120px;height:120px;border-radius:16px; margin:0 auto 24px;overflow:hidden;border:4px solid var(--gold); display:none; box-shadow: 0 0 30px rgba(249,217,118,0.3);}
-.upload-preview img{width:100%;height:100%;object-fit:cover;}
-.modal-btn{ width:100%;padding:16px;border-radius:14px; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:#000;border:none;font-weight:800;font-size:15px; letter-spacing:2px;cursor:pointer;transition:all 0.3s; text-transform:uppercase;font-family:'Rajdhani',sans-serif; }
-.modal-btn:hover{box-shadow:0 0 30px var(--gold-glow);transform:translateY(-3px);}
-.modal-btn:disabled{background:#222;color:#555;cursor:not-allowed;transform:none;box-shadow:none;}
+.upload-zone { border:2px dashed rgba(249,217,118,0.3); border-radius:20px; padding:48px; text-align:center; cursor:pointer; transition:all 0.3s; background:rgba(249,217,118,0.02); margin-bottom:24px; }
+.upload-zone:hover { border-color:var(--gold); background:rgba(249,217,118,0.05); transform:scale(1.02); }
+.upload-zone-icon { font-size:48px; margin-bottom:16px; }
+.upload-zone-text { font-size:15px; color:var(--text-muted); line-height:1.5; }
+.upload-zone-text strong { color:var(--gold); }
+.upload-preview { width:120px; height:120px; border-radius:16px; margin:0 auto 24px; overflow:hidden; border:4px solid var(--gold); display:none; box-shadow: 0 0 30px rgba(249,217,118,0.3);}
+.upload-preview img { width:100%; height:100%; object-fit:cover;}
+.modal-btn { width:100%; padding:16px; border-radius:14px; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:#000; border:none; font-weight:800; font-size:15px; letter-spacing:2px; cursor:pointer; transition:all 0.3s; text-transform:uppercase; font-family:'Rajdhani',sans-serif; }
+.modal-btn:hover { box-shadow:0 0 30px var(--gold-glow); transform:translateY(-3px); }
 
 .custom-input { width: 100%; padding: 14px 20px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 12px; outline: none; font-size: 16px; font-family: 'Inter', sans-serif; margin-bottom: 20px; text-align: center;}
 .custom-input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(249,217,118,0.2);}
 
-#toast-container{ position:fixed;bottom:32px;right:32px;z-index:9999; display:flex;flex-direction:column;gap:12px; pointer-events:none;}
-.toast{ background:var(--panel);border:1px solid var(--border-bright); border-radius:16px;padding:16px 24px; font-size:14px;font-weight:600; display:flex;align-items:center;gap:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5); animation:toastIn 0.4s cubic-bezier(0.16,1,0.3,1) both; min-width:280px; }
-@keyframes toastIn{from{transform:translateX(100px);opacity:0;}to{transform:translateX(0);opacity:1;}}
-.toast.success{border-color:rgba(0,255,157,0.4); border-left: 4px solid var(--neon-green);}
-.toast.success::before{content:'✓';color:var(--neon-green);font-weight:900; font-size:18px;}
-.toast.error{border-color:rgba(255,51,102,0.4); border-left: 4px solid var(--neon-red);}
-.toast.error::before{content:'✗';color:var(--neon-red);font-weight:900; font-size:18px;}
+#toast-container { position:fixed; bottom:32px; right:32px; z-index:9999; display:flex; flex-direction:column; gap:12px; pointer-events:none;}
+.toast { background:var(--panel); border:1px solid var(--border-bright); border-radius:16px; padding:16px 24px; font-size:14px; font-weight:600; display:flex; align-items:center; gap:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5); animation:toastIn 0.4s cubic-bezier(0.16,1,0.3,1) both; min-width:280px; }
+@keyframes toastIn { from{transform:translateX(100px);opacity:0;} to{transform:translateX(0);opacity:1;} }
+.toast.success { border-color:rgba(0,255,157,0.4); border-left: 4px solid var(--neon-green); }
+.toast.success::before { content:'✓'; color:var(--neon-green); font-weight:900; font-size:18px; }
+.toast.error { border-color:rgba(255,51,102,0.4); border-left: 4px solid var(--neon-red); }
+.toast.error::before { content:'✗'; color:var(--neon-red); font-weight:900; font-size:18px; }
 
-.empty-state{ padding:80px;text-align:center;color:var(--text-muted); }
-.empty-state-icon{font-size:56px;margin-bottom:20px; opacity:0.5;}
-.empty-state p{font-size:15px; font-weight:500;}
+.empty-state { padding:80px; text-align:center; color:var(--text-muted); }
+.empty-state-icon { font-size:56px; margin-bottom:20px; opacity:0.5; }
+.empty-state p { font-size:15px; font-weight:500; }
 
-/* Public Profile Modal */
 .public-profile { text-align: left; }
 .pp-banner { width: 100%; height: 120px; background: #222; border-radius: 16px 16px 0 0; background-size: cover; background-position: center; position: relative;}
 .pp-avatar { width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--panel); background: #111; position: absolute; bottom: -40px; left: 32px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 30px;}
@@ -334,7 +330,6 @@ body{
 .pp-name { font-family:'Rajdhani',sans-serif; font-size: 32px; font-weight: 800; color: white; }
 .pp-id { color: var(--text-muted); font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 20px;}
 
-/* Explosion Animation */
 @keyframes explodeChip {
   0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
   100% { transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(var(--rot)); opacity: 0; }
@@ -351,18 +346,18 @@ body{
   <h1>🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
   <p style="color:#e2e8f0;font-size:24px;margin-top:24px; font-weight:600;">Ви покинули територію казино.</p>
   <p style="color:var(--text-muted);font-size:16px;margin-top:12px;">Поверніться до будівлі в Minecraft, щоб продовжити гру.</p>
-  <button onclick="checkLocationStatus()" style="margin-top:30px; padding:14px 30px; border-radius:12px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.2); cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; transition:0.3s; z-index:99999999;">🔄 ПЕРЕВІРИТИ СТАТУС ЗНОВУ</button>
+  <button onclick="checkLocationStatus()" style="margin-top:30px; padding:14px 30px; border-radius:12px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.2); cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; transition:0.3s;">🔄 ПЕРЕВІРИТИ СТАТУС ЗНОВУ</button>
 </div>
 
 <div class="modal-overlay" id="upload-modal">
   <div class="modal">
-    <div class="modal-close" onclick="closeUploadModal()">✕</div>
+    <div class="modal-close" onclick="document.getElementById('upload-modal').classList.remove('open')">✕</div>
     <div class="modal-title shimmer-text" id="upload-title">Змінити зображення</div>
     <div class="modal-sub" id="upload-sub">Виберіть файл (JPG, PNG)</div>
     <div class="upload-preview" id="upload-preview"><img id="preview-img" src="" alt=""></div>
     <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-upload-input').click()">
       <div class="upload-zone-icon">🖼️</div>
-      <div class="upload-zone-text"><strong>Натисніть</strong> або перетягніть фото сюди<br>Стискається автоматично у браузері</div>
+      <div class="upload-zone-text"><strong>Натисніть</strong> або перетягніть фото сюди</div>
     </div>
     <input type="file" id="file-upload-input" accept="image/*" onchange="onFileSelect(event)" style="display:none;">
     <button class="modal-btn" id="upload-btn" onclick="uploadImage()" disabled>ЗБЕРЕГТИ</button>
@@ -419,7 +414,6 @@ body{
 </div>
 
 <div id="lobby-section">
-
   <div class="header">
     <div class="header-logo shimmer-text" onclick="createEasterEgg(event)">
       KURAHIVKA
@@ -514,7 +508,6 @@ body{
         <div class="page-desc">Ваша особиста статистика, досягнення та історія всіх ігор</div>
       </div>
       <div class="profile-layout">
-
         <div>
           <div class="profile-card">
             <div class="profile-banner-wrap">
@@ -615,44 +608,20 @@ body{
             </div>
           </div>
           <div class="lb-header" style="grid-template-columns:48px 1fr 120px 140px 100px;padding:16px 32px; background:rgba(0,0,0,0.3);">
-            <div></div><div>Гра</div><div>Ставка</div><div>Результат</div><div>Множник</div>
+            <div></div><div>Grad</div><div>Ставка</div><div>Результат</div><div>Множник</div>
           </div>
           <div class="history-list" id="history-list">
-            <div class="empty-state">
-              <div class="empty-state-icon">🎰</div>
-              <p>Ще немає ігор · Зіграйте першу!</p>
-            </div>
+            <div class="empty-state"><div class="empty-state-icon">🎰</div><p>Ще немає ігор · Зіграйте першу!</p></div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
-
 </div>
 
 <script>
 /* ══════════════════════════════════════════════════════════
-   НАЛАШТУВАННЯ ІГОР ТА ІКОНОК
-══════════════════════════════════════════════════════════ */
-const chipSvg = `<svg class="chip-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 0c141.4 0 256 114.6 256 256s-114.6 256-256 256S0 397.4 0 256 114.6 0 256 0zM256 464c114.9 0 208-93.1 208-208S370.9 48 256 48 48 141.1 48 256s93.1 208 208 208zm0-352c88.4 0 160 71.6 160 160s-71.6 160-160 160-160-71.6-160-160 71.6-160 160-160zm0 272c61.9 0 112-50.1 112-112s-50.1-112-112-112-112 50.1-112 112 50.1 112 112 112zm0-176c35.3 0 64 28.7 64 64s-28.7 64-64 64-64-28.7-64-64 28.7-64 64-64z"/></svg>`;
-document.getElementById('min-bet-desc').innerHTML = `Ставки приймаються у фішках казино • Мінімум 10 ${chipSvg}`;
-
-const GAMES=[
-  {id:'roulette1',name:'Roulette Classic',image:'https://images.unsplash.com/photo-1606167668584-78701c57f13d?auto=format&fit=crop&q=80&w=600',tag:'Настільна',desc:'Класична рулетка з прямою трансляцією. Ставки на числа, кольори, сектори.',maxwin:'35x',url:'games/roulette.html?table=1',accent:'#00ff9d',glow:'rgba(0,255,157,0.2)',cat:'table'},
-  {id:'roulette2',name:'Roulette Fast',image:'https://images.unsplash.com/photo-1571295669299-c8eb5c94bd75?auto=format&fit=crop&q=80&w=600',tag:'Настільна',desc:'Другий стіл рулетки зі швидкими раундами. Менше часу на роздуми.',maxwin:'35x',url:'games/roulette.html?table=2',accent:'#00ff9d',glow:'rgba(0,255,157,0.2)',cat:'table'},
-  {id:'roulette3',name:'Roulette VIP',image:'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80&w=600',tag:'VIP',desc:'VIP стіл з підвищеними лімітами ставок. Тільки для серйозних гравців.',maxwin:'35x',url:'games/roulette.html?table=3',accent:'#f9d976',glow:'rgba(249,217,118,0.2)',cat:'vip',ribbon:'VIP'},
-  {id:'slots',name:'Pixel Slots',image:'https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&q=80&w=600',tag:'Слот',desc:'Майнкрафт едішн — три барабани з пікселями. Три в ряд — джекпот!',maxwin:'50x',url:'games/mc_slot.html',accent:'#ff3366',glow:'rgba(255,51,102,0.2)',cat:'slots'},
-  {id:'bilmen',name:'Більше-Менше',image:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=600',tag:'Карткова',desc:'Вгадай — більше чи менше наступна карта. Просто, але адреналін зашкалює.',maxwin:'2x',url:'games/bilmen.html',accent:'#ff3366',glow:'rgba(255,51,102,0.2)',cat:'table'},
-  {id:'blackjack',name:'Blackjack 21',image:'https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&q=80&w=600',tag:'Карткова',desc:'Класичний блекджек. Набери 21 і не перебери. Чи зможеш перемогти дилера?',maxwin:'2x',url:'games/21ochko.html',accent:'#28a745',glow:'rgba(40,167,69,0.2)',cat:'table'},
-  {id:'plinko',name:'Plinko',image:'https://images.unsplash.com/photo-1553481187-be93c21490a9?auto=format&fit=crop&q=80&w=600',tag:'Аркада',desc:'Киньте кульку і спостерігайте як вона падає. Множники до 850x!',maxwin:'850x',url:'games/plinko.html',accent:'#a855f7',glow:'rgba(168,85,247,0.2)',cat:'arcade'},
-  {id:'kubik',name:'Dice (Кубик)',image:'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=600',tag:'Аркада',desc:'Прокрути кубик і роби ставки на результат. Класична азартна гра.',maxwin:'6x',url:'games/kubik.html',accent:'#4f8eff',glow:'rgba(79,142,255,0.2)',cat:'arcade'},
-  {id:'penalty',name:'Penalty Shoot',image:'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&q=80&w=600',tag:'Спорт',desc:'Б`є 11-метровий! Вибери кут і сподівайся що воротар не встигне.',maxwin:'30x',url:'games/penalty.html',accent:'#28a745',glow:'rgba(40,167,69,0.2)',cat:'arcade'},
-  {id:'aviator',name:'Aviator Crash',image:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=600',tag:'Краш',desc:'Літак злітає — множник росте. Встигни вивести ставку до падіння!',maxwin:'100x',url:'games/aviator.html',accent:'#e5053a',glow:'rgba(229,5,58,0.3)',cat:'arcade'},
-];
-
-/* ══════════════════════════════════════════════════════════
-   FIREBASE
+   ІНІЦІАЛІЗАЦІЯ БАЗИ ДАНИХ
 ══════════════════════════════════════════════════════════ */
 const firebaseConfig = {
   apiKey:"AIzaSyC1HOC3_im8YiziljGqpR_0AvHLQctIfxQ",
@@ -664,30 +633,23 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let currentUser = null;
+let userRef = null;
 let currentChips = 0;
 let allHistory = [];
 let historyFilter = 'all';
-
-function toast(msg,type='success'){
-  const tc=document.getElementById('toast-container');
-  const t=document.createElement('div');
-  t.className=`toast ${type}`;t.textContent=msg;
-  tc.appendChild(t);
-  setTimeout(()=>{t.style.animation='toastIn 0.4s reverse';setTimeout(()=>t.remove(),400);},3000);
-}
+let allUsersMap = {};
 
 window.onload=()=>{
   const saved=localStorage.getItem('casino_user');
-  if(saved) openLobby(saved);
+  if(saved) openLobby(saved.trim().toLowerCase());
   buildGameGrid();
   initGlobalData(); 
 };
 
 function checkLocationStatus() {
     if(!currentUser) return;
-    db.ref('users_by_name/' + currentUser).once('value').then(snap => {
-        const data = snap.val();
-        if(data && (data.in_casino === true || String(data.in_casino) === "true")) {
+    db.ref('users_by_name/' + currentUser + '/in_casino').once('value').then(snap => {
+        if(snap.val() === true || String(snap.val()) === "true") {
             document.getElementById('out-of-casino-overlay').classList.remove('show-overlay');
             toast("Доступ відновлено!", "success");
         } else {
@@ -715,18 +677,17 @@ async function login(){
       localStorage.setItem('casino_user', username);
       await db.ref('users_by_name/' + username).update({ pin: null }); 
       toast('Успішний вхід!', 'success');
-      setTimeout(() => openLobby(username), 100); 
+      openLobby(username);
     } else {
       toast('Помилка: Невірний нік або код', 'error');
     }
   } catch(e) {
     console.error(e); toast('Помилка бази даних', 'error');
-  } 
-  
-  btn.textContent = 'УВІЙТИ В КАЗИНО'; btn.disabled = false; userInp.disabled = false; pinInp.disabled = false; pinInp.value = ''; 
+  } finally {
+    btn.textContent = 'УВІЙТИ В КАЗИНО'; btn.disabled = false; userInp.disabled = false; pinInp.disabled = false; pinInp.value = ''; 
+  }
 }
 
-let allUsersMap = {};
 function initGlobalData() {
     db.ref('users_by_name').on('value', snap => {
         try {
@@ -741,9 +702,8 @@ function initGlobalData() {
                     const uname = child.key;
                     const dName = d.display_name || uname;
                     
-                    rows.push({ id: uname, name: dName, chips: parseInt(d.chips)||0, games: d.total_games || (d.game_history ? Object.keys(d.game_history).length : 0), avatar: d.avatar_url || null });
-                    
-                    if(d.online) onlinePlayers.push({ id: uname, name: dName, avatar: d.avatar_url });
+                    rows.push({ id: uname, name: dName, chips: parseInt(d.chips)||0, games: d.game_history ? Object.keys(d.game_history).length : (parseInt(d.total_games)||0), avatar: d.avatar_url || null });
+                    if(d.online === true || String(d.online) === "true") onlinePlayers.push({ id: uname, name: dName, avatar: d.avatar_url });
 
                     if (d.game_history) {
                         Object.values(d.game_history).forEach(h => {
@@ -761,16 +721,16 @@ function initGlobalData() {
             globalHistory.sort((a,b) => b.ts - a.ts);
             const recent = globalHistory.slice(0, 20);
             if(recent.length > 0) buildRealTicker(recent);
-            else document.getElementById('ticker-inner').innerHTML = `<div class="ticker-item" style="font-size:14px; font-weight:700;">🎰 ПОКИ ЩО СТАВОК НЕМАЄ... БУДЬ ПЕРШИМ, ХТО ЗІРВЕ КУШ! 🎰</div>`;
+            else document.getElementById('ticker-inner').innerHTML = `<div class="ticker-item">🎰 ПОКИ ЩО СТАВОК НЕМАЄ... БУДЬ ПЕРШИМ! 🎰</div>`;
         } catch(err) { console.error(err); }
     });
 }
 
 function openLobby(username){
-  currentUser=username.toLowerCase();
+  currentUser=username.trim().toLowerCase();
   document.getElementById('auth-section').style.display='none';
   document.getElementById('lobby-section').style.display='block';
-  document.getElementById('profile-id-el').textContent=username;
+  document.getElementById('profile-id-el').textContent=currentUser;
 
   const myConnectionsRef = db.ref(`users_by_name/${currentUser}/online`);
   db.ref('.info/connected').on('value', snap => {
@@ -780,8 +740,9 @@ function openLobby(username){
       }
   });
 
-  db.ref('users_by_name/'+currentUser).on('value',snap=>{
-    const data=snap.val()||{};
+  userRef = db.ref('users_by_name/' + currentUser);
+  userRef.on('value', snap => {
+    const data = snap.val() || {};
     
     if(data.in_casino === false || String(data.in_casino) === "false") {
         document.getElementById('out-of-casino-overlay').classList.add('show-overlay');
@@ -789,9 +750,9 @@ function openLobby(username){
         document.getElementById('out-of-casino-overlay').classList.remove('show-overlay');
     }
     
-    currentChips=parseInt(data.chips)||0;
-    document.getElementById('chips-balance-container').innerHTML = currentChips.toLocaleString() + ' ' + chipSvg;
-    document.getElementById('ps-balance-container').innerHTML = currentChips.toLocaleString() + ' ' + chipSvg;
+    currentChips = parseInt(data.chips) || 0;
+    document.getElementById('chips-balance').innerText = currentChips.toLocaleString();
+    document.getElementById('ps-balance').innerText = currentChips.toLocaleString();
 
     const displayName = data.display_name || currentUser;
     document.getElementById('player-name').textContent = displayName.toUpperCase();
@@ -800,13 +761,20 @@ function openLobby(username){
     if(data.avatar_url) {
         document.getElementById('header-avatar').innerHTML=`<img src="${data.avatar_url}" alt="avatar">`;
         document.getElementById('profile-avatar-el').innerHTML=`<img src="${data.avatar_url}" alt="avatar">`;
+    } else {
+        document.getElementById('header-avatar').innerHTML=`<span style="font-size:20px;">👤</span>`;
+        document.getElementById('profile-avatar-el').innerHTML=`<span style="font-size:48px;">👤</span>`;
     }
     if(data.banner_url) {
         document.getElementById('profile-banner-bg').style.backgroundImage = `url(${data.banner_url})`;
+    } else {
+        document.getElementById('profile-banner-bg').style.backgroundImage = 'none';
     }
 
-    allHistory=data.game_history ? Object.values(data.game_history) : [];
-    allHistory.sort((a,b)=>(b.ts||0)-(a.ts||0));
+    // Повний перерахунок історії та лічильників ігор (вирішує проблему з нулями)
+    allHistory = data.game_history ? Object.values(data.game_history) : [];
+    allHistory.sort((a,b) => (b.ts || 0) - (a.ts || 0));
+    
     renderHistory();
     renderProfileStats();
     renderChart();
@@ -832,22 +800,13 @@ function showPage(page,tab){
 }
 
 /* ══════════════════════════════════════════════════════════
-   ГЕНЕРАЦІЯ СІТОК (Ігри, Онлайн, Лідерборд)
+   ГЕНЕРАЦІЯ РЕНДЕРУ (СІТКИ ТА ЛІДЕРБОРД)
 ══════════════════════════════════════════════════════════ */
-let catFilter='all';
-function filterGames(cat,btn){
-  catFilter=cat;
-  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  buildGameGrid();
-}
-
 function buildGameGrid(){
   const grid=document.getElementById('game-grid');
   if(!grid)return;
-  const filtered=catFilter==='all'?GAMES:GAMES.filter(g=>g.cat===catFilter);
   grid.innerHTML='';
-  filtered.forEach((g,i)=>{
+  GAMES.forEach((g,i)=>{
     const d=document.createElement('div'); d.className='game-card';
     d.style.cssText=`--accent-color:${g.accent};--accent-glow:${g.glow};animation-delay:${i*0.06}s`;
     d.onclick=()=>navigate(g.url);
@@ -885,7 +844,6 @@ function renderLeaderboard(rows){
 function renderOnlinePlayers(players) {
     const grid = document.getElementById('online-grid');
     if(!players.length) { grid.innerHTML = '<div class="empty-state"><p>Наразі нікого немає на сайті</p></div>'; return; }
-    
     grid.innerHTML = players.map((p, i) => `
         <div class="game-card" style="align-items:center; text-align:center; animation-delay:${i*0.05}s;" onclick="openPublicProfile('${p.id}')">
             <div style="width:80px;height:80px;border-radius:50%;background:#222;margin-bottom:15px;border:3px solid var(--neon-green);display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden;box-shadow:0 0 15px rgba(0,255,157,0.3);">
@@ -897,13 +855,10 @@ function renderOnlinePlayers(players) {
     `).join('');
 }
 
-/* ══════════════════════════════════════════════════════════
-   ПУБЛІЧНИЙ ПРОФІЛЬ (МОДАЛКА)
-══════════════════════════════════════════════════════════ */
 function openPublicProfile(userId) {
     if(!allUsersMap[userId]) return;
     const d = allUsersMap[userId];
-    const games = d.total_games || (d.game_history ? Object.keys(d.game_history).length : 0);
+    const games = d.game_history ? Object.keys(d.game_history).length : (parseInt(d.total_games) || 0);
     
     document.getElementById('pp-name').textContent = d.display_name || userId;
     document.getElementById('pp-id').textContent = 'ID: ' + userId;
@@ -922,17 +877,14 @@ function openPublicProfile(userId) {
     document.getElementById('public-profile-modal').classList.add('open');
 }
 
-/* ══════════════════════════════════════════════════════════
-   СИСТЕМА БЕЙДЖІВ ТА ІСТОРІЯ
-══════════════════════════════════════════════════════════ */
 function renderBadges(data, containerId){
   const row=document.getElementById(containerId);
   const chips=parseInt(data.chips)||0;
-  const games=data.total_games || (data.game_history ? Object.keys(data.game_history).length : 0);
+  const games=data.game_history ? Object.keys(data.game_history).length : (parseInt(data.total_games) || 0);
   const badges=[];
   
   if (containerId === 'profile-badges') {
-      let nextGoal = 10; let percent = 0;
+      let percent = 0;
       if(games < 10) { percent = (games/10)*100; document.getElementById('vip-progress-text').innerText = `${games}/10 ігор`; }
       else if(games < 100) { percent = (games/100)*100; document.getElementById('vip-progress-text').innerText = `${games}/100 ігор`; }
       else { percent = 100; document.getElementById('vip-progress-text').innerText = `Максимальний рівень!`; }
@@ -949,9 +901,6 @@ function renderBadges(data, containerId){
   
   row.innerHTML=badges.join('');
 }
-
-const GAME_META={ roulette:{icon:'🎡',bg:'rgba(0,255,157,0.12)',label:'Рулетка'}, mc_slot:{icon:'🎮',bg:'rgba(255,51,102,0.12)',label:'Слот'}, bilmen:{icon:'🃏',bg:'rgba(255,51,102,0.12)',label:'Більше/Менше'}, '21ochko':{icon:'🃏',bg:'rgba(34,197,94,0.12)',label:'Blackjack'}, plinko:{icon:'🔵',bg:'rgba(168,85,247,0.12)',label:'Plinko'}, kubik:{icon:'🎲',bg:'rgba(79,142,255,0.12)',label:'Dice'}, penalty:{icon:'⚽',bg:'rgba(34,197,94,0.12)',label:'Penalty'}, aviator:{icon:'✈️',bg:'rgba(229,5,58,0.12)',label:'Aviator'} };
-function gameMeta(key){ for(let k in GAME_META) if(key.toLowerCase().includes(k)) return GAME_META[k]; return {icon:'🎰',bg:'rgba(255,255,255,0.06)',label:key}; }
 
 function filterHistory(f,btn){ historyFilter=f; document.querySelectorAll('.hf-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderHistory(); }
 
@@ -997,12 +946,9 @@ function renderChart(){
   const rev=[...allHistory].reverse().slice(-30);
   rev.forEach(r=>{ 
       const p = r.profit !== undefined ? parseFloat(r.profit) : (parseFloat(r.win||r.result||0) - parseFloat(r.bet||0));
-      bal-=p; // Йдемо назад у часі
-      pts.push(bal); 
+      bal+=p; pts.push(bal); 
   });
-  pts.reverse(); // Повертаємо в нормальний порядок
-  pts.push(currentChips); // Поточний баланс
-  
+  pts.reverse(); pts.push(currentChips);
   const mn=Math.min(...pts),mx=Math.max(...pts); const range=mx-mn||1;
   const W=500,H=140,pad=10;
   const cx=(i)=>pad+(i/(pts.length-1||1))*(W-pad*2);
@@ -1020,17 +966,16 @@ function buildRealTicker(recentHistory){
       const m = gameMeta(t.game);
       const isWin = t.profit >= 0;
       return `<div class="ticker-item">
-          <strong onclick="openPublicProfile('${t.player}')">${t.player}</strong> ${isWin ? 'виграв' : 'зіграв'} у <em>${m.label}</em>
+          <strong onclick="openPublicProfile('${t.player.toLowerCase()}')">${t.player}</strong> ${isWin ? 'виграв' : 'зіграв'} у <em>${m.label}</em>
           <span class="${isWin ? 'win-tag' : 'loss-tag'}">${isWin ? '+' : ''}${t.profit} ${chipSvg}</span>
       </div>`;
   }).join('');
 }
 
 /* ══════════════════════════════════════════════════════════
-   ХАЛЯВНІ ФІШКИ ТА ПРОМОКОДИ
+   БОНУСНА СИСТЕМА ТА ПРОМОКОДИ
 ══════════════════════════════════════════════════════════ */
 let bonusTimersInterval;
-
 function updateBonusesUI(data) {
     clearInterval(bonusTimersInterval);
     const lastDaily = data.last_bonus || 0;
@@ -1038,163 +983,97 @@ function updateBonusesUI(data) {
     
     function tick() {
         const now = Date.now();
-        
-        // Щоденний бонус
-        const dailyDiff = now - lastDaily;
         const dailyBtn = document.getElementById('daily-bonus-btn');
         const dailyTime = document.getElementById('daily-time');
-        if (dailyDiff >= 24 * 60 * 60 * 1000) {
-            dailyBtn.classList.remove('disabled');
-            dailyTime.innerText = '🎁 ЗАБРАТИ';
-            dailyBtn.disabled = false;
+        if (now - lastDaily >= 24 * 60 * 60 * 1000) {
+            dailyBtn.classList.remove('disabled'); dailyTime.innerText = '🎁 ЗАБРАТИ'; dailyBtn.disabled = false;
         } else {
-            dailyBtn.classList.add('disabled');
-            const left = 24 * 60 * 60 * 1000 - dailyDiff;
-            const h = Math.floor(left / 3600000);
-            const m = Math.floor((left % 3600000) / 60000);
-            dailyTime.innerText = `⏳ Через ${h}г ${m}хв`;
-            dailyBtn.disabled = true;
+            dailyBtn.classList.add('disabled'); const left = 24 * 60 * 60 * 1000 - (now - lastDaily);
+            const h = Math.floor(left / 3600000); const m = Math.floor((left % 3600000) / 60000);
+            dailyTime.innerText = `⏳ ${h}г ${m}хв`; dailyBtn.disabled = true;
         }
 
-        // Щогодинний бонус
-        const hourlyDiff = now - lastHourly;
         const hourlyBtn = document.getElementById('hourly-bonus-btn');
         const hourlyTime = document.getElementById('hourly-time');
-        if (hourlyDiff >= 60 * 60 * 1000) {
-            hourlyBtn.classList.remove('disabled');
-            hourlyTime.innerText = '⚡ ЗАБРАТИ';
-            hourlyBtn.disabled = false;
+        if (now - lastHourly >= 60 * 60 * 1000) {
+            hourlyBtn.classList.remove('disabled'); hourlyTime.innerText = '⚡ ЗАБРАТИ'; hourlyBtn.disabled = false;
         } else {
-            hourlyBtn.classList.add('disabled');
-            const left = 60 * 60 * 1000 - hourlyDiff;
-            const m = Math.floor(left / 60000);
-            const s = Math.floor((left % 60000) / 1000);
-            hourlyTime.innerText = `⏳ ${m}хв ${s}с`;
-            hourlyBtn.disabled = true;
+            hourlyBtn.classList.add('disabled'); const left = 60 * 60 * 1000 - (now - lastHourly);
+            const m = Math.floor(left / 60000); const s = Math.floor((left % 60000) / 1000);
+            hourlyTime.innerText = `⏳ ${m}хв ${s}с`; hourlyBtn.disabled = true;
         }
     }
-    
-    tick();
-    bonusTimersInterval = setInterval(tick, 1000);
+    tick(); bonusTimersInterval = setInterval(tick, 1000);
 }
 
 async function claimDailyBonus() {
-    const snap = await db.ref('users_by_name/' + currentUser + '/last_bonus').once('value');
-    const lastBonus = snap.val() || 0;
+    if(currentChips === undefined) return;
     const now = Date.now();
-    if (now - lastBonus >= 24 * 60 * 60 * 1000) {
-        await db.ref('users_by_name/' + currentUser).update({ chips: currentChips + 100, last_bonus: now });
-        toast('🎁 Ви отримали 100 фішок!', 'success');
-        createExplosion();
-    } else {
-        toast('Бонус поки недоступний.', 'error');
-    }
+    await db.ref('users_by_name/' + currentUser).update({ chips: currentChips + 100, last_bonus: now });
+    toast('🎁 Ви отримали 100 фішок!', 'success'); createExplosion();
 }
 
 async function claimHourlyBonus() {
-    const snap = await db.ref('users_by_name/' + currentUser + '/last_hourly_bonus').once('value');
-    const lastHourly = snap.val() || 0;
+    if(currentChips === undefined) return;
     const now = Date.now();
-    if (now - lastHourly >= 60 * 60 * 1000) {
-        await db.ref('users_by_name/' + currentUser).update({ chips: currentChips + 15, last_hourly_bonus: now });
-        toast('⚡ Ви отримали 15 фішок!', 'success');
-        createExplosion();
-    } else {
-        toast('Бонус поки недоступний.', 'error');
-    }
+    await db.ref('users_by_name/' + currentUser).update({ chips: currentChips + 15, last_hourly_bonus: now });
+    toast('⚡ Ви отримали 15 фішок!', 'success'); createExplosion();
 }
 
 const PROMO_CODES = { 'START': 100, 'KURAHIVKA': 250, 'VIP2026': 500, 'ELITE': 150 };
-
 async function activatePromo() {
     const inp = document.getElementById('promo-input');
     const code = inp.value.trim().toUpperCase();
     if (!code) return toast('Введіть промокод!', 'error');
-
-    if (!PROMO_CODES[code]) {
-        return toast('❌ Такого промокоду не існує!', 'error');
-    }
+    if (!PROMO_CODES[code]) return toast('❌ Такого промокоду не існує!', 'error');
 
     const ref = db.ref(`users_by_name/${currentUser}/used_promos/${code}`);
     const snap = await ref.once('value');
-    if (snap.exists()) {
-        return toast('⚠️ Ви вже використовували цей промокод!', 'error');
-    }
+    if (snap.exists()) return toast('⚠️ Ви вже використовували цей промокод!', 'error');
 
     const reward = PROMO_CODES[code];
     await db.ref(`users_by_name/${currentUser}`).update({ chips: currentChips + reward });
     await ref.set(Date.now());
-    
-    inp.value = '';
-    toast(`✅ Промокод активовано! +${reward} фішок`, 'success');
-    createExplosion();
+    inp.value = ''; toast(`✅ Промокод активовано! +${reward} фішок`, 'success'); createExplosion();
 }
 
-/* ══════════════════════════════════════════════════════════
-   ЗМІНА НІКНЕЙМУ (МОДАЛКА)
-══════════════════════════════════════════════════════════ */
-function openNickModal() {
-    document.getElementById('nick-modal').classList.add('open');
-    document.getElementById('new-nick-input').value = document.getElementById('profile-name-el').textContent;
-}
-
+function openNickModal() { document.getElementById('nick-modal').classList.add('open'); document.getElementById('new-nick-input').value = document.getElementById('profile-name-el').textContent; }
 function saveNewNick() {
     const newName = document.getElementById('new-nick-input').value;
-    if(newName !== null && newName.trim() !== '') {
+    if(newName && newName.trim() !== '') {
         let cleanName = newName.trim().substring(0, 15);
         db.ref('users_by_name/' + currentUser).update({ display_name: cleanName }).then(() => {
             toast('Нікнейм успішно змінено!', 'success');
-            document.getElementById('profile-name-el').textContent = cleanName;
-            document.getElementById('player-name').textContent = cleanName.toUpperCase();
             document.getElementById('nick-modal').classList.remove('open');
         });
     }
 }
 
 /* ══════════════════════════════════════════════════════════
-   ЗАВАНТАЖЕННЯ КАРТИНОК В БРАУЗЕРІ (ФІКС БАЗИ)
+   ЗАВАНТАЖЕННЯ МЕДІА (МИТТЄВИЙ ОНОВЛЕННЯ ПРОФІЛЮ)
 ══════════════════════════════════════════════════════════ */
-let imageUploadTarget = 'avatar'; 
-let compressedImageData = null;
-
+let imageUploadTarget = 'avatar'; let compressedImageData = null;
 function openImageModal(type){
-  imageUploadTarget = type;
-  document.getElementById('upload-modal').classList.add('open');
+  imageUploadTarget = type; document.getElementById('upload-modal').classList.add('open');
   document.getElementById('upload-title').textContent = type === 'avatar' ? 'Змінити аватарку' : 'Змінити фон профілю';
-  document.getElementById('upload-btn').disabled=true;
-  document.getElementById('upload-preview').style.display='none';
+  document.getElementById('upload-btn').disabled=true; document.getElementById('upload-preview').style.display='none';
+  const prev = document.getElementById('upload-preview');
+  if (type === 'banner') { prev.style.borderRadius = '16px'; prev.style.width = '240px'; prev.style.height = '80px'; }
+  else { prev.style.borderRadius = '50%'; prev.style.width = '120px'; prev.style.height = '120px'; }
   document.getElementById('upload-zone').style.display='block';
-  
-  if (type === 'banner') {
-      document.getElementById('upload-preview').style.borderRadius = '16px';
-      document.getElementById('upload-preview').style.width = '240px';
-      document.getElementById('upload-preview').style.height = '80px';
-  } else {
-      document.getElementById('upload-preview').style.borderRadius = '50%';
-      document.getElementById('upload-preview').style.width = '120px';
-      document.getElementById('upload-preview').style.height = '120px';
-  }
 }
 
 function onFileSelect(e){
-  const file=e.target.files[0];
-  if(!file)return;
-  
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
+  const file=e.target.files[0]; if(!file)return;
+  const reader = new FileReader(); reader.readAsDataURL(file);
   reader.onload = event => {
-    const img = new Image();
-    img.src = event.target.result;
+    const img = new Image(); img.src = event.target.result;
     img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = imageUploadTarget === 'banner' ? 600 : 150; // Стиснення щоб база не падала
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        
-        compressedImageData = canvas.toDataURL('image/jpeg', 0.5); // 50% якість
+        const MAX_WIDTH = imageUploadTarget === 'banner' ? 600 : 150;
+        const scaleSize = MAX_WIDTH / img.width; canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
+        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        compressedImageData = canvas.toDataURL('image/jpeg', 0.5);
         document.getElementById('preview-img').src = compressedImageData;
         document.getElementById('upload-preview').style.display='block';
         document.getElementById('upload-zone').style.display='none';
@@ -1205,9 +1084,7 @@ function onFileSelect(e){
 
 async function uploadImage(){
   if(!compressedImageData)return;
-  const btn=document.getElementById('upload-btn');
-  btn.disabled=true; btn.textContent='Збереження...';
-  
+  const btn=document.getElementById('upload-btn'); btn.disabled=true; btn.textContent='Збереження...';
   try{
     if (imageUploadTarget === 'avatar') {
         await db.ref('users_by_name/' + currentUser).update({ avatar_url: compressedImageData });
@@ -1220,61 +1097,46 @@ async function uploadImage(){
         toast('Фон профілю успішно оновлено!');
     }
     setTimeout(() => document.getElementById('upload-modal').classList.remove('open'), 500);
-  } catch(err){
-    toast('Помилка: Виберіть менший файл', 'error');
-  }
+  } catch(err){ toast('Помилка завантаження бази даних.', 'error'); }
   btn.textContent='ЗБЕРЕГТИ';
 }
 
-/* ══════════════════════════════════════════════════════════
-   ІНТЕРАКТИВНІ ПАСХАЛКИ & ВИБУХ
-══════════════════════════════════════════════════════════ */
 function createExplosion() {
     for(let i=0; i<15; i++) {
-        const chip = document.createElement('div');
-        chip.innerHTML = chipSvg;
-        chip.className = 'explode-chip';
-        chip.style.left = '50%'; chip.style.top = '50%';
-        
-        const angle = Math.random() * Math.PI * 2;
-        const dist = Math.random() * 200 + 50;
-        const tx = Math.cos(angle) * dist + 'px';
-        const ty = Math.sin(angle) * dist + 'px';
-        const rot = Math.random() * 360 + 'deg';
-        
-        chip.style.setProperty('--tx', tx);
-        chip.style.setProperty('--ty', ty);
-        chip.style.setProperty('--rot', rot);
-        
-        document.body.appendChild(chip);
-        setTimeout(() => chip.remove(), 1000);
+        const chip = document.createElement('div'); chip.innerHTML = chipSvg; chip.className = 'explode-chip'; chip.style.left = '50%'; chip.style.top = '50%';
+        const angle = Math.random() * Math.PI * 2; const dist = Math.random() * 200 + 50;
+        const tx = Math.cos(angle) * dist + 'px'; const ty = Math.sin(angle) * dist + 'px'; const rot = Math.random() * 360 + 'deg';
+        chip.style.setProperty('--tx', tx); chip.style.setProperty('--ty', ty); chip.style.setProperty('--rot', rot);
+        document.body.appendChild(chip); setTimeout(() => chip.remove(), 1000);
     }
 }
 
-let clickCount = 0;
 function createEasterEgg(e) {
-    clickCount++;
-    if(clickCount >= 5) {
-        toast("🎰 JACKPOT! Ви знайшли секретну анімацію!", "success");
-        document.body.style.animation = "spin 1s ease-in-out";
-        createExplosion();
-        setTimeout(() => document.body.style.animation = "", 1000);
-        clickCount = 0;
-    }
+    document.body.style.animation = "spin 0.5s ease-in-out"; createExplosion();
+    setTimeout(() => document.body.style.animation = "", 500);
 }
 
-(function(){
-  let mx = -1000, my = -1000;
-  window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-  setInterval(() => {
-     if(window.particles) {
-         window.particles.forEach(p => {
-             const dx = p.x - mx; const dy = p.y - my; const dist = Math.sqrt(dx*dx + dy*dy);
-             if(dist < 100) { p.x += dx * 0.05; p.y += dy * 0.05; }
-         });
-     }
-  }, 16);
-})();
+const GAMES=[
+  {id:'roulette1',name:'Roulette Classic',image:'https://images.unsplash.com/photo-1606167668584-78701c57f13d?auto=format&fit=crop&q=80&w=600',tag:'Настільна',desc:'Класична рулетка з прямою трансляцією. Ставки на числа, кольори, сектори.',maxwin:'35x',url:'games/roulette.html?table=1',accent:'#00ff9d',glow:'rgba(0,255,157,0.2)',cat:'table'},
+  {id:'roulette2',name:'Roulette Fast',image:'https://images.unsplash.com/photo-1571295669299-c8eb5c94bd75?auto=format&fit=crop&q=80&w=600',tag:'Настільна',desc:'Другий стіл рулетки зі швидкими раундами. Менше часу на роздуми.',maxwin:'35x',url:'games/roulette.html?table=2',accent:'#00ff9d',glow:'rgba(0,255,157,0.2)',cat:'table'},
+  {id:'roulette3',name:'Roulette VIP',image:'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80&w=600',tag:'VIP',desc:'VIP стіл з підвищеними лімітами ставок. Тільки для серйозних гравців.',maxwin:'35x',url:'games/roulette.html?table=3',accent:'#f9d976',glow:'rgba(249,217,118,0.2)',cat:'vip',ribbon:'VIP'},
+  {id:'slots',name:'Pixel Slots',image:'https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&q=80&w=600',tag:'Слот',desc:'Майнкрафт едішн — три барабани з пікселями. Три в ряд — джекпот!',maxwin:'50x',url:'games/mc_slot.html',accent:'#ff3366',glow:'rgba(255,51,102,0.2)',cat:'slots'},
+  {id:'bilmen',name:'Більше-Менше',image:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=600',tag:'Карткова',desc:'Вгадай — більше чи менше наступна карта. Просто, але адреналін зашкалює.',maxwin:'2x',url:'games/bilmen.html',accent:'#ff3366',glow:'rgba(255,51,102,0.2)',cat:'table'},
+  {id:'blackjack',name:'Blackjack 21',image:'https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&q=80&w=600',tag:'Карткова',desc:'Класичний блекджек. Набери 21 і не перебери. Чи зможеш перемогти дилера?',maxwin:'2x',url:'games/21ochko.html',accent:'#28a745',glow:'rgba(40,167,69,0.2)',cat:'table'},
+  {id:'plinko',name:'Plinko',image:'https://images.unsplash.com/photo-1553481187-be93c21490a9?auto=format&fit=crop&q=80&w=600',tag:'Аркада',desc:'Киньте кульку і спостерігайте як вона падає. Множники до 850x!',maxwin:'850x',url:'games/plinko.html',accent:'#a855f7',glow:'rgba(168,85,247,0.2)',cat:'arcade'},
+  {id:'kubik',name:'Dice (Кубик)',image:'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=600',tag:'Аркада',desc:'Прокрути кубик і роби ставки на результат. Класична азартна гра.',maxwin:'6x',url:'games/kubik.html',accent:'#4f8eff',glow:'rgba(79,142,255,0.2)',cat:'arcade'},
+  {id:'penalty',name:'Penalty Shoot',image:'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&q=80&w=600',tag:'Спорт',desc:'Б`є 11-метровий! Вибери кут і сподівайся що воротар не встигне.',maxwin:'30x',url:'games/penalty.html',accent:'#28a745',glow:'rgba(40,167,69,0.2)',cat:'arcade'},
+  {id:'aviator',name:'Aviator Crash',image:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=600',tag:'Краш',desc:'Літак злітає — множник росте. Встигни вивести ставку до падіння!',maxwin:'100x',url:'games/aviator.html',accent:'#e5053a',glow:'rgba(229,5,58,0.3)',cat:'arcade'},
+];
+const GAME_META={ roulette:{icon:'🎡',bg:'rgba(0,255,157,0.12)',label:'Рулетка'}, mc_slot:{icon:'🎮',bg:'rgba(255,51,102,0.12)',label:'Слот'}, bilmen:{icon:'🃏',bg:'rgba(255,51,102,0.12)',label:'Більше/Менше'}, '21ochko':{icon:'🃏',bg:'rgba(34,197,94,0.12)',label:'Blackjack'}, plinko:{icon:'🔵',bg:'rgba(168,85,247,0.12)',label:'Plinko'}, kubik:{icon:'🎲',bg:'rgba(79,142,255,0.12)',label:'Dice'}, penalty:{icon:'⚽',bg:'rgba(34,197,94,0.12)',label:'Penalty'}, aviator:{icon:'✈️',bg:'rgba(229,5,58,0.12)',label:'Aviator'} };
+function gameMeta(key){ for(let k in GAME_META) if(key.toLowerCase().includes(k)) return GAME_META[k]; return {icon:'🎰',bg:'rgba(255,255,255,0.06)',label:key}; }
+
+document.addEventListener('click', (e) => {
+    if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.game-card') || e.target.closest('.modal')) return;
+    const ripple = document.createElement('div'); ripple.className = 'click-ripple';
+    ripple.style.left = e.clientX + 'px'; ripple.style.top = e.clientY + 'px';
+    document.body.appendChild(ripple); setTimeout(() => ripple.remove(), 600);
+});
 </script>
 </body>
 </html>

@@ -737,6 +737,7 @@ function land(idx, ballRisk, ballRows) {
     const chips = snap.val() ? (snap.val().chips || 0) : 0;
     userRef.update({ chips: chips + win });
   });
+  saveGameResult("Plinko", betAmount, win - betAmount);
   flashBucket(idx);
   addRecentWin(win, betAmount);
   playSound(win >= betAmount ? 'win' : 'lose');

@@ -795,6 +795,7 @@
                 resultType = 'win';
                 resultMessage = `🎉 ВИГРАШ! ${betName} - ${currentCard.name} → ${nextCard.name}! ВИ ВИГРАЛИ ${winAmount} 🪙`;
                 await updateBalance(winAmount);
+                await saveGameResult("Більше-Менше", currentBet, winAmount - currentBet);
                 addToHistory(`🎴 +${winAmount} 🪙 (${betName}, ${currentCard.name}→${nextCard.name})`, 
                             winAmount >= currentBet * 8 ? 'big-win' : 'win');
                 if (winAmount >= currentBet * 8) {
@@ -817,6 +818,7 @@
                 resultMessage = `😔 ВИПАЛО ${nextCard.name} (${nextVal} ≥ ${currentVal}). ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 addToHistory(`🎴 -${currentBet} 🪙 (МЕНШЕ, ${currentCard.name}→${nextCard.name})`, 'lose');
                 playLoseSound();
+                await saveGameResult("Більше-Менше", currentBet, -currentBet);
             }
             
             showResult(resultMessage, resultType);

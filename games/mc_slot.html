@@ -1073,6 +1073,7 @@
                     addToHistory(`🏆 +${winAmount} 🪙`, winAmount >= currentBet * 30 ? 'big-win' : 'win');
                     setStatus(`🏆 ВИГРАШ: ${winAmount}`);
                     if (!isBonusGame) await userRef.update({ chips: currentBalance + winAmount });
+                    await saveGameResult("Pixel Slots", currentBet, winAmount - currentBet);
                 } else if (scatters >= 3) {
                     playSound('bonus');
                     addToHistory(`✨ АКТИВАЦІЯ БОНУСУ! ✨`, 'bonus');
@@ -1122,6 +1123,7 @@
                             betInput.disabled = false;
                         }
                     } else {
+                        await saveGameResult("Pixel Slots", currentBet, -currentBet);
                         document.getElementById('spin-btn').disabled = false;
                         document.getElementById('buy-bonus-btn').disabled = false;
                         document.getElementById('bet-minus').disabled = isBonusGame;

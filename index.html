@@ -7,14 +7,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700;800&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════════════════
    ROOT & RESET
 ══════════════════════════════════════════════════════════ */
 :root {
   --neon-green: #00ff9d;
-  --neon-green-dim: rgba(0,255,157,0.12);
   --neon-red: #ff3366;
   --gold: #f9d976;
   --gold-dark: #d4af37;
@@ -25,11 +24,10 @@
   --bg2: #0d0d12;
   --panel: rgba(16,16,22,0.9);
   --glass: rgba(22,22,32,0.7);
-  --border: rgba(255,255,255,0.06);
-  --border-bright: rgba(255,255,255,0.12);
+  --border: rgba(255,255,255,0.08);
+  --border-bright: rgba(255,255,255,0.15);
   --text: #ffffff;
   --text-muted: #8b92a5;
-  --radius: 16px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -68,14 +66,14 @@ body{
 .page.active { display: block; animation: pageEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
 .chip-icon {
-  width: 1.1em; height: 1.1em; vertical-align: middle; margin-top: -2px; fill: var(--gold);
+  width: 1.2em; height: 1.2em; vertical-align: middle; margin-top: -3px; fill: var(--gold);
   filter: drop-shadow(0 0 5px rgba(249,217,118,0.4));
 }
 
 /* ══════════════════════════════════════════════════════════
    PARTICLE CANVAS
 ══════════════════════════════════════════════════════════ */
-#particle-canvas{ position:fixed;top:0;left:0;width:100%;height:100%; pointer-events:none;z-index:0;opacity:0.4; }
+#particle-canvas{ position:fixed;top:0;left:0;width:100%;height:100%; pointer-events:none;z-index:0;opacity:0.5; }
 ::-webkit-scrollbar{width:6px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:rgba(249,217,118,0.3);border-radius:3px;}
@@ -131,7 +129,7 @@ body{
   padding:0 48px;height:80px; background:rgba(7,7,10,0.85); backdrop-filter:blur(30px);
   border-bottom:1px solid var(--border); position:sticky;top:0;z-index:100;
 }
-.header-logo{ font-family:'Orbitron',monospace; font-size:16px;font-weight:900;letter-spacing:5px; line-height:1.2;}
+.header-logo{ font-family:'Orbitron',monospace; font-size:16px;font-weight:900;letter-spacing:5px; line-height:1.2; cursor: pointer;}
 .header-logo span{ color:var(--text-muted); font-size:11px;letter-spacing:6px;display:block;font-weight:400; text-transform:uppercase;}
 
 .header-nav{display:flex;gap:8px;align-items:center;}
@@ -157,17 +155,6 @@ body{
 }
 .avatar-btn img{width:100%;height:100%;object-fit:cover;}
 .avatar-btn:hover{border-color:var(--gold);box-shadow:0 0 20px rgba(249,217,118,0.3); transform:scale(1.05);}
-
-/* Кнопка виходу (Замість "Вихід") */
-.logout-btn{
-  background:transparent; color:var(--text-muted); border:1px solid var(--border);
-  padding:10px 18px; border-radius:12px; font-size:13px; font-weight:600;
-  display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.logout-btn:hover{
-  background:rgba(255,51,102,0.1); color:var(--neon-red); border-color:rgba(255,51,102,0.4);
-  box-shadow:0 0 15px rgba(255,51,102,0.2); transform:translateY(-2px);
-}
 
 /* ══════════════════════════════════════════════════════════
    GAMES PAGE (CARDS WITH REAL IMAGES)
@@ -262,21 +249,8 @@ body{
 .game-card:hover .card-play-btn{ background:var(--accent-color); color:#000; box-shadow:0 0 20px var(--accent-glow); border-color:var(--accent-color); }
 
 /* ══════════════════════════════════════════════════════════
-   PROFILE BADGES & STATS
+   LEADERBOARD PAGE
 ══════════════════════════════════════════════════════════ */
-.profile-badge-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center; margin-top: 10px;}
-.p-badge{
-  padding:6px 16px;border-radius:30px;font-size:12px;font-weight:800; letter-spacing:1px;border:1px solid; text-transform:uppercase;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-}
-.p-badge.newcomer{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.2);color:#ccc;}
-.p-badge.experienced{background:rgba(0,255,157,0.1);border-color:rgba(0,255,157,0.4);color:var(--neon-green); box-shadow:0 0 15px rgba(0,255,157,0.2);}
-.p-badge.veteran{background:rgba(79,142,255,0.1);border-color:rgba(79,142,255,0.4);color:var(--blue-accent); box-shadow:0 0 15px rgba(79,142,255,0.2);}
-.p-badge.vip{background:rgba(249,217,118,0.1);border-color:rgba(249,217,118,0.4);color:var(--gold); box-shadow:0 0 15px rgba(249,217,118,0.2);}
-.p-badge.highroller{background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.4);color:var(--purple-accent); box-shadow:0 0 15px rgba(168,85,247,0.2);}
-.p-badge.whale{background:rgba(255,51,102,0.15);border-color:rgba(255,51,102,0.6);color:var(--neon-red); box-shadow:0 0 25px rgba(255,51,102,0.3);}
-
-/* Решта коду CSS (Таблиці, профілі, модалки) без змін, просто вставляємо */
 .leaderboard-table{ background:var(--panel);border:1px solid var(--border); border-radius:24px;overflow:hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
 .lb-header{ display:grid;grid-template-columns:80px 1fr 180px 160px; padding:18px 32px; background:rgba(0,0,0,0.5); font-size:11px;font-weight:800;letter-spacing:2px; color:var(--text-muted);text-transform:uppercase; border-bottom:1px solid var(--border); }
 .lb-row{ display:grid;grid-template-columns:80px 1fr 180px 160px; padding:20px 32px; border-bottom:1px solid var(--border); align-items:center;transition:background 0.2s; animation:slideIn 0.4s ease both; }
@@ -294,6 +268,9 @@ body{
 .lb-chips{ font-family:'Rajdhani',sans-serif; font-size:22px;font-weight:800;color:var(--gold); letter-spacing:1px; }
 .lb-games{color:var(--text-muted);font-size:14px; font-weight: 600;}
 
+/* ══════════════════════════════════════════════════════════
+   PROFILE PAGE & BADGES
+══════════════════════════════════════════════════════════ */
 .profile-layout{display:grid;grid-template-columns:360px 1fr;gap:32px;}
 .profile-card{ background:var(--panel);border:1px solid var(--border); border-radius:28px;padding:40px 32px;text-align:center; position:relative;overflow:hidden;height:fit-content; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
 .profile-card::before{ content:'';position:absolute;top:0;left:0;right:0;height:100px; background:linear-gradient(135deg,rgba(249,217,118,0.1),rgba(0,0,0,0)); }
@@ -306,9 +283,19 @@ body{
 #avatar-upload-input{display:none;}
 
 .profile-name{ font-family:'Rajdhani',sans-serif; font-size:36px;font-weight:800;margin-bottom:4px; }
-.profile-since{color:var(--text-muted);font-size:13px;letter-spacing:2px;margin-bottom:32px; font-weight:700;}
+.profile-since{color:var(--text-muted);font-size:13px;letter-spacing:2px;margin-bottom:20px; font-weight:700;}
 
-.profile-stats{ display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px; }
+/* Нова система бейджів */
+.profile-badge-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center; margin-bottom: 24px;}
+.p-badge{ padding:6px 16px;border-radius:30px;font-size:12px;font-weight:800; letter-spacing:1px;border:1px solid; text-transform:uppercase; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+.p-badge.newcomer{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.2);color:#ccc;}
+.p-badge.experienced{background:rgba(0,255,157,0.1);border-color:rgba(0,255,157,0.4);color:var(--neon-green); box-shadow:0 0 15px rgba(0,255,157,0.2);}
+.p-badge.veteran{background:rgba(79,142,255,0.1);border-color:rgba(79,142,255,0.4);color:var(--blue-accent); box-shadow:0 0 15px rgba(79,142,255,0.2);}
+.p-badge.vip{background:rgba(249,217,118,0.1);border-color:rgba(249,217,118,0.4);color:var(--gold); box-shadow:0 0 15px rgba(249,217,118,0.2);}
+.p-badge.highroller{background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.4);color:var(--purple-accent); box-shadow:0 0 15px rgba(168,85,247,0.2);}
+.p-badge.whale{background:rgba(255,51,102,0.15);border-color:rgba(255,51,102,0.6);color:var(--neon-red); box-shadow:0 0 25px rgba(255,51,102,0.3);}
+
+.profile-stats{ display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px; }
 .pstat{ background:rgba(0,0,0,0.4);border:1px solid var(--border); border-radius:16px;padding:20px 12px; transition: transform 0.3s; cursor: default;}
 .pstat:hover { transform: translateY(-5px); background:rgba(255,255,255,0.03); }
 .pstat-val{ font-family:'Orbitron',monospace; font-size:22px;font-weight:800; margin-bottom:6px; }
@@ -361,8 +348,20 @@ body{
 .ticker-item .loss-tag{color:var(--neon-red);font-weight:800; background:rgba(255,51,102,0.1); padding: 4px 10px; border-radius: 20px;}
 
 /* ══════════════════════════════════════════════════════════
-   AVATAR MODAL & TOASTS & BLOCKED 
+   AVATAR MODAL, TOASTS & BLOCKED OVERLAY
 ══════════════════════════════════════════════════════════ */
+#out-of-casino-overlay{
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(7,7,10,0.95);z-index:999999; pointer-events:all;
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;backdrop-filter:blur(20px);
+}
+#out-of-casino-overlay h1{
+  font-family:'Orbitron',monospace; color:var(--neon-red);font-size:56px;
+  text-shadow:0 0 50px var(--neon-red),0 0 100px rgba(255,51,102,0.4); animation:flickerRed 2s ease-in-out infinite;
+}
+@keyframes flickerRed{ 0%,100%{opacity:1;}50%{opacity:0.7;} }
+
 .modal-overlay{ display:none;position:fixed;inset:0; background:rgba(0,0,0,0.85);backdrop-filter:blur(15px); z-index:500;align-items:center;justify-content:center; }
 .modal-overlay.open{display:flex;animation:fadeIn 0.3s ease;}
 .modal{ background:var(--panel);border:1px solid var(--border-bright); border-radius:28px;padding:48px;width:480px; position:relative;animation:slideUp 0.4s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 40px 100px rgba(0,0,0,0.8); text-align:center;}
@@ -397,12 +396,11 @@ body{
 .empty-state-icon{font-size:56px;margin-bottom:20px; opacity:0.5;}
 .empty-state p{font-size:15px; font-weight:500;}
 
-#out-of-casino-overlay h1{
-  font-family:'Orbitron',monospace; color:var(--neon-red);font-size:56px;
-  text-shadow:0 0 50px var(--neon-red),0 0 100px rgba(255,51,102,0.4); animation:flickerRed 2s ease-in-out infinite;
+/* Анімація "відлітаючих" фішок при кліку */
+@keyframes floatUp {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  100% { transform: translate(-50%, -150px) scale(1.5) rotate(180deg); opacity: 0; }
 }
-@keyframes flickerRed{ 0%,100%{opacity:1;}50%{opacity:0.7;} }
-</script>
 </style>
 </head>
 <body>
@@ -414,17 +412,18 @@ body{
   <h1>🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
   <p style="color:#e2e8f0;font-size:24px;margin-top:24px; font-weight:600;">Ви покинули територію казино.</p>
   <p style="color:var(--text-muted);font-size:16px;margin-top:12px;">Поверніться до будівлі в Minecraft, щоб продовжити гру.</p>
+  <button onclick="checkLocationStatus()" style="margin-top:24px; padding:12px 24px; border-radius:12px; background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); cursor:pointer;">🔄 ПЕРЕВІРИТИ СТАТУС</button>
 </div>
 
 <div class="modal-overlay" id="avatar-modal">
   <div class="modal">
     <div class="modal-close" onclick="closeAvatarModal()">✕</div>
-    <div class="modal-title">Змінити аватарку</div>
+    <div class="modal-title shimmer-text">Змінити аватарку</div>
     <div class="modal-sub">Завантажте фото — воно буде видно всім гравцям</div>
     <div class="upload-preview" id="upload-preview"><img id="preview-img" src="" alt=""></div>
     <div class="upload-zone" id="upload-zone" onclick="document.getElementById('avatar-upload-input').click()">
       <div class="upload-zone-icon">🖼️</div>
-      <div class="upload-zone-text"><strong>Натисніть</strong> або перетягніть фото сюди<br>JPG, PNG, WEBP · до 32МБ</div>
+      <div class="upload-zone-text"><strong>Натисніть</strong> або перетягніть фото сюди<br>Стискається автоматично</div>
     </div>
     <input type="file" id="avatar-upload-input" accept="image/*" onchange="onAvatarFileSelect(event)">
     <button class="modal-btn" id="upload-btn" onclick="uploadAvatar()" disabled>ЗАВАНТАЖИТИ</button>
@@ -454,7 +453,7 @@ body{
 <div id="lobby-section">
 
   <div class="header">
-    <div class="header-logo shimmer-text">
+    <div class="header-logo shimmer-text" onclick="createEasterEgg(event)">
       KURAHIVKA
       <span>Casino Elite</span>
     </div>
@@ -464,8 +463,8 @@ body{
       <button class="nav-tab" onclick="showPage('profile',this)" id="tab-profile">👤 Профіль</button>
     </div>
     <div class="header-right">
-      <div class="balance-badge" id="chips-balance-container">
-        <span id="chips-balance">0</span>
+      <div class="balance-badge">
+        <span id="chips-balance">0</span> <span class="chip-holder"></span>
       </div>
       <div class="avatar-btn" onclick="openAvatarModal()" title="Змінити аватарку" id="header-avatar">
         <span id="header-avatar-emoji" style="font-size:20px;">👤</span>
@@ -550,13 +549,12 @@ body{
             <div class="profile-name" id="profile-name-el">—</div>
             <div class="profile-since" id="profile-since">РЕЗИДЕНТ КАЗИНО</div>
             
-            <div class="profile-badge-row" id="profile-badges" style="margin-bottom: 24px;">
-              <span class="p-badge newcomer">🎲 Новачок</span>
-            </div>
+            <div class="profile-badge-row" id="profile-badges">
+              </div>
 
             <div class="profile-stats" id="profile-stats">
               <div class="pstat gold">
-                <div class="pstat-val" id="ps-balance-container"><span id="ps-balance">0</span></div>
+                <div class="pstat-val"><span id="ps-balance">0</span></div>
                 <div class="pstat-lbl">Фішки</div>
               </div>
               <div class="pstat blue">
@@ -574,12 +572,12 @@ body{
             </div>
             
             <div style="margin-top: 16px;">
-              <button onclick="logout()" style="width:100%; padding:14px; background:rgba(255,51,102,0.1); border:1px solid rgba(255,51,102,0.4); color:var(--neon-red); border-radius:14px; font-weight:800; cursor:pointer; transition:all 0.3s cubic-bezier(0.16,1,0.3,1); font-family:'Rajdhani',sans-serif; font-size:16px; letter-spacing:2px; text-transform:uppercase; box-shadow: 0 5px 15px rgba(255,51,102,0.05);">🚪 Вийти з акаунту</button>
+              <button onclick="logout()" style="width:100%; padding:14px; background:rgba(255,51,102,0.1); border:1px solid rgba(255,51,102,0.4); color:var(--neon-red); border-radius:14px; font-weight:800; cursor:pointer; transition:all 0.3s; font-family:'Rajdhani',sans-serif; font-size:16px; letter-spacing:2px; text-transform:uppercase; box-shadow: 0 5px 15px rgba(255,51,102,0.05);">🚪 Вийти з акаунту</button>
             </div>
           </div>
 
           <div class="profile-chart-section">
-            <div class="chart-title">Динаміка балансу</div>
+            <div class="chart-title shimmer-text">Динаміка балансу</div>
             <div id="profit-chart">
               <svg class="chart-svg" id="chart-svg" viewBox="0 0 500 140" preserveAspectRatio="none">
                 <defs>
@@ -589,8 +587,7 @@ body{
                   </linearGradient>
                 </defs>
                 <path id="chart-area" fill="url(#chartGrad)" d=""/>
-                <path id="chart-line" fill="none" stroke="var(--gold)" stroke-width="3"
-                      stroke-linecap="round" stroke-linejoin="round" d=""/>
+                <path id="chart-line" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d=""/>
               </svg>
             </div>
           </div>
@@ -598,7 +595,7 @@ body{
 
         <div class="history-panel">
           <div class="history-header">
-            <div class="history-title">Історія ігор</div>
+            <div class="history-title shimmer-text">Історія ігор</div>
             <div class="history-filter">
               <button class="hf-btn active" onclick="filterHistory('all',this)">Всі ігри</button>
               <button class="hf-btn" onclick="filterHistory('win',this)">Тільки Перемоги</button>
@@ -624,11 +621,25 @@ body{
 
 <script>
 /* ══════════════════════════════════════════════════════════
+   НАЛАШТУВАННЯ ІГОР (ЗМІНЮЙТЕ ФОТО ТУТ)
+══════════════════════════════════════════════════════════ */
+const GAMES=[
+  {id:'roulette1',name:'Рулетка Стіл #1',image:'https://images.unsplash.com/photo-1606167668584-78701c57f13d?auto=format&fit=crop&q=80&w=600',tag:'Настільна',desc:'Класична рулетка з прямою трансляцією. Ставки на числа, кольори, сектори.',maxwin:'35x',url:'games/roulette.html?table=1',accent:'#00ff9d',glow:'rgba(0,255,157,0.2)',cat:'table'},
+  {id:'roulette2',name:'Рулетка Стіл #2',image:'https://images.unsplash.com/photo-1606167668584-78701c57f13d?auto=format&fit=crop&q=80&w=600',tag:'Настільна',desc:'Другий стіл рулетки. Менше гравців — більше шансів на виграш.',maxwin:'35x',url:'games/roulette.html?table=2',accent:'#00ff9d',glow:'rgba(0,255,157,0.2)',cat:'table'},
+  {id:'roulette3',name:'Рулетка VIP',image:'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80&w=600',tag:'VIP',desc:'VIP стіл з підвищеними лімітами ставок. Тільки для серйозних гравців.',maxwin:'35x',url:'games/roulette.html?table=3',accent:'#f9d976',glow:'rgba(249,217,118,0.2)',cat:'vip',ribbon:'VIP'},
+  {id:'slots',name:'Піксельний Слот',image:'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80&w=600',tag:'Слот',desc:'Майнкрафт едішн — три барабани з пікселями. Три в ряд — джекпот!',maxwin:'50x',url:'games/mc_slot.html',accent:'#ff3366',glow:'rgba(255,51,102,0.2)',cat:'slots'},
+  {id:'bilmen',name:'Більше/Менше',image:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=600',tag:'Настільна',desc:'Вгадай — більше чи менше наступне число. Просто, але адреналін зашкалює.',maxwin:'2x',url:'games/bilmen.html',accent:'#ff3366',glow:'rgba(255,51,102,0.2)',cat:'table'},
+  {id:'blackjack',name:'Blackjack 21',image:'https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&q=80&w=600',tag:'Карткова',desc:'Класичний блекджек. Набери 21 і не перебери. Чи зможеш перемогти дилера?',maxwin:'2x',url:'games/21ochko.html',accent:'#28a745',glow:'rgba(40,167,69,0.2)',cat:'table'},
+  {id:'plinko',name:'Plinko',image:'https://images.unsplash.com/photo-1553481187-be93c21490a9?auto=format&fit=crop&q=80&w=600',tag:'Аркада',desc:'Киньте кульку і спостерігайте як вона падає. Множники до 850x!',maxwin:'850x',url:'games/plinko.html',accent:'#a855f7',glow:'rgba(168,85,247,0.2)',cat:'arcade'},
+  {id:'kubik',name:'Dice (Кубик)',image:'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=600',tag:'Аркада',desc:'Прокрути кубик і роби ставки на результат. Класична азартна гра.',maxwin:'6x',url:'games/kubik.html',accent:'#4f8eff',glow:'rgba(79,142,255,0.2)',cat:'arcade'},
+  {id:'penalty',name:'Penalty Shoot',image:'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&q=80&w=600',tag:'Спорт',desc:'Б`є 11-метровий! Вибери кут і сподівайся що воротар не встигне.',maxwin:'30x',url:'games/penalty.html',accent:'#28a745',glow:'rgba(40,167,69,0.2)',cat:'arcade'},
+  {id:'aviator',name:'Aviator',image:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=600',tag:'Краш',desc:'Літак злітає — множник росте. Встигни вивести ставку до падіння!',maxwin:'999x',url:'games/aviator.html',accent:'#e5053a',glow:'rgba(229,5,58,0.3)',cat:'arcade'},
+];
+
+/* ══════════════════════════════════════════════════════════
    ІКОНКА ФІШКИ (SVG)
 ══════════════════════════════════════════════════════════ */
 const chipSvg = `<svg class="chip-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 0c141.4 0 256 114.6 256 256s-114.6 256-256 256S0 397.4 0 256 114.6 0 256 0zM256 464c114.9 0 208-93.1 208-208S370.9 48 256 48 48 141.1 48 256s93.1 208 208 208zm0-352c88.4 0 160 71.6 160 160s-71.6 160-160 160-160-71.6-160-160 71.6-160 160-160zm0 272c61.9 0 112-50.1 112-112s-50.1-112-112-112-112 50.1-112 112 50.1 112 112 112zm0-176c35.3 0 64 28.7 64 64s-28.7 64-64 64-64-28.7-64-64 28.7-64 64-64z"/></svg>`;
-
-// Вставляємо іконку у опис мінімальної ставки
 document.getElementById('min-bet-desc').innerHTML = `Ставки приймаються у фішках казино • Мінімум 10 ${chipSvg}`;
 
 /* ══════════════════════════════════════════════════════════
@@ -648,9 +659,6 @@ let userRef = null;
 let currentChips = 0;
 let allHistory = [];
 let historyFilter = 'all';
-let currentPage = 'games';
-let selectedAvatarFile = null;
-const IMGBB_API_KEY = '7ef81dfc56bab94048936358f8fb9097'; 
 
 function toast(msg,type='success'){
   const tc=document.getElementById('toast-container');
@@ -666,6 +674,20 @@ window.onload=()=>{
   buildGameGrid();
   initGlobalData(); 
 };
+
+// ПЕРЕВІРКА СТАТУСУ З КНОПКИ
+function checkLocationStatus() {
+    if(!currentUser) return;
+    db.ref('users_by_name/' + currentUser).once('value').then(snap => {
+        const data = snap.val();
+        if(data && data.in_casino === true) {
+            document.getElementById('out-of-casino-overlay').style.display='none';
+            toast("Ви в казино. Доступ відновлено!", "success");
+        } else {
+            toast("Ви все ще не в казино за даними сервера.", "error");
+        }
+    });
+}
 
 async function login(){
   const userInp = document.getElementById('username-input');
@@ -701,35 +723,36 @@ async function login(){
 }
 
 function initGlobalData() {
-    db.ref('users_by_name').on('value', snap => {
-        const rows = [];
-        let globalHistory = [];
+    // Лімітуємо виклик, щоб не вантажити базу безкінечно (Беремо топ 100 гравців)
+    db.ref('users_by_name').orderByChild('chips').limitToLast(100).on('value', snap => {
+        try {
+            const rows = [];
+            let globalHistory = [];
 
-        snap.forEach(child => {
-            const d = child.val();
-            const uname = child.key;
-            
-            rows.push({
-                name: uname, 
-                chips: d.chips || 0, 
-                games: d.total_games || (d.game_history ? Object.keys(d.game_history).length : 0), 
-                avatar: d.avatar_url || null
+            snap.forEach(child => {
+                const d = child.val();
+                if(d.chips !== undefined) {
+                    const uname = child.key;
+                    rows.push({ name: uname, chips: parseInt(d.chips)||0, games: d.total_games || (d.game_history ? Object.keys(d.game_history).length : 0), avatar: d.avatar_url || null });
+                    
+                    if (d.game_history) {
+                        Object.values(d.game_history).forEach(h => {
+                            globalHistory.push({ player: uname, game: h.game || h.type || 'Ігри', profit: h.profit !== undefined ? h.profit : ((h.result || 0) - (h.bet || 0)), ts: h.ts || 0 });
+                        });
+                    }
+                }
             });
-            
-            if (d.game_history) {
-                Object.values(d.game_history).forEach(h => {
-                    globalHistory.push({ player: uname, game: h.game || h.type || 'Ігри', profit: h.profit !== undefined ? h.profit : ((h.result || 0) - (h.bet || 0)), ts: h.ts || 0 });
-                });
-            }
-        });
 
-        rows.sort((a,b) => b.chips - a.chips);
-        renderLeaderboard(rows.slice(0, 50));
+            rows.sort((a,b) => b.chips - a.chips);
+            renderLeaderboard(rows);
 
-        globalHistory.sort((a,b) => b.ts - a.ts);
-        const recent = globalHistory.slice(0, 20);
-        if(recent.length > 0) buildRealTicker(recent);
-        else document.getElementById('ticker-inner').innerHTML = `<div class="ticker-item">Чекаємо на перші ставки на сервері...</div>`;
+            globalHistory.sort((a,b) => b.ts - a.ts);
+            const recent = globalHistory.slice(0, 20);
+            if(recent.length > 0) buildRealTicker(recent);
+            else document.getElementById('ticker-inner').innerHTML = `<div class="ticker-item" style="font-size:14px; font-weight:700;">🎲 ПОКИ ЩО СТАВОК НЕМАЄ... БУДЬ ПЕРШИМ, ХТО ЗІРВЕ КУШ! 🎲</div><div class="ticker-item" style="font-size:14px; font-weight:700;">🎲 ПОКИ ЩО СТАВОК НЕМАЄ... БУДЬ ПЕРШИМ, ХТО ЗІРВЕ КУШ! 🎲</div>`;
+        } catch(err) {
+            console.error(err);
+        }
     });
 }
 
@@ -747,11 +770,11 @@ function openLobby(username){
     if(data.in_casino===false) document.getElementById('out-of-casino-overlay').style.display='flex';
     else document.getElementById('out-of-casino-overlay').style.display='none';
     
-    currentChips=data.chips||0;
+    currentChips=parseInt(data.chips)||0;
     
-    // Відображаємо баланс із SVG іконкою
-    document.getElementById('chips-balance-container').innerHTML = currentChips.toLocaleString() + ' ' + chipSvg;
-    document.getElementById('ps-balance-container').innerHTML = currentChips.toLocaleString() + ' ' + chipSvg;
+    document.getElementById('chips-balance').innerText = currentChips.toLocaleString();
+    document.getElementById('ps-balance').innerText = currentChips.toLocaleString();
+    document.querySelectorAll('.chip-holder').forEach(el => el.innerHTML = chipSvg);
 
     if(data.avatar_url) setAvatarEverywhere(data.avatar_url);
 
@@ -768,12 +791,10 @@ function logout(){ localStorage.removeItem('casino_user'); location.reload(); }
 function navigate(url){ window.location.href=url; }
 
 function showPage(page,tab){
-  currentPage=page;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   
   const pageEl = document.getElementById('page-'+page);
-  // Перезапуск анімації
   pageEl.style.animation = 'none';
   pageEl.offsetHeight; 
   pageEl.style.animation = null;
@@ -781,22 +802,6 @@ function showPage(page,tab){
   pageEl.classList.add('active');
   if(tab)tab.classList.add('active');
 }
-
-/* ══════════════════════════════════════════════════════════
-   GAMES DATA З РЕАЛЬНИМИ ФОТО
-══════════════════════════════════════════════════════════ */
-const GAMES=[
-  {id:'roulette1',name:'Рулетка Стіл #1',image:'https://images.unsplash.com/photo-1606167668584-78701c57f13d?auto=format&fit=crop&q=80&w=600',tag:'Настільна',desc:'Класична рулетка з прямою трансляцією. Ставки на числа, кольори, сектори.',maxwin:'35x',url:'games/roulette.html?table=1',accent:'#00ff9d',glow:'rgba(0,255,157,0.2)',cat:'table'},
-  {id:'roulette2',name:'Рулетка Стіл #2',image:'https://images.unsplash.com/photo-1606167668584-78701c57f13d?auto=format&fit=crop&q=80&w=600',tag:'Настільна',desc:'Другий стіл рулетки. Менше гравців — більше шансів на виграш.',maxwin:'35x',url:'games/roulette.html?table=2',accent:'#00ff9d',glow:'rgba(0,255,157,0.2)',cat:'table'},
-  {id:'roulette3',name:'Рулетка VIP',image:'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80&w=600',tag:'VIP',desc:'VIP стіл з підвищеними лімітами ставок. Тільки для серйозних гравців.',maxwin:'35x',url:'games/roulette.html?table=3',accent:'#f9d976',glow:'rgba(249,217,118,0.2)',cat:'vip',ribbon:'VIP'},
-  {id:'slots',name:'Піксельний Слот',image:'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80&w=600',tag:'Слот',desc:'Майнкрафт едішн — три барабани з пікселями. Три в ряд — джекпот!',maxwin:'50x',url:'games/mc_slot.html',accent:'#ff3366',glow:'rgba(255,51,102,0.2)',cat:'slots'},
-  {id:'bilmen',name:'Більше/Менше',image:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=600',tag:'Аркада',desc:'Вгадай — більше чи менше наступне число. Просто, але адреналін зашкалює.',maxwin:'2x',url:'games/bilmen.html',accent:'#ff3366',glow:'rgba(255,51,102,0.2)',cat:'arcade'},
-  {id:'blackjack',name:'Blackjack 21',image:'https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&q=80&w=600',tag:'Карткова',desc:'Класичний блекджек. Набери 21 і не перебери. Чи зможеш перемогти дилера?',maxwin:'2x',url:'games/21ochko.html',accent:'#28a745',glow:'rgba(40,167,69,0.2)',cat:'table'},
-  {id:'plinko',name:'Plinko',image:'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600',tag:'Аркада',desc:'Киньте кульку і спостерігайте як вона падає. Множники до 850x!',maxwin:'850x',url:'games/plinko.html',accent:'#a855f7',glow:'rgba(168,85,247,0.2)',cat:'arcade'},
-  {id:'kubik',name:'Dice (Кубик)',image:'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=600',tag:'Аркада',desc:'Прокрути кубик і роби ставки на результат. Класична азартна гра.',maxwin:'6x',url:'games/kubik.html',accent:'#4f8eff',glow:'rgba(79,142,255,0.2)',cat:'arcade'},
-  {id:'penalty',name:'Penalty Shoot',image:'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&q=80&w=600',tag:'Спорт',desc:'Б`є 11-метровий! Вибери кут і сподівайся що воротар не встигне.',maxwin:'30x',url:'games/penalty.html',accent:'#28a745',glow:'rgba(40,167,69,0.2)',cat:'arcade'},
-  {id:'aviator',name:'Aviator',image:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=600',tag:'Краш',desc:'Літак злітає — множник росте. Встигни вивести ставку до падіння!',maxwin:'999x',url:'games/aviator.html',accent:'#e5053a',glow:'rgba(229,5,58,0.3)',cat:'arcade'},
-];
 
 let catFilter='all';
 function filterGames(cat,btn){
@@ -835,7 +840,7 @@ function renderLeaderboard(rows){
   if(!rows.length){c.innerHTML='<div class="empty-state"><div class="empty-state-icon">🏆</div><p>Ще немає даних</p></div>';return;}
   const rankClass=(i)=>i===0?'gold':i===1?'silver':i===2?'bronze':'';
   const rankEmoji=(i)=>i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
-  c.innerHTML=rows.map((r,i)=>`
+  c.innerHTML=rows.slice(0,50).map((r,i)=>`
     <div class="lb-row ${r.name===currentUser?'me':''}" style="animation-delay:${i*0.05}s">
       <div class="lb-rank ${rankClass(i)}">${rankEmoji(i)}</div>
       <div class="lb-player">
@@ -909,10 +914,10 @@ function renderProfileStats(){
   document.getElementById('ps-lost').textContent=losses;
 }
 
-// ПРАВИЛЬНІ БЕЙДЖІ (Накладаються один на одного)
+// ПРАВИЛЬНІ БЕЙДЖІ (РІВНІ)
 function renderBadges(data){
   const row=document.getElementById('profile-badges');
-  const chips=data.chips||0;
+  const chips=parseInt(data.chips)||0;
   const games=data.total_games||allHistory.length;
   const badges=[];
   
@@ -972,7 +977,6 @@ function setAvatarEverywhere(url){
 
 function openAvatarModal(){
   document.getElementById('avatar-modal').classList.add('open');
-  selectedAvatarFile=null;
   document.getElementById('upload-btn').disabled=true;
   document.getElementById('upload-status').textContent='';
   document.getElementById('upload-preview').style.display='none';
@@ -981,18 +985,34 @@ function openAvatarModal(){
 function closeAvatarModal(){document.getElementById('avatar-modal').classList.remove('open');}
 document.getElementById('avatar-modal').onclick=e=>{if(e.target===e.currentTarget)closeAvatarModal();};
 
+let compressedImageData = null;
+
 function onAvatarFileSelect(e){
   const file=e.target.files[0];
   if(!file)return;
-  selectedAvatarFile=file;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    document.getElementById('preview-img').src=ev.target.result;
-    document.getElementById('upload-preview').style.display='block';
-    document.getElementById('upload-zone').style.display='none';
-  };
+  
+  // Стискаємо аватарку прямо в браузері через Canvas (Фікс помилки завантаження)
+  const reader = new FileReader();
   reader.readAsDataURL(file);
-  document.getElementById('upload-btn').disabled=false;
+  reader.onload = event => {
+    const img = new Image();
+    img.src = event.target.result;
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 200;
+        const scaleSize = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleSize;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        compressedImageData = canvas.toDataURL('image/jpeg', 0.8);
+        document.getElementById('preview-img').src = compressedImageData;
+        document.getElementById('upload-preview').style.display='block';
+        document.getElementById('upload-zone').style.display='none';
+        document.getElementById('upload-btn').disabled=false;
+    }
+  };
 }
 
 const zone=document.getElementById('upload-zone');
@@ -1002,38 +1022,86 @@ zone.ondrop=e=>{
   e.preventDefault();zone.style.borderColor='';
   const file=e.dataTransfer.files[0];
   if(file&&file.type.startsWith('image/')){
-    const dt=new DataTransfer();dt.items.add(file);
-    document.getElementById('avatar-upload-input').files=dt.files;
+    document.getElementById('avatar-upload-input').files = e.dataTransfer.files;
     onAvatarFileSelect({target:{files:[file]}});
   }
 };
 
 async function uploadAvatar(){
-  if(!selectedAvatarFile)return;
+  if(!compressedImageData)return;
   const btn=document.getElementById('upload-btn');
   const status=document.getElementById('upload-status');
   btn.disabled=true;btn.textContent='Завантаження…';
-  status.textContent='';status.className='modal-status';
+  
   try{
-    const formData=new FormData();
-    formData.append('image',selectedAvatarFile);
-    const res=await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,{method:'POST',body:formData});
-    const data=await res.json();
-    if(data.success){
-      const url=data.data.url;
-      await userRef.update({avatar_url:url});
-      setAvatarEverywhere(url);
-      status.textContent='✓ Аватарку оновлено!';status.className='modal-status ok';
-      toast('Аватарку успішно оновлено!');
-      setTimeout(closeAvatarModal,1200);
-    } else throw new Error('ImgBB error');
+    // Зберігаємо стислу фотографію безпосередньо в Firebase (без ImgBB)
+    await userRef.update({ avatar_url: compressedImageData });
+    setAvatarEverywhere(compressedImageData);
+    
+    status.textContent='✓ Аватарку оновлено!';status.className='modal-status ok';
+    toast('Аватарку успішно оновлено!');
+    setTimeout(closeAvatarModal,1000);
   } catch(err){
-    status.textContent='Помилка завантаження.';
+    status.textContent='Помилка збереження в базу.';
     status.className='modal-status err';
     toast('Помилка завантаження аватарки','error');
   }
   btn.disabled=false;btn.textContent='ЗАВАНТАЖИТИ';
 }
+
+/* ══════════════════════════════════════════════════════════
+   ІНТЕРАКТИВНІ ПАСХАЛКИ
+══════════════════════════════════════════════════════════ */
+// Фішки, що відлітають при кліку в пустоту
+document.addEventListener('click', (e) => {
+    if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.game-card')) return;
+    
+    const chip = document.createElement('div');
+    chip.innerHTML = chipSvg;
+    chip.style.position = 'fixed';
+    chip.style.left = e.clientX + 'px';
+    chip.style.top = e.clientY + 'px';
+    chip.style.transform = 'translate(-50%, -50%)';
+    chip.style.pointerEvents = 'none';
+    chip.style.zIndex = '9999';
+    chip.style.animation = 'floatUp 1s ease-out forwards';
+    document.body.appendChild(chip);
+    setTimeout(() => chip.remove(), 1000);
+});
+
+// Пасхалка на логотипі
+let clickCount = 0;
+function createEasterEgg(e) {
+    clickCount++;
+    if(clickCount >= 5) {
+        toast("🎰 JACKPOT! Ви знайшли секретну анімацію!", "success");
+        document.body.style.animation = "spin 1s ease-in-out";
+        setTimeout(() => document.body.style.animation = "", 1000);
+        clickCount = 0;
+    }
+}
+
+/* Анімація частинок, що тікають від мишки */
+(function(){
+  const c=document.getElementById('particle-canvas');
+  let mx = -1000, my = -1000;
+  window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  
+  // Додаємо відштовхування
+  setInterval(() => {
+     if(window.particles) {
+         window.particles.forEach(p => {
+             const dx = p.x - mx;
+             const dy = p.y - my;
+             const dist = Math.sqrt(dx*dx + dy*dy);
+             if(dist < 100) {
+                 p.x += dx * 0.05;
+                 p.y += dy * 0.05;
+             }
+         });
+     }
+  }, 16);
+})();
 </script>
 </body>
 </html>

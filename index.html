@@ -1375,7 +1375,7 @@ async function uploadAvatar(){
   try{
     const formData=new FormData();
     formData.append('image',selectedAvatarFile);
-    const res=await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,{method:'POST',body:formData});
+    const res=await fetch(`https://api.imgbb.com/1/upload?key=${7ef81dfc56bab94048936358f8fb9097}`,{method:'POST',body:formData});
     const data=await res.json();
     if(data.success){
       const url=data.data.url;

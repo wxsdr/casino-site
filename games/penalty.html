@@ -429,7 +429,7 @@
             const isGoal = Math.random() < WIN_CHANCE;
 
             let goalieDive;
-            if (!isGoal) goalieDive = dives.find(d => d.id === target).t; 
+            if (!isGoal) goalieDive = dives.find(d => d.id === target).t;
             else {
                 const wrongDives = dives.filter(d => d.id !== target); 
                 goalieDive = wrongDives[Math.floor(Math.random() * wrongDives.length)].t;
@@ -483,6 +483,7 @@
                     showMsg("СЕЙВ!", "msg-save");
                     document.getElementById('sound-lose').currentTime = 0;
                     document.getElementById('sound-lose').play().catch(()=>{});
+                    saveGameResult("Penalty", currentBet, -currentBet);
                     currentStep = -1; potentialWin = 0;
                     setTimeout(() => resetPitch(), 2000);
                 }
@@ -498,6 +499,7 @@
             document.getElementById('sound-collect').play().catch(()=>{});
             
             await userRef.once('value').then(s => { userRef.update({ chips: s.val().chips + potentialWin }); });
+            await saveGameResult("Penalty", currentBet, potentialWin - currentBet);
 
             setTimeout(() => {
                 currentStep = -1; potentialWin = 0; resetPitch();

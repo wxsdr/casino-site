@@ -743,13 +743,10 @@ body{
 </head>
 <body>
 
-<!-- PARTICLE BG -->
 <canvas id="particle-canvas"></canvas>
 
-<!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
 
-<!-- BLOCKED OVERLAY -->
 <div id="out-of-casino-overlay">
   <h1>🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
   <p style="color:#aaa;font-size:20px;margin-top:16px;">Ви покинули територію казино.</p>
@@ -757,7 +754,6 @@ body{
   <button onclick="logout()" style="margin-top:28px;padding:12px 32px;background:var(--neon-red);border:none;color:#fff;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;letter-spacing:1px;">ВИЙТИ</button>
 </div>
 
-<!-- AVATAR MODAL -->
 <div class="modal-overlay" id="avatar-modal">
   <div class="modal">
     <div class="modal-close" onclick="closeAvatarModal()">✕</div>
@@ -774,7 +770,6 @@ body{
   </div>
 </div>
 
-<!-- ══════════ AUTH ══════════ -->
 <div id="auth-section">
   <div class="auth-glow-ring"></div>
   <div class="auth-box">
@@ -794,10 +789,8 @@ body{
   </div>
 </div>
 
-<!-- ══════════ LOBBY ══════════ -->
 <div id="lobby-section">
 
-  <!-- HEADER -->
   <div class="header">
     <div class="header-logo">
       KURAHIVKA
@@ -820,17 +813,14 @@ body{
     </div>
   </div>
 
-  <!-- LIVE TICKER -->
   <div class="live-ticker">
     <div class="ticker-label">🔴 LIVE</div>
     <div class="ticker-wrap">
       <div class="ticker-inner" id="ticker-inner">
-        <!-- populated by JS -->
-      </div>
+        </div>
     </div>
   </div>
 
-  <!-- ── GAMES PAGE ── -->
   <div class="page active" id="page-games">
     <div class="page-content">
       <div class="page-header">
@@ -838,7 +828,6 @@ body{
         <div class="page-desc">Ставки приймаються у фішках казино • Мінімум 10 🪙</div>
       </div>
 
-      <!-- FEATURED -->
       <div class="featured-card" onclick="navigate('games/roulette.html?table=1')">
         <div class="featured-icon">🎡</div>
         <div>
@@ -853,7 +842,6 @@ body{
         </div>
       </div>
 
-      <!-- FILTER -->
       <div class="category-filter">
         <button class="cat-btn active" onclick="filterGames('all',this)">Всі ігри</button>
         <button class="cat-btn" onclick="filterGames('table',this)">Настільні</button>
@@ -863,12 +851,10 @@ body{
       </div>
 
       <div class="game-grid" id="game-grid">
-        <!-- populated by JS -->
-      </div>
+        </div>
     </div>
   </div>
 
-  <!-- ── LEADERBOARD PAGE ── -->
   <div class="page" id="page-leaderboard">
     <div class="page-content">
       <div class="page-header">
@@ -884,7 +870,6 @@ body{
     </div>
   </div>
 
-  <!-- ── PROFILE PAGE ── -->
   <div class="page" id="page-profile">
     <div class="page-content">
       <div class="page-header">
@@ -893,7 +878,6 @@ body{
       </div>
       <div class="profile-layout">
 
-        <!-- LEFT CARD -->
         <div>
           <div class="profile-card">
             <div class="profile-avatar-wrap">
@@ -927,7 +911,6 @@ body{
             </div>
           </div>
 
-          <!-- CHART -->
           <div class="profile-chart-section">
             <div class="chart-title">Баланс фішок (графік)</div>
             <div id="profit-chart">
@@ -946,7 +929,6 @@ body{
           </div>
         </div>
 
-        <!-- RIGHT: HISTORY -->
         <div class="history-panel">
           <div class="history-header">
             <div class="history-title">Історія ігор</div>
@@ -971,9 +953,7 @@ body{
     </div>
   </div>
 
-</div><!-- #lobby-section -->
-
-<script>
+</div><script>
 /* ══════════════════════════════════════════════════════════
    FIREBASE
 ══════════════════════════════════════════════════════════ */
@@ -1040,30 +1020,93 @@ function toast(msg,type='success'){
 }
 
 /* ══════════════════════════════════════════════════════════
-   AUTH
+   AUTH & GLOBAL DATA
 ══════════════════════════════════════════════════════════ */
 window.onload=()=>{
   const saved=localStorage.getItem('casino_user');
-  if(saved)openLobby(saved);
+  if(saved) openLobby(saved);
   buildGameGrid();
-  buildTicker();
+  initGlobalData(); // Запускаємо збір реальної історії для стрічки
 };
 
 async function login(){
-  const username=document.getElementById('username-input').value.trim();
-  const pin=document.getElementById('pin-input').value.trim();
-  const btn=document.getElementById('login-btn');
-  if(!username||!pin){toast('Введіть нік і код!','error');return;}
-  btn.textContent="З'єднання…";btn.disabled=true;
-  try{
-    const res=await fetch(`https://casino-backend-039e.onrender.com/api/login?user=${username}&pin=${pin}`);
-    const data=await res.json();
+  const userInp = document.getElementById('username-input');
+  const pinInp = document.getElementById('pin-input');
+  const btn = document.getElementById('login-btn');
+  const username = userInp.value.trim();
+  const pin = pinInp.value.trim();
+  
+  if(!username||!pin) { toast('Введіть нік і код!','error'); return; }
+  
+  // Блокуємо поля і чітко показуємо завантаження
+  btn.textContent = 'ЗАВАНТАЖЕННЯ...';
+  btn.disabled = true;
+  userInp.disabled = true;
+  pinInp.disabled = true;
+
+  try {
+    const res = await fetch(`https://casino-backend-039e.onrender.com/api/login?user=${username}&pin=${pin}`);
+    const data = await res.json();
     if(data.success){
       localStorage.setItem('casino_user',username.toLowerCase());
       openLobby(username);
-    } else {toast('Помилка: '+(data.message||'невірний код'),'error');}
-  } catch(e){toast('Сервер недоступний','error');}
-  finally{btn.textContent='УВІЙТИ В КАЗИНО';btn.disabled=false;}
+    } else {
+      toast('Помилка: '+(data.message||'невірний код'),'error');
+    }
+  } catch(e) {
+    console.error("Login Error:", e);
+    toast('Сервер недоступний або прокидається. Зачекайте 10-20 секунд і спробуйте знову.','error');
+  } finally {
+    btn.textContent = 'УВІЙТИ В КАЗИНО';
+    btn.disabled = false;
+    userInp.disabled = false;
+    pinInp.disabled = false;
+  }
+}
+
+// Завантаження глобальної статистики зі всієї бази даних
+function initGlobalData() {
+    db.ref('users_by_name').on('value', snap => {
+        const rows = [];
+        let globalHistory = [];
+
+        snap.forEach(child => {
+            const d = child.val();
+            const uname = child.key;
+            
+            rows.push({
+                name: uname, 
+                chips: d.chips || 0, 
+                games: d.total_games || (d.game_history ? Object.keys(d.game_history).length : 0), 
+                avatar: d.avatar_url || null
+            });
+            
+            if (d.game_history) {
+                Object.values(d.game_history).forEach(h => {
+                    globalHistory.push({
+                        player: uname,
+                        game: h.game || h.type || 'Ігри',
+                        profit: h.profit !== undefined ? h.profit : ((h.result || 0) - (h.bet || 0)),
+                        ts: h.ts || 0
+                    });
+                });
+            }
+        });
+
+        // Оновлюємо лідерборд (топ 50 багатіїв)
+        rows.sort((a,b) => b.chips - a.chips);
+        renderLeaderboard(rows.slice(0, 50));
+
+        // Оновлюємо LIVE стрічку (останні 15 ігор зі всього сервера)
+        globalHistory.sort((a,b) => b.ts - a.ts);
+        const recent = globalHistory.slice(0, 15);
+        if(recent.length > 0) {
+            buildRealTicker(recent);
+        } else {
+            // Якщо база повністю порожня, нічого не виводимо
+            document.getElementById('ticker-inner').innerHTML = `<div class="ticker-item">Чекаємо на перші ставки на сервері...</div>`;
+        }
+    });
 }
 
 function openLobby(username){
@@ -1098,17 +1141,6 @@ function openLobby(username){
     renderChart();
     renderBadges(data);
   });
-
-  // Leaderboard
-  db.ref('users_by_name').orderByChild('chips').limitToLast(20).on('value',snap=>{
-    const rows=[];
-    snap.forEach(child=>{
-      const d=child.val();
-      rows.push({name:child.key,chips:d.chips||0,games:d.total_games||0,avatar:d.avatar_url||null});
-    });
-    rows.sort((a,b)=>b.chips-a.chips);
-    renderLeaderboard(rows);
-  });
 }
 
 function logout(){localStorage.removeItem('casino_user');location.reload();}
@@ -1139,7 +1171,7 @@ const GAMES=[
   {id:'plinko',name:'Plinko',icon:'🔵',tag:'Аркада',desc:'Киньте кульку і спостерігайте як вона падає крізь пеги. Множники до 850x!',maxwin:'850x',url:'games/plinko.html',accent:'#22c55e',glow:'rgba(34,197,94,0.15)',cat:'arcade'},
   {id:'kubik',name:'Кубик',icon:'🎲',tag:'Аркада',desc:'Прокрути кубик і роби ставки на результат. Класична азартна гра.',maxwin:'6x',url:'games/kubik.html',accent:'#22c55e',glow:'rgba(34,197,94,0.15)',cat:'arcade'},
   {id:'penalty',name:'Penalty Shoot',icon:'⚽',tag:'Спорт',desc:'Б`є 11-метровий! Вибери кут і сподівайся що воротар не встигне.',maxwin:'30x',url:'games/penalty.html',accent:'#22c55e',glow:'rgba(34,197,94,0.15)',cat:'arcade'},
-  {id:'aviator',name:'Aviator',icon:'✈️',tag:'Краш',desc:'Літак злітає — множник росте. Встигни вивести ставку до падіння!',maxwin:'999x',url:'games/aviator.html',accent:'#4f8eff',glow:'rgba(79,142,255,0.15)',cat:'arcade'},
+  {id:'aviator',name:'Aviator',icon:'✈️',tag:'Краш',desc:'Літак злітає — множник росте. Встигни вивести ставку до падіння!',maxwin:'100x',url:'games/aviator.html',accent:'#4f8eff',glow:'rgba(79,142,255,0.15)',cat:'arcade'},
 ];
 
 let catFilter='all';
@@ -1209,7 +1241,12 @@ const GAME_META={
   penalty:{icon:'⚽',bg:'rgba(34,197,94,0.12)',label:'Penalty'},
   aviator:{icon:'✈️',bg:'rgba(79,142,255,0.12)',label:'Aviator'},
 };
-function gameMeta(key){return GAME_META[key]||{icon:'🎰',bg:'rgba(255,255,255,0.06)',label:key};}
+function gameMeta(key){
+  for (let k in GAME_META) {
+      if (key.toLowerCase().includes(k)) return GAME_META[k];
+  }
+  return {icon:'🎰',bg:'rgba(255,255,255,0.06)',label:key};
+}
 
 function filterHistory(f,btn){
   historyFilter=f;
@@ -1271,11 +1308,10 @@ function renderChart(){
   if(!allHistory.length)return;
   const pts=[];
   let bal=currentChips;
-  // Walk history backwards to reconstruct balance over time
   const rev=[...allHistory].reverse().slice(-30);
   rev.forEach(r=>{
     const p=r.profit!==undefined?r.profit:(r.result||0)-(r.bet||0);
-    bal+=p; // approximate
+    bal+=p; 
     pts.push(bal);
   });
   pts.unshift(currentChips);
@@ -1291,36 +1327,32 @@ function renderChart(){
 }
 
 /* ══════════════════════════════════════════════════════════
-   TICKER
+   TICKER (REAL DATA)
 ══════════════════════════════════════════════════════════ */
-const TICKER_SAMPLES=[
-  {player:'Serhii_UA',game:'Aviator',result:'+2840 🪙',win:true},
-  {player:'DarkHorse',game:'Plinko',result:'+14500 🪙',win:true},
-  {player:'MaxxPower',game:'Рулетка',result:'-800 🪙',win:false},
-  {player:'AnnaK',game:'21 Очко',result:'+1200 🪙',win:true},
-  {player:'Viper99',game:'Penalty',result:'+6000 🪙',win:true},
-  {player:'NightOwl',game:'Слот',result:'-450 🪙',win:false},
-  {player:'Lucky7',game:'Рулетка',result:'+35000 🪙',win:true},
-  {player:'ZenMaster',game:'Більше/Менше',result:'+300 🪙',win:true},
-];
-function buildTicker(){
-  const ti=document.getElementById('ticker-inner');
-  const items=[...TICKER_SAMPLES,...TICKER_SAMPLES]; // double for seamless
-  ti.innerHTML=items.map(t=>`
-    <div class="ticker-item">
-      <strong>${t.player}</strong> виграв у <em>${t.game}</em>
-      <span class="${t.win?'win-tag':'loss-tag'}">${t.result}</span>
-    </div>`).join('');
+function buildRealTicker(recentHistory){
+  const ti = document.getElementById('ticker-inner');
+  const items = [...recentHistory, ...recentHistory]; // для безперервної прокрутки
+  
+  ti.innerHTML = items.map(t => {
+      const m = gameMeta(t.game);
+      const isWin = t.profit >= 0;
+      const prefix = isWin ? '+' : '';
+      const action = isWin ? 'виграв' : 'зіграв';
+      
+      return `
+      <div class="ticker-item">
+          <strong>${t.player.toUpperCase()}</strong> ${action} у <em>${m.label}</em>
+          <span class="${isWin ? 'win-tag' : 'loss-tag'}">${prefix}${t.profit} 🪙</span>
+      </div>`;
+  }).join('');
 }
 
 /* ══════════════════════════════════════════════════════════
    AVATAR
 ══════════════════════════════════════════════════════════ */
 function setAvatarEverywhere(url){
-  // Header
   const ha=document.getElementById('header-avatar');
   ha.innerHTML=`<img src="${url}" alt="avatar">`;
-  // Profile page
   const pa=document.getElementById('profile-avatar-el');
   pa.innerHTML=`<img src="${url}" alt="avatar">`;
 }
@@ -1351,7 +1383,6 @@ function onAvatarFileSelect(e){
   document.getElementById('upload-status').textContent='';
 }
 
-// Drag & drop
 const zone=document.getElementById('upload-zone');
 zone.ondragover=e=>{e.preventDefault();zone.style.borderColor='var(--neon-green)';};
 zone.ondragleave=()=>{zone.style.borderColor='';};
@@ -1359,7 +1390,6 @@ zone.ondrop=e=>{
   e.preventDefault();zone.style.borderColor='';
   const file=e.dataTransfer.files[0];
   if(file&&file.type.startsWith('image/')){
-    // simulate file input
     const dt=new DataTransfer();dt.items.add(file);
     document.getElementById('avatar-upload-input').files=dt.files;
     onAvatarFileSelect({target:{files:[file]}});
@@ -1375,7 +1405,7 @@ async function uploadAvatar(){
   try{
     const formData=new FormData();
     formData.append('image',selectedAvatarFile);
-    const res=await fetch(`https://api.imgbb.com/1/upload?key=${7ef81dfc56bab94048936358f8fb9097}`,{method:'POST',body:formData});
+    const res=await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,{method:'POST',body:formData});
     const data=await res.json();
     if(data.success){
       const url=data.data.url;

@@ -1038,25 +1038,37 @@ async function login(){
   
   if(!username||!pin) { toast('Введіть нік і код!','error'); return; }
   
-  // Блокуємо поля і чітко показуємо завантаження
-  btn.textContent = 'ЗАВАНТАЖЕННЯ...';
+  // Блокуємо поля і показуємо завантаження
+  btn.textContent = 'ПЕРЕВІРКА...';
   btn.disabled = true;
   userInp.disabled = true;
   pinInp.disabled = true;
 
   try {
-    const res = await fetch(`https://casino-backend-039e.onrender.com/api/login?user=${username}&pin=${pin}`);
-    const data = await res.json();
-    if(data.success){
-      localStorage.setItem('casino_user',username.toLowerCase());
+    // ЙДЕМО НАПРЯМУЮ В FIREBASE (БЕЗ ЖОДНОГО RENDER'А!)
+    const snap = await db.ref('users_by_name/' + username.toLowerCase()).once('value');
+    const data = snap.val();
+
+    // Перевіряємо, чи існує гравець і чи збігається його пін-код
+    if (data && data.pin === pin) {
+      
+      localStorage.setItem('casino_user', username.toLowerCase());
+      
+      // БЕЗПЕКА: Видаляємо пін-код після успішного входу (щоб він був одноразовим)
+      await db.ref('users_by_name/' + username.toLowerCase()).update({ pin: null });
+
+      toast('Успішний вхід!', 'success');
       openLobby(username);
+      
     } else {
-      toast('Помилка: '+(data.message||'невірний код'),'error');
+      toast('Помилка: Невірний нік або код', 'error');
     }
+    
   } catch(e) {
     console.error("Login Error:", e);
-    toast('Сервер недоступний або прокидається. Зачекайте 10-20 секунд і спробуйте знову.','error');
+    toast('Помилка з\'єднання з базою даних', 'error');
   } finally {
+    // Повертаємо кнопку в початковий стан
     btn.textContent = 'УВІЙТИ В КАЗИНО';
     btn.disabled = false;
     userInp.disabled = false;

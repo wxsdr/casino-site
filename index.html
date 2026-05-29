@@ -251,15 +251,6 @@ body{
 .avatar-btn img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .avatar-btn:hover{border-color:var(--neon-green);box-shadow:0 0 15px rgba(0,255,157,0.3);}
 
-.logout-btn{
-  padding:8px 18px;border-radius:10px;
-  background:rgba(255,51,102,0.1);border:1px solid rgba(255,51,102,0.25);
-  color:var(--neon-red);font-size:13px;font-weight:600;
-  cursor:pointer;transition:all 0.2s;
-  font-family:'Inter',sans-serif;
-}
-.logout-btn:hover{background:rgba(255,51,102,0.2);box-shadow:0 0 15px rgba(255,51,102,0.2);}
-
 /* ══════════════════════════════════════════════════════════
    PAGE VIEWS
 ══════════════════════════════════════════════════════════ */
@@ -750,9 +741,8 @@ body{
 <div id="out-of-casino-overlay">
   <h1>🚫 ДОСТУП ЗАБЛОКОВАНО</h1>
   <p style="color:#aaa;font-size:20px;margin-top:16px;">Ви покинули територію казино.</p>
-  <p style="color:#666;font-size:15px;margin-top:8px;">Поверніться до будівлі в Minecraft.</p>
-  <button onclick="logout()" style="margin-top:28px;padding:12px 32px;background:var(--neon-red);border:none;color:#fff;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;letter-spacing:1px;">ВИЙТИ</button>
-</div>
+  <p style="color:#666;font-size:15px;margin-top:8px;">Поверніться до будівлі в Minecraft, щоб продовжити гру.</p>
+  </div>
 
 <div class="modal-overlay" id="avatar-modal">
   <div class="modal">
@@ -909,6 +899,9 @@ body{
             <div class="profile-badge-row" id="profile-badges">
               <span class="p-badge newcomer">🎲 Новачок</span>
             </div>
+            <div style="margin-top: 24px;">
+              <button onclick="logout()" style="width:100%; padding:12px; background:rgba(255,51,102,0.1); border:1px solid rgba(255,51,102,0.4); color:var(--neon-red); border-radius:12px; font-weight:700; cursor:pointer; transition:0.3s; font-family:'Rajdhani',sans-serif; font-size:16px; letter-spacing:1px; text-transform:uppercase;">🚪 Вийти з акаунту</button>
+            </div>
           </div>
 
           <div class="profile-chart-section">
@@ -976,7 +969,7 @@ let allHistory = [];
 let historyFilter = 'all';
 let currentPage = 'games';
 let selectedAvatarFile = null;
-const IMGBB_API_KEY = '2c313ad979d9b7e78aa9027c58c9abef'; // free ImgBB key
+const IMGBB_API_KEY = '2c313ad979d9b7e78aa9027c58c9abef'; 
 
 /* ══════════════════════════════════════════════════════════
    PARTICLES
@@ -1026,36 +1019,35 @@ window.onload=()=>{
   const saved=localStorage.getItem('casino_user');
   if(saved) openLobby(saved);
   buildGameGrid();
-  initGlobalData(); // Запускаємо збір реальної історії для стрічки
+  initGlobalData(); 
 };
 
+// НОВИЙ МЕТОД ЛОГІНУ (Прямо через Firebase, без Render)
 async function login(){
   const userInp = document.getElementById('username-input');
   const pinInp = document.getElementById('pin-input');
   const btn = document.getElementById('login-btn');
-  const username = userInp.value.trim();
+  const username = userInp.value.trim().toLowerCase(); // Переводимо в нижній регістр для бази
   const pin = pinInp.value.trim();
   
   if(!username||!pin) { toast('Введіть нік і код!','error'); return; }
   
-  // Блокуємо поля і показуємо завантаження
   btn.textContent = 'ПЕРЕВІРКА...';
   btn.disabled = true;
   userInp.disabled = true;
   pinInp.disabled = true;
 
   try {
-    // ЙДЕМО НАПРЯМУЮ В FIREBASE (БЕЗ ЖОДНОГО RENDER'А!)
-    const snap = await db.ref('users_by_name/' + username.toLowerCase()).once('value');
+    const snap = await db.ref('users_by_name/' + username).once('value');
     const data = snap.val();
 
-    // Перевіряємо, чи існує гравець і чи збігається його пін-код
-    if (data && data.pin === pin) {
+    // Жорстка перевірка з конвертацією в текст (String), щоб не було помилок типів
+    if (data && data.pin && String(data.pin) === String(pin)) {
       
-      localStorage.setItem('casino_user', username.toLowerCase());
+      localStorage.setItem('casino_user', username);
       
-      // БЕЗПЕКА: Видаляємо пін-код після успішного входу (щоб він був одноразовим)
-      await db.ref('users_by_name/' + username.toLowerCase()).update({ pin: null });
+      // Затираємо пін-код, щоб він став одноразовим
+      await db.ref('users_by_name/' + username).update({ pin: null });
 
       toast('Успішний вхід!', 'success');
       openLobby(username);
@@ -1068,15 +1060,14 @@ async function login(){
     console.error("Login Error:", e);
     toast('Помилка з\'єднання з базою даних', 'error');
   } finally {
-    // Повертаємо кнопку в початковий стан
     btn.textContent = 'УВІЙТИ В КАЗИНО';
     btn.disabled = false;
     userInp.disabled = false;
     pinInp.disabled = false;
+    pinInp.value = ''; // Очищаємо поле
   }
 }
 
-// Завантаження глобальної статистики зі всієї бази даних
 function initGlobalData() {
     db.ref('users_by_name').on('value', snap => {
         const rows = [];
@@ -1105,17 +1096,14 @@ function initGlobalData() {
             }
         });
 
-        // Оновлюємо лідерборд (топ 50 багатіїв)
         rows.sort((a,b) => b.chips - a.chips);
         renderLeaderboard(rows.slice(0, 50));
 
-        // Оновлюємо LIVE стрічку (останні 15 ігор зі всього сервера)
         globalHistory.sort((a,b) => b.ts - a.ts);
         const recent = globalHistory.slice(0, 15);
         if(recent.length > 0) {
             buildRealTicker(recent);
         } else {
-            // Якщо база повністю порожня, нічого не виводимо
             document.getElementById('ticker-inner').innerHTML = `<div class="ticker-item">Чекаємо на перші ставки на сервері...</div>`;
         }
     });
@@ -1131,21 +1119,22 @@ function openLobby(username){
   userRef=db.ref('users_by_name/'+currentUser);
   userRef.on('value',snap=>{
     const data=snap.val()||{};
+    
+    // Блокуємо доступ, якщо гравця немає в казино в Майнкрафті
     if(data.in_casino===false){
       document.getElementById('out-of-casino-overlay').style.display='flex';
     } else {
       document.getElementById('out-of-casino-overlay').style.display='none';
     }
+    
     currentChips=data.chips||0;
     document.getElementById('chips-balance').textContent=currentChips.toLocaleString();
     document.getElementById('ps-balance').textContent=currentChips.toLocaleString();
 
-    // Avatar
     if(data.avatar_url){
       setAvatarEverywhere(data.avatar_url);
     }
 
-    // History
     allHistory=data.game_history ? Object.values(data.game_history) : [];
     allHistory.sort((a,b)=>(b.ts||0)-(a.ts||0));
     renderHistory();
@@ -1155,7 +1144,10 @@ function openLobby(username){
   });
 }
 
-function logout(){localStorage.removeItem('casino_user');location.reload();}
+function logout(){
+  localStorage.removeItem('casino_user');
+  location.reload();
+}
 function navigate(url){window.location.href=url;}
 
 /* ══════════════════════════════════════════════════════════
@@ -1343,7 +1335,7 @@ function renderChart(){
 ══════════════════════════════════════════════════════════ */
 function buildRealTicker(recentHistory){
   const ti = document.getElementById('ticker-inner');
-  const items = [...recentHistory, ...recentHistory]; // для безперервної прокрутки
+  const items = [...recentHistory, ...recentHistory]; 
   
   ti.innerHTML = items.map(t => {
       const m = gameMeta(t.game);
@@ -1417,7 +1409,7 @@ async function uploadAvatar(){
   try{
     const formData=new FormData();
     formData.append('image',selectedAvatarFile);
-    const res=await fetch(`https://api.imgbb.com/1/upload?key=${7ef81dfc56bab94048936358f8fb9097}`,{method:'POST',body:formData});
+    const res=await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,{method:'POST',body:formData});
     const data=await res.json();
     if(data.success){
       const url=data.data.url;

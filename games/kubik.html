@@ -752,6 +752,7 @@
                 resultType = 'win';
                 resultMessage = `🎉 ВИГРАШ! ${betName} - СУМА ${sum}! ВИ ВИГРАЛИ ${winAmount} 🪙`;
                 await updateBalance(winAmount);
+                await saveGameResult("Кубики", currentBet, winAmount - currentBet);
                 addToHistory(`🎲 +${winAmount} 🪙 (${betName}, сума ${sum}, ставка ${currentBet})`, 
                             winAmount >= currentBet * 8 ? 'big-win' : 'win');
                 if (winAmount >= currentBet * 8) {
@@ -764,6 +765,7 @@
                 resultMessage = `😔 НЕ ВГАДАЛИ! СУМА ${sum}, А ВИ СТАВИЛИ НА РІВНО 6. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 addToHistory(`🎲 -${currentBet} 🪙 (РІВНО 6, випало ${sum})`, 'lose');
                 playLoseSound();
+                await saveGameResult("Кубики", currentBet, -currentBet);
             } else if (selectedBet === 'over6' && sum <= 6) {
                 if (sum === 6) {
                     resultType = 'push';
@@ -771,11 +773,13 @@
                     await updateBalance(currentBet);
                     addToHistory(`🔄 +${currentBet} 🪙 (НІЧИЯ, сума 6)`, 'push');
                     playWinSound();
+                    await saveGameResult("Кубики", currentBet, -currentBet);
                 } else {
                     resultType = 'lose';
                     resultMessage = `😔 ВИПАЛО ${sum}. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                     addToHistory(`🎲 -${currentBet} 🪙 (БІЛЬШЕ 6, випало ${sum})`, 'lose');
                     playLoseSound();
+                    await saveGameResult("Кубики", currentBet, -currentBet);
                 }
             } else if (selectedBet === 'under6' && sum >= 6) {
                 if (sum === 6) {
@@ -784,22 +788,26 @@
                     await updateBalance(currentBet);
                     addToHistory(`🔄 +${currentBet} 🪙 (НІЧИЯ, сума 6)`, 'push');
                     playWinSound();
+                    await saveGameResult("Кубики", currentBet, -currentBet);
                 } else {
                     resultType = 'lose';
                     resultMessage = `😔 ВИПАЛО ${sum}. ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                     addToHistory(`🎲 -${currentBet} 🪙 (МЕНШЕ 6, випало ${sum})`, 'lose');
                     playLoseSound();
+                    await saveGameResult("Кубики", currentBet, -currentBet);
                 }
             } else if (selectedBet === 'even' && sum % 2 === 1) {
                 resultType = 'lose';
                 resultMessage = `😔 ВИПАЛО ${sum} (НЕПАРНЕ). ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 addToHistory(`🎲 -${currentBet} 🪙 (ПАРНЕ, випало ${sum})`, 'lose');
                 playLoseSound();
+                await saveGameResult("Кубики", currentBet, -currentBet);
             } else if (selectedBet === 'odd' && sum % 2 === 0) {
                 resultType = 'lose';
                 resultMessage = `😔 ВИПАЛО ${sum} (ПАРНЕ). ВИ ПРОГРАЛИ ${currentBet} 🪙`;
                 addToHistory(`🎲 -${currentBet} 🪙 (НЕПАРНЕ, випало ${sum})`, 'lose');
                 playLoseSound();
+                await saveGameResult("Кубики", currentBet, -currentBet);
             }
             
             showResult(resultMessage, resultType);

@@ -95,8 +95,6 @@ body{
 .avatar-btn{ width:46px;height:46px;border-radius:50%; border:2px solid rgba(255,255,255,0.1); cursor:pointer;overflow:hidden; background:var(--bg2); display:flex;align-items:center;justify-content:center; transition:all 0.3s; }
 .avatar-btn img{width:100%;height:100%;object-fit:cover;}
 .avatar-btn:hover{border-color:var(--gold);box-shadow:0 0 20px rgba(249,217,118,0.3); transform:scale(1.05);}
-.logout-btn{ background:transparent; color:var(--text-muted); border:1px solid var(--border); padding:10px 18px; border-radius:12px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.logout-btn:hover{ background:rgba(255,51,102,0.1); color:var(--neon-red); border-color:rgba(255,51,102,0.4); box-shadow:0 0 15px rgba(255,51,102,0.2); transform:translateY(-2px); }
 
 /* ══════════════════════════════════════════════════════════
    GAMES PAGE
@@ -163,7 +161,7 @@ body{
 .lb-games{color:var(--text-muted);font-size:14px; font-weight: 600;}
 
 /* ══════════════════════════════════════════════════════════
-   PROFILE PAGE
+   PROFILE PAGE & BONUSES
 ══════════════════════════════════════════════════════════ */
 .profile-layout{display:grid;grid-template-columns:360px 1fr;gap:32px;}
 .profile-card{ background:var(--panel);border:1px solid var(--border); border-radius:28px;padding:40px 32px;text-align:center; position:relative;overflow:hidden;height:fit-content; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
@@ -200,36 +198,27 @@ body{
 .vip-progress-bar { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
 .vip-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold)); width: 0%; transition: width 1s ease; box-shadow: 0 0 10px var(--gold);}
 
-/* ── НОВИЙ БЛОК: ХАЛЯВНІ ФІШКИ ── */
-.bonuses-section {
-  background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:24px; padding:24px;
-  margin-bottom:24px; text-align:left; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index:1; position:relative;
-}
-.bonuses-title {
-  font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:800; margin-bottom:16px; color:var(--gold);
-}
+/* ФІКС: Кнопки халявних фішок і промокоду */
+.bonuses-section { background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:24px; padding:24px; margin-bottom:24px; text-align:left; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index:1; position:relative; }
+.bonuses-title { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:800; margin-bottom:16px; color:var(--gold); }
 .bonus-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-.bonus-btn {
-  background: linear-gradient(135deg, rgba(0,255,157,0.1), rgba(0,255,157,0.02));
-  border: 1px solid rgba(0,255,157,0.3); border-radius: 16px; padding: 16px; text-align: center;
-  cursor: pointer; transition: all 0.3s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: hidden;
-}
+.bonus-btn { background: linear-gradient(135deg, rgba(0,255,157,0.1), rgba(0,255,157,0.02)); border: 1px solid rgba(0,255,157,0.3); border-radius: 16px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: hidden; }
 .bonus-btn:hover { background: rgba(0,255,157,0.15); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,255,157,0.15); }
 .bonus-btn:active { transform: translateY(0); }
 .bonus-btn.disabled { background: rgba(255,255,255,0.03); border-color: var(--border); cursor: not-allowed; transform: none; box-shadow: none; filter: grayscale(1); opacity: 0.6;}
 .bonus-btn .b-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px; }
-.bonus-btn .b-val { font-size: 22px; font-weight: 900; color: var(--neon-green); font-family: 'Rajdhani', sans-serif; margin-bottom: 6px; display:flex; align-items:center; justify-content:center; gap:4px;}
-.bonus-btn .b-time { font-size: 12px; color: white; font-weight: 700; background:rgba(0,0,0,0.5); display:inline-block; padding:4px 12px; border-radius:20px;}
-
+.bonus-btn .b-val { font-size: 20px; font-weight: 900; color: var(--neon-green); font-family: 'Rajdhani', sans-serif; margin-bottom: 6px; display:flex; align-items:center; justify-content:center; gap:4px;}
+.bonus-btn .b-time { font-size: 11px; color: white; font-weight: 700; background:rgba(0,0,0,0.5); display:inline-block; padding:4px 8px; border-radius:20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;}
 .bonus-btn.hourly { background: linear-gradient(135deg, rgba(79,142,255,0.1), rgba(79,142,255,0.02)); border-color: rgba(79,142,255,0.3); }
 .bonus-btn.hourly .b-val { color: var(--blue-accent); }
 .bonus-btn.hourly:hover { background: rgba(79,142,255,0.15); box-shadow: 0 10px 25px rgba(79,142,255,0.15); }
 
-.promo-wrap { display:flex; gap:10px; }
-.promo-input { flex:1; padding:12px 16px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:white; outline:none; font-family:'Inter',sans-serif; font-weight:600; text-transform:uppercase; font-size: 13px;}
-.promo-input:focus { border-color:var(--blue-accent); box-shadow: 0 0 15px rgba(79,142,255,0.2);}
-.promo-btn { padding:0 20px; border-radius:12px; background:var(--blue-accent); color:white; border:none; font-weight:800; cursor:pointer; transition:0.3s; font-family:'Rajdhani',sans-serif; font-size:15px; letter-spacing:1px; text-transform:uppercase; box-shadow:0 5px 15px rgba(79,142,255,0.3);}
-.promo-btn:hover { background:#6b9fff; transform: translateY(-2px); }
+/* ФІКС: Рівна кнопка промокоду */
+.promo-wrap { display: flex; gap: 8px; align-items: stretch; height: 48px; }
+.promo-input { flex: 1; padding: 0 16px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; outline: none; font-family: 'Inter', sans-serif; font-weight: 600; text-transform: uppercase; font-size: 13px; margin: 0;}
+.promo-input:focus { border-color: var(--blue-accent); box-shadow: 0 0 15px rgba(79,142,255,0.2);}
+.promo-btn { padding: 0 20px; border-radius: 12px; background: var(--blue-accent); color: white; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; font-family: 'Rajdhani', sans-serif; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 5px 15px rgba(79,142,255,0.3); margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap;}
+.promo-btn:hover { background: #6b9fff; transform: translateY(-2px); }
 
 /* Profile Stats */
 .profile-stats{ display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px; z-index:1; position:relative;}
@@ -367,7 +356,7 @@ body{
 
 <div class="modal-overlay" id="upload-modal">
   <div class="modal">
-    <div class="modal-close" onclick="document.getElementById('upload-modal').classList.remove('open')">✕</div>
+    <div class="modal-close" onclick="closeUploadModal()">✕</div>
     <div class="modal-title shimmer-text" id="upload-title">Змінити зображення</div>
     <div class="modal-sub" id="upload-sub">Виберіть файл (JPG, PNG)</div>
     <div class="upload-preview" id="upload-preview"><img id="preview-img" src="" alt=""></div>
@@ -570,7 +559,7 @@ body{
                 </button>
               </div>
               <div class="promo-wrap">
-                <input type="text" id="promo-input" class="promo-input" placeholder="ПРОМОКОД (Напр. START)">
+                <input type="text" id="promo-input" class="promo-input" placeholder="ПРОМОКОД">
                 <button class="promo-btn" onclick="activatePromo()">АКТИВУВАТИ</button>
               </div>
             </div>
@@ -694,7 +683,6 @@ window.onload=()=>{
   initGlobalData(); 
 };
 
-// ПЕРЕВІРКА СТАТУСУ БЛОКУВАННЯ
 function checkLocationStatus() {
     if(!currentUser) return;
     db.ref('users_by_name/' + currentUser).once('value').then(snap => {
@@ -708,7 +696,6 @@ function checkLocationStatus() {
     });
 }
 
-// ЛОГІН (ФІКС ПОДВІЙНОГО ПОВІДОМЛЕННЯ)
 async function login(){
   const userInp = document.getElementById('username-input');
   const pinInp = document.getElementById('pin-input');
@@ -720,15 +707,15 @@ async function login(){
   
   btn.textContent = 'ПЕРЕВІРКА...'; btn.disabled = true; userInp.disabled = true; pinInp.disabled = true;
 
-  let loginSuccess = false;
   try {
     const snap = await db.ref('users_by_name/' + username).once('value');
     const data = snap.val();
 
     if (data && data.pin && String(data.pin) === String(pin)) {
       localStorage.setItem('casino_user', username);
-      await db.ref('users_by_name/' + username).update({ pin: null }); // Робимо код одноразовим
-      loginSuccess = true;
+      await db.ref('users_by_name/' + username).update({ pin: null }); 
+      toast('Успішний вхід!', 'success');
+      setTimeout(() => openLobby(username), 100); 
     } else {
       toast('Помилка: Невірний нік або код', 'error');
     }
@@ -737,14 +724,8 @@ async function login(){
   } 
   
   btn.textContent = 'УВІЙТИ В КАЗИНО'; btn.disabled = false; userInp.disabled = false; pinInp.disabled = false; pinInp.value = ''; 
-
-  if (loginSuccess) {
-      toast('Успішний вхід!', 'success');
-      setTimeout(() => openLobby(username), 100); 
-  }
 }
 
-// ГЛОБАЛЬНА ДАТА (Лідерборд + Тікер + Онлайн)
 let allUsersMap = {};
 function initGlobalData() {
     db.ref('users_by_name').on('value', snap => {
@@ -791,7 +772,6 @@ function openLobby(username){
   document.getElementById('lobby-section').style.display='block';
   document.getElementById('profile-id-el').textContent=username;
 
-  // Онлайн статус
   const myConnectionsRef = db.ref(`users_by_name/${currentUser}/online`);
   db.ref('.info/connected').on('value', snap => {
       if (snap.val() === true) {
@@ -803,7 +783,6 @@ function openLobby(username){
   db.ref('users_by_name/'+currentUser).on('value',snap=>{
     const data=snap.val()||{};
     
-    // Блокування екрану (Жорсткий display: flex)
     if(data.in_casino === false || String(data.in_casino) === "false") {
         document.getElementById('out-of-casino-overlay').classList.add('show-overlay');
     } else {
@@ -832,10 +811,9 @@ function openLobby(username){
     renderProfileStats();
     renderChart();
     renderBadges(data, 'profile-badges');
-    updateBonusesUI(data); // Таймери халявних фішок
+    updateBonusesUI(data); 
   });
   
-  // Вставляємо SVG у всі потрібні місця
   document.querySelectorAll('.chip-holder').forEach(el => el.innerHTML = chipSvg);
 }
 
@@ -1019,9 +997,12 @@ function renderChart(){
   const rev=[...allHistory].reverse().slice(-30);
   rev.forEach(r=>{ 
       const p = r.profit !== undefined ? parseFloat(r.profit) : (parseFloat(r.win||r.result||0) - parseFloat(r.bet||0));
-      bal+=p; pts.push(bal); 
+      bal-=p; // Йдемо назад у часі
+      pts.push(bal); 
   });
-  pts.unshift(currentChips);
+  pts.reverse(); // Повертаємо в нормальний порядок
+  pts.push(currentChips); // Поточний баланс
+  
   const mn=Math.min(...pts),mx=Math.max(...pts); const range=mx-mn||1;
   const W=500,H=140,pad=10;
   const cx=(i)=>pad+(i/(pts.length-1||1))*(W-pad*2);
@@ -1163,6 +1144,8 @@ function saveNewNick() {
         let cleanName = newName.trim().substring(0, 15);
         db.ref('users_by_name/' + currentUser).update({ display_name: cleanName }).then(() => {
             toast('Нікнейм успішно змінено!', 'success');
+            document.getElementById('profile-name-el').textContent = cleanName;
+            document.getElementById('player-name').textContent = cleanName.toUpperCase();
             document.getElementById('nick-modal').classList.remove('open');
         });
     }
@@ -1171,7 +1154,7 @@ function saveNewNick() {
 /* ══════════════════════════════════════════════════════════
    ЗАВАНТАЖЕННЯ КАРТИНОК В БРАУЗЕРІ (ФІКС БАЗИ)
 ══════════════════════════════════════════════════════════ */
-let imageUploadTarget = 'avatar'; // 'avatar' or 'banner'
+let imageUploadTarget = 'avatar'; 
 let compressedImageData = null;
 
 function openImageModal(type){
@@ -1180,6 +1163,7 @@ function openImageModal(type){
   document.getElementById('upload-title').textContent = type === 'avatar' ? 'Змінити аватарку' : 'Змінити фон профілю';
   document.getElementById('upload-btn').disabled=true;
   document.getElementById('upload-preview').style.display='none';
+  document.getElementById('upload-zone').style.display='block';
   
   if (type === 'banner') {
       document.getElementById('upload-preview').style.borderRadius = '16px';
@@ -1190,7 +1174,6 @@ function openImageModal(type){
       document.getElementById('upload-preview').style.width = '120px';
       document.getElementById('upload-preview').style.height = '120px';
   }
-  document.getElementById('upload-zone').style.display='block';
 }
 
 function onFileSelect(e){
@@ -1204,14 +1187,14 @@ function onFileSelect(e){
     img.src = event.target.result;
     img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = imageUploadTarget === 'banner' ? 500 : 150; 
+        const MAX_WIDTH = imageUploadTarget === 'banner' ? 600 : 150; // Стиснення щоб база не падала
         const scaleSize = MAX_WIDTH / img.width;
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scaleSize;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         
-        compressedImageData = canvas.toDataURL('image/jpeg', 0.6); 
+        compressedImageData = canvas.toDataURL('image/jpeg', 0.5); // 50% якість
         document.getElementById('preview-img').src = compressedImageData;
         document.getElementById('upload-preview').style.display='block';
         document.getElementById('upload-zone').style.display='none';
@@ -1228,14 +1211,17 @@ async function uploadImage(){
   try{
     if (imageUploadTarget === 'avatar') {
         await db.ref('users_by_name/' + currentUser).update({ avatar_url: compressedImageData });
+        document.getElementById('header-avatar').innerHTML=`<img src="${compressedImageData}">`;
+        document.getElementById('profile-avatar-el').innerHTML=`<img src="${compressedImageData}">`;
         toast('Аватарку успішно оновлено!');
     } else {
         await db.ref('users_by_name/' + currentUser).update({ banner_url: compressedImageData });
+        document.getElementById('profile-banner-bg').style.backgroundImage = `url(${compressedImageData})`;
         toast('Фон профілю успішно оновлено!');
     }
-    setTimeout(() => document.getElementById('upload-modal').classList.remove('open'), 800);
+    setTimeout(() => document.getElementById('upload-modal').classList.remove('open'), 500);
   } catch(err){
-    toast('Помилка завантаження бази даних.', 'error');
+    toast('Помилка: Виберіть менший файл', 'error');
   }
   btn.textContent='ЗБЕРЕГТИ';
 }

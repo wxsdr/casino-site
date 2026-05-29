@@ -918,6 +918,20 @@
                 statusText.innerText = "ОЧІКУВАННЯ СТАВОК...";
             }, 4000);
         }
+
+        async function saveGameResult(gameName, bet, profit) {
+    const username = localStorage.getItem('casino_user');
+    if (!username) return;
+    const timestamp = firebase.database.ServerValue.TIMESTAMP;
+    await database.ref('users_by_name/' + username.toLowerCase() + '/game_history').push({
+        game: gameName,
+        bet: parseFloat(bet),
+        profit: parseFloat(profit),
+        ts: timestamp
+    });
+    await database.ref('users_by_name/' + username.toLowerCase() + '/total_games')
+        .set(firebase.database.ServerValue.increment(1));
+}
     </script>
 </body>
 </html>

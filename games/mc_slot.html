@@ -220,6 +220,7 @@
             display: flex;
             gap: 10px;
             height: 440px;
+            overflow: hidden;
         }
         .reel {
             width: 148px;
@@ -229,6 +230,7 @@
             overflow: hidden;
             border: 1px solid rgba(255, 215, 0, 0.15);
             position: relative;
+            transform: translateZ(0); /* Для хардварного прискорення */
         }
         .reel-strip {
             width: 100%;
@@ -237,7 +239,7 @@
             left: 0;
             display: flex;
             flex-direction: column;
-            transition: transform 0s ease;
+            will-change: transform; /* Оптимізація анімації */
         }
         
         .symbol-cell {
@@ -249,16 +251,10 @@
             position: relative;
         }
         
-        @keyframes spinBlur {
-            0% { filter: blur(0px); transform: translateX(0px); }
-            25% { filter: blur(10px); transform: translateX(5px); }
-            50% { filter: blur(15px); transform: translateX(-5px); }
-            75% { filter: blur(10px); transform: translateX(3px); }
-            100% { filter: blur(0px); transform: translateX(0px); }
-        }
-        
-        .spinning-symbol {
-            animation: spinBlur 0.12s ease-in-out infinite;
+        /* ВЕРТИКАЛЬНИЙ МБЛЮР (Підключається через SVG) */
+        .reel-blur {
+            filter: url(#verticalMotionBlur);
+            transform: scaleY(1.05); /* Легке вертикальне розтягнення додає ефекту швидкості */
         }
 
         .minecraft-block {
@@ -525,6 +521,14 @@
 </head>
 <body>
 
+    <svg width="0" height="0" style="position: absolute; z-index: -1;">
+        <defs>
+            <filter id="verticalMotionBlur" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="0 15" />
+            </filter>
+        </defs>
+    </svg>
+
     <div class="top-bar">
         <button class="btn-exit" onclick="window.location.href='../index.html'">✧ ВИЙТИ ✧</button>
         <div class="balance-badge">⚡ БАЛАНС <span id="balance-amount">0</span></div>
@@ -689,13 +693,15 @@
                     osc2.start();
                     osc2.stop(now + 0.25);
                 } else if (type === 'reel') {
-                    gainNode.gain.value = 0.03;
+                    // ЗВУК ТЯЖКОЇ ЗУПИНКИ БАРАБАНА
+                    gainNode.gain.value = 0.15;
                     const osc = audioContext.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.value = 164.81;
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(100, now);
+                    osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
                     osc.connect(gainNode);
                     osc.start();
-                    osc.stop(now + 0.04);
+                    osc.stop(now + 0.15);
                 }
             } catch(e) { console.log('Audio error:', e); }
         }
@@ -769,6 +775,13 @@
         let currentBet = 10;
         let pendingStopAuto = false;
         
+        // Матриця для безшовних переходів анімації
+        let currentMatrix = [
+            ['block-diamond', 'block-gold', 'block-emerald', 'block-dirt', 'block-wood'],
+            ['block-wood', 'block-diamond', 'block-gold', 'block-emerald', 'block-dirt'],
+            ['block-emerald', 'block-dirt', 'block-wood', 'block-diamond', 'block-gold']
+        ];
+        
         const betInput = document.getElementById('bet-input');
         const bonusPriceSpan = document.getElementById('bonus-price');
         
@@ -825,10 +838,7 @@
             if (isSpinning) return;
             document.getElementById('auto-modal').style.display = 'flex'; 
         }
-        
-        function closeAutoModal() {
-            document.getElementById('auto-modal').style.display = 'none';
-        }
+        function closeAutoModal() { document.getElementById('auto-modal').style.display = 'none'; }
         
         function startAuto(count) {
             if (isSpinning) return;
@@ -853,8 +863,6 @@
             }
         }
         
-        const STRIP_LENGTH = 16;
-        
         function getBlockDisplay(block, hasStickyMult = false, multValue = 1) {
             let isWild = (block === wildBlock);
             let isScatter = (block === scatterBlock);
@@ -874,40 +882,6 @@
                     </div>`;
         }
         
-        function buildReels(matrix) {
-            for (let x = 0; x < 5; x++) {
-                let stripDiv = document.getElementById(`strip-${x}`);
-                if (!stripDiv) continue;
-                let cellsHtml = '';
-                for (let y = 0; y < 3; y++) {
-                    let block = matrix[y][x];
-                    let hasMult = false, multVal = 1;
-                    if (stickyWilds[`${x}-${y}`] && activeBonusType === 'sticky') {
-                        hasMult = true;
-                        multVal = stickyWilds[`${x}-${y}`] || 2;
-                    }
-                    cellsHtml += getBlockDisplay(block, hasMult, multVal);
-                }
-                for (let i = 0; i < STRIP_LENGTH - 3; i++) {
-                    cellsHtml += getBlockDisplay(getRandomBlock());
-                }
-                stripDiv.innerHTML = cellsHtml;
-                stripDiv.style.transform = 'translateY(0px)';
-            }
-        }
-        
-        function applyBlurToSymbols(reelIndex, duration) {
-            const stripDiv = document.getElementById(`strip-${reelIndex}`);
-            if (!stripDiv) return;
-            const symbols = stripDiv.querySelectorAll('.symbol-cell');
-            symbols.forEach(symbol => {
-                symbol.classList.add('spinning-symbol');
-                setTimeout(() => {
-                    symbol.classList.remove('spinning-symbol');
-                }, duration);
-            });
-        }
-        
         function generateMatrix() {
             let matrix = [[], [], []];
             let rainingWilds = (isBonusGame && activeBonusType === 'raining') ? Math.floor(Math.random() * 3) + 1 : 0;
@@ -924,15 +898,9 @@
                         continue;
                     }
                     let rand = Math.random();
-                    if (!isBonusGame && rand < 0.02) {
-                        matrix[y][x] = scatterBlock;
-                    }
-                    else if (!isBonusGame && rand < 0.05) {
-                        matrix[y][x] = wildBlock;
-                    }
-                    else {
-                        matrix[y][x] = getRandomBlock();
-                    }
+                    if (!isBonusGame && rand < 0.02) matrix[y][x] = scatterBlock;
+                    else if (!isBonusGame && rand < 0.05) matrix[y][x] = wildBlock;
+                    else matrix[y][x] = getRandomBlock();
                 }
             }
             return matrix;
@@ -965,9 +933,7 @@
                 if (count >= 3 && payTable[firstBlock] && payTable[firstBlock][count]) {
                     let winAmount = payTable[firstBlock][count] * bet;
                     totalWin += winAmount;
-                    for (let i = 0; i < count; i++) {
-                        winPositions.push(`${line.indices[i][0]}-${line.indices[i][1]}`);
-                    }
+                    for (let i = 0; i < count; i++) winPositions.push(`${line.indices[i][0]}-${line.indices[i][1]}`);
                 }
             }
             return { totalWin, winPositions };
@@ -999,48 +965,81 @@
             else freeSpinsLeft--;
             
             const targetMatrix = generateMatrix();
-            const spinDuration = isTurbo ? 200 : 450;
-            const reelDelay = isTurbo ? 30 : 60;
+            const baseDuration = isTurbo ? 400 : 900; 
+            const stopDelay = isTurbo ? 150 : 350; // Каскадна зупинка
+            const CELL_HEIGHT = 138;
             
+            // Запуск анімації для кожного барабана
             for (let x = 0; x < 5; x++) {
+                const strip = document.getElementById(`strip-${x}`);
+                
+                // Будуємо стрічку: Поточні символи -> Випадковий блюр -> Нові цільові символи
+                let cellsHtml = '';
+                
+                // 1. Поточні символи (щоб не було ривків)
+                for (let y = 0; y < 3; y++) {
+                    let hasMult = false, multVal = 1;
+                    if (stickyWilds[`${x}-${y}`] && activeBonusType === 'sticky') { hasMult = true; multVal = stickyWilds[`${x}-${y}`] || 2; }
+                    cellsHtml += getBlockDisplay(currentMatrix[y][x], hasMult, multVal);
+                }
+                
+                // 2. Блюр-символи (чим далі барабан, тим довше крутиться)
+                const numRandoms = 20 + (x * 12); 
+                for (let i = 0; i < numRandoms; i++) cellsHtml += getBlockDisplay(getRandomBlock());
+                
+                // 3. Нові цільові символи
+                for (let y = 0; y < 3; y++) {
+                    let hasMult = false, multVal = 1;
+                    if (stickyWilds[`${x}-${y}`] && activeBonusType === 'sticky') { hasMult = true; multVal = stickyWilds[`${x}-${y}`] || 2; }
+                    cellsHtml += getBlockDisplay(targetMatrix[y][x], hasMult, multVal);
+                }
+                
+                strip.innerHTML = cellsHtml;
+                strip.style.transition = 'none';
+                strip.style.transform = 'translateY(0px)';
+                
+                void strip.offsetWidth; // Force DOM reflow
+                
+                // Дистанція: прокручуємо вниз до нових символів
+                const distance = (3 + numRandoms) * CELL_HEIGHT;
+                const duration = baseDuration + (x * stopDelay);
+                
                 setTimeout(() => {
-                    const strip = document.getElementById(`strip-${x}`);
-                    const distance = (STRIP_LENGTH - 3) * 138;
-                    strip.style.transition = `transform ${spinDuration / 1000}s cubic-bezier(0.2, 0.95, 0.4, 1.05)`;
+                    strip.classList.add('reel-blur');
+                    // Анімація: розгін, рівна швидкість, і потім сильний відскок в кінці
+                    strip.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.8, 0.1, 1.15)`;
                     strip.style.transform = `translateY(-${distance}px)`;
-                    playSound('reel');
-                    applyBlurToSymbols(x, spinDuration);
-                }, x * reelDelay);
+                    
+                    // Зняття блюру і звук за мить до повної зупинки
+                    setTimeout(() => {
+                        strip.classList.remove('reel-blur');
+                        playSound('reel');
+                    }, duration - 150);
+                    
+                }, 10);
             }
             
-            const totalSpinTime = spinDuration + (4 * reelDelay);
+            // Оновлюємо поточну матрицю для наступного спіну
+            currentMatrix = targetMatrix;
+            const totalSpinTime = baseDuration + (4 * stopDelay) + 150;
             
-            setTimeout(() => {
-                for (let x = 0; x < 5; x++) {
-                    setTimeout(() => {
-                        const strip = document.getElementById(`strip-${x}`);
-                        strip.style.transition = 'none';
-                        let cellsHtml = '';
-                        for (let y = 0; y < 3; y++) {
-                            let block = targetMatrix[y][x];
-                            let hasMult = false, multVal = 1;
-                            if (stickyWilds[`${x}-${y}`] && activeBonusType === 'sticky') {
-                                hasMult = true;
-                                multVal = stickyWilds[`${x}-${y}`] || 2;
-                            }
-                            cellsHtml += getBlockDisplay(block, hasMult, multVal);
-                        }
-                        for (let i = 0; i < STRIP_LENGTH - 3; i++) {
-                            cellsHtml += getBlockDisplay(getRandomBlock());
-                        }
-                        strip.innerHTML = cellsHtml;
-                        strip.style.transform = 'translateY(0px)';
-                    }, x * 50);
-                }
-            }, totalSpinTime + 50);
-            
-            // Внутрішня функція обробки результату, зроблена async, щоб дозволити await saveGameResult
+            // Після зупинки всіх барабанів
             setTimeout(async () => {
+                
+                // Очищаємо ДОМ від зайвого сміття (залишаємо тільки 3 видимі)
+                for (let x = 0; x < 5; x++) {
+                    const strip = document.getElementById(`strip-${x}`);
+                    strip.style.transition = 'none';
+                    let cleanHtml = '';
+                    for (let y = 0; y < 3; y++) {
+                        let hasMult = false, multVal = 1;
+                        if (stickyWilds[`${x}-${y}`] && activeBonusType === 'sticky') { hasMult = true; multVal = stickyWilds[`${x}-${y}`] || 2; }
+                        cleanHtml += getBlockDisplay(targetMatrix[y][x], hasMult, multVal);
+                    }
+                    strip.innerHTML = cleanHtml;
+                    strip.style.transform = 'translateY(0px)';
+                }
+
                 const scatters = countScatters(targetMatrix);
                 const winResult = calculateWin(targetMatrix, currentBet);
                 const winAmount = winResult.totalWin;
@@ -1063,17 +1062,13 @@
                     setStatus(`🏆 ВИГРАШ: ${winAmount}`);
                     if (!isBonusGame) await userRef.update({ chips: currentBalance + winAmount });
                     
-                    // Зберігаємо виграш
                     await saveGameResult("Pixel Slots", actualBet, winAmount - actualBet);
 
                 } else if (scatters >= 3) {
                     playSound('bonus');
                     addToHistory(`✨ АКТИВАЦІЯ БОНУСУ! ✨`, 'bonus');
                     setStatus("✨ БОНУС!");
-                    
-                    // Зберігаємо пустий спін, що викликав бонус
                     await saveGameResult("Pixel Slots", actualBet, -actualBet);
-                    
                     startBonusGame();
                     return;
                 } else {
@@ -1081,8 +1076,6 @@
                         addToHistory(`🏁 БОНУС ЗАВЕРШЕНО`, 'win');
                         endBonus();
                     }
-
-                    // Зберігаємо програш
                     await saveGameResult("Pixel Slots", actualBet, -actualBet);
                 }
                 
@@ -1093,11 +1086,8 @@
                 
                 setTimeout(() => {
                     isSpinning = false;
-                    
                     if (pendingStopAuto && autoSpinsLeft > 0 && !isBonusGame) {
-                        pendingStopAuto = false;
-                        addToHistory(`⏹ АВТОГРУ ЗУПИНЕНО`, 'win');
-                        autoSpinsLeft = 0;
+                        pendingStopAuto = false; addToHistory(`⏹ АВТОГРУ ЗУПИНЕНО`, 'win'); autoSpinsLeft = 0;
                         setStatus("✨ ГОТОВИЙ ДО ГРИ");
                         document.getElementById('spin-btn').disabled = false;
                         document.getElementById('buy-bonus-btn').disabled = false;
@@ -1106,33 +1096,24 @@
                         betInput.disabled = isBonusGame;
                         return;
                     }
-                    
                     if (isBonusGame && freeSpinsLeft > 0) {
                         setTimeout(() => spin(), isTurbo ? 150 : 400);
                     } else if (autoSpinsLeft > 0 && !isBonusGame) {
                         autoSpinsLeft--;
                         if (autoSpinsLeft > 0) {
-                            setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`);
-                            setTimeout(() => spin(), isTurbo ? 150 : 400);
+                            setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`); setTimeout(() => spin(), isTurbo ? 150 : 400);
                         } else {
-                            addToHistory(`✅ АВТОГРА ЗАВЕРШЕНА!`, 'win');
-                            setStatus("✨ ГОТОВИЙ ДО ГРИ");
-                            document.getElementById('spin-btn').disabled = false;
-                            document.getElementById('buy-bonus-btn').disabled = false;
-                            document.getElementById('bet-minus').disabled = false;
-                            document.getElementById('bet-plus').disabled = false;
-                            betInput.disabled = false;
+                            addToHistory(`✅ АВТОГРА ЗАВЕРШЕНА!`, 'win'); setStatus("✨ ГОТОВИЙ ДО ГРИ");
+                            document.getElementById('spin-btn').disabled = false; document.getElementById('buy-bonus-btn').disabled = false;
+                            document.getElementById('bet-minus').disabled = false; document.getElementById('bet-plus').disabled = false; betInput.disabled = false;
                         }
                     } else {
-                        document.getElementById('spin-btn').disabled = false;
-                        document.getElementById('buy-bonus-btn').disabled = false;
-                        document.getElementById('bet-minus').disabled = isBonusGame;
-                        document.getElementById('bet-plus').disabled = isBonusGame;
-                        betInput.disabled = isBonusGame;
+                        document.getElementById('spin-btn').disabled = false; document.getElementById('buy-bonus-btn').disabled = false;
+                        document.getElementById('bet-minus').disabled = isBonusGame; document.getElementById('bet-plus').disabled = isBonusGame; betInput.disabled = isBonusGame;
                         setStatus("✨ ГОТОВИЙ ДО ГРИ");
                     }
                 }, 300);
-            }, totalSpinTime + 150);
+            }, totalSpinTime);
         }
         
         async function buyBonus() {
@@ -1141,9 +1122,7 @@
             if (currentBalance >= bonusCost) {
                 await userRef.update({ chips: currentBalance - bonusCost });
                 addToHistory(`🎁 КУПЛЕНО БОНУС ЗА ${bonusCost} 🪙`, 'bonus');
-                
                 await saveGameResult("Pixel Slots (Bonus Buy)", bonusCost, -bonusCost);
-
                 document.getElementById('bonus-modal').style.display = 'flex';
             } else setStatus("❌ НЕ ВИСТАЧАЄ ФІШОК!");
         }
@@ -1155,44 +1134,34 @@
             document.body.className = activeBonusType === 'sticky' ? 'bonus-sticky' : 'bonus-raining';
             if (activeBonusType === 'sticky') stickyWilds = {};
             addToHistory(`${activeBonusType === 'sticky' ? '🔥 НЕЗЕР-РЕАКТОР' : '🌊 ЕНДЕР-ШТОРМ'}! ${freeSpinsLeft} ФРІСПІНІВ`, 'bonus');
-            document.getElementById('bet-minus').disabled = true;
-            document.getElementById('bet-plus').disabled = true;
-            betInput.disabled = true;
+            document.getElementById('bet-minus').disabled = true; document.getElementById('bet-plus').disabled = true; betInput.disabled = true;
             spin();
         }
         
         function endBonus() {
-            isBonusGame = false;
-            activeBonusType = null;
-            freeSpinsLeft = 0;
-            stickyWilds = {};
+            isBonusGame = false; activeBonusType = null; freeSpinsLeft = 0; stickyWilds = {};
             document.body.className = '';
-            document.getElementById('bet-minus').disabled = false;
-            document.getElementById('bet-plus').disabled = false;
-            betInput.disabled = false;
+            document.getElementById('bet-minus').disabled = false; document.getElementById('bet-plus').disabled = false; betInput.disabled = false;
         }
         
         window.selectBonus = function(type) {
             document.getElementById('bonus-modal').style.display = 'none';
-            isBonusGame = true;
-            activeBonusType = type;
+            isBonusGame = true; activeBonusType = type;
             document.body.className = type === 'sticky' ? 'bonus-sticky' : 'bonus-raining';
             freeSpinsLeft = type === 'sticky' ? 10 : 12;
             if (type === 'sticky') stickyWilds = {};
             addToHistory(`${type === 'sticky' ? '🔥' : '🌊'} ВИБРАНО БОНУС: ${type === 'sticky' ? 'НЕЗЕР-РЕАКТОР' : 'ЕНДЕР-ШТОРМ'} (${freeSpinsLeft} СПІНІВ)`, 'bonus');
-            document.getElementById('bet-minus').disabled = true;
-            document.getElementById('bet-plus').disabled = true;
-            betInput.disabled = true;
+            document.getElementById('bet-minus').disabled = true; document.getElementById('bet-plus').disabled = true; betInput.disabled = true;
             spin();
         };
         
         function initGame() {
-            const initMatrix = [
-                ['block-diamond', 'block-gold', 'block-emerald', 'block-dirt', 'block-wood'],
-                ['block-wood', 'block-diamond', 'block-gold', 'block-emerald', 'block-dirt'],
-                ['block-emerald', 'block-dirt', 'block-wood', 'block-diamond', 'block-gold']
-            ];
-            buildReels(initMatrix);
+            for (let x = 0; x < 5; x++) {
+                const strip = document.getElementById(`strip-${x}`);
+                let cellsHtml = '';
+                for (let y = 0; y < 3; y++) cellsHtml += getBlockDisplay(currentMatrix[y][x]);
+                strip.innerHTML = cellsHtml;
+            }
             updateBonusPrice();
         }
         initGame();
@@ -1201,18 +1170,13 @@
             if (audioContext && audioContext.state === 'suspended') audioContext.resume();
         }, { once: true });
 
-        // ФУНКЦІЯ ЗАПИСУ ІСТОРІЇ (Тепер не крашить гру)
         async function saveGameResult(gameName, bet, profit) {
             if (!username) return;
             const timestamp = firebase.database.ServerValue.TIMESTAMP;
             await database.ref('users_by_name/' + username.toLowerCase() + '/game_history').push({
-                game: gameName,
-                bet: parseFloat(bet),
-                profit: parseFloat(profit),
-                ts: timestamp
+                game: gameName, bet: parseFloat(bet), profit: parseFloat(profit), ts: timestamp
             });
-            await database.ref('users_by_name/' + username.toLowerCase() + '/total_games')
-                .set(firebase.database.ServerValue.increment(1));
+            await database.ref('users_by_name/' + username.toLowerCase() + '/total_games').set(firebase.database.ServerValue.increment(1));
         }
     </script>
 </body>

@@ -10,301 +10,79 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
-        
-        body {
-            background: radial-gradient(ellipse at 30% 40%, #0d1117 0%, #05080f 100%);
-            color: white;
-            font-family: 'Montserrat', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body { background: radial-gradient(ellipse at 30% 40%, #0d1117 0%, #05080f 100%); color: white; font-family: 'Montserrat', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; position: relative; }
         body.bonus-sticky { background: radial-gradient(ellipse at 30% 40%, #3a0a0a 0%, #1a0303 100%); }
         body.bonus-raining { background: radial-gradient(ellipse at 30% 40%, #0a0a3a 0%, #03031a 100%); }
 
-        .top-bar {
-            position: relative;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 35px;
-            background: rgba(8, 12, 20, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.25);
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
-        }
-        
-        .btn-exit {
-            background: rgba(255, 255, 255, 0.03);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 10px 28px;
-            border-radius: 40px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 13px;
-            letter-spacing: 1.5px;
-        }
-        .btn-exit:hover {
-            background: #ff4433;
-            border-color: #ff4433;
-            box-shadow: 0 0 20px rgba(255, 68, 51, 0.4);
-        }
-        
-        .balance-badge {
-            font-size: 22px;
-            font-weight: 900;
-            background: rgba(0, 255, 157, 0.1);
-            padding: 10px 32px;
-            border-radius: 40px;
-            border: 1px solid rgba(0, 255, 157, 0.35);
-            backdrop-filter: blur(10px);
-            color: #00ff9d;
-        }
-        .balance-badge span {
-            color: #00ff88;
-            font-size: 28px;
-            margin-left: 10px;
-        }
+        .top-bar { position: relative; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 12px 35px; background: rgba(8, 12, 20, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 215, 0, 0.25); box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5); }
+        .btn-exit { background: rgba(255, 255, 255, 0.03); color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 10px 28px; border-radius: 40px; font-weight: 800; cursor: pointer; transition: all 0.2s; font-size: 13px; letter-spacing: 1.5px; }
+        .btn-exit:hover { background: #ff4433; border-color: #ff4433; box-shadow: 0 0 20px rgba(255, 68, 51, 0.4); }
+        .balance-badge { font-size: 22px; font-weight: 900; background: rgba(0, 255, 157, 0.1); padding: 10px 32px; border-radius: 40px; border: 1px solid rgba(0, 255, 157, 0.35); backdrop-filter: blur(10px); color: #00ff9d; }
+        .balance-badge span { color: #00ff88; font-size: 28px; margin-left: 10px; }
 
-        #game-wrapper {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            position: relative;
-            z-index: 1;
-        }
+        #game-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; position: relative; z-index: 1; }
+        .game-container { display: flex; gap: 30px; align-items: center; justify-content: center; }
         
-        .game-container {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .win-history {
-            background: rgba(8, 12, 20, 0.9);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            border-right: 3px solid #00ff88;
-            padding: 20px;
-            width: 300px;
-            height: 500px;
-            display: flex;
-            flex-direction: column;
-        }
-        .win-history h4 {
-            color: #00ff88;
-            font-size: 18px;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-            text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
-        }
-        .history-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .history-list div {
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            border-left: 3px solid;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: 'Montserrat', sans-serif;
-        }
+        .win-history { background: rgba(8, 12, 20, 0.9); backdrop-filter: blur(15px); border-radius: 20px; border-right: 3px solid #00ff88; padding: 20px; width: 300px; height: 500px; display: flex; flex-direction: column; }
+        .win-history h4 { color: #00ff88; font-size: 18px; margin-bottom: 15px; letter-spacing: 2px; text-align: center; padding-bottom: 10px; border-bottom: 1px solid rgba(0, 255, 136, 0.3); }
+        .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .history-list div { padding: 8px 12px; background: rgba(0, 0, 0, 0.5); border-radius: 10px; border-left: 3px solid; font-size: 14px; font-weight: 600; font-family: 'Montserrat', sans-serif; }
         .history-list .win { color: #00ff88; border-left-color: #00ff88; }
         .history-list .big-win { color: #ffd700; border-left-color: #ffd700; font-weight: 900; background: rgba(255, 215, 0, 0.1); }
         .history-list .bonus { color: #9b30ff; border-left-color: #9b30ff; }
 
-        #game-scene {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .slot-machine {
-            background: linear-gradient(145deg, rgba(18, 22, 35, 0.95), rgba(8, 10, 20, 0.98));
-            border-radius: 50px;
-            border: 1px solid rgba(255, 215, 0, 0.25);
-            padding: 25px 40px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
-            position: relative;
-        }
+        #game-scene { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+        .slot-machine { background: linear-gradient(145deg, rgba(18, 22, 35, 0.95), rgba(8, 10, 20, 0.98)); border-radius: 50px; border: 1px solid rgba(255, 215, 0, 0.25); padding: 25px 40px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8); position: relative; }
+        .machine-neon { position: absolute; inset: -2px; border-radius: 52px; z-index: -1; filter: blur(18px); opacity: 0.35; background: linear-gradient(45deg, #ffd700, #9b30ff, #00f2ff); animation: neonBreathe 3s infinite alternate; }
+        @keyframes neonBreathe { 0% { opacity: 0.25; filter: blur(12px); } 100% { opacity: 0.5; filter: blur(22px); } }
         
-        .machine-neon {
-            position: absolute;
-            inset: -2px;
-            border-radius: 52px;
-            z-index: -1;
-            filter: blur(18px);
-            opacity: 0.35;
-            background: linear-gradient(45deg, #ffd700, #9b30ff, #00f2ff);
-            animation: neonBreathe 3s infinite alternate;
-        }
-        
-        @keyframes neonBreathe {
-            0% { opacity: 0.25; filter: blur(12px); }
-            100% { opacity: 0.5; filter: blur(22px); }
-        }
-        
-        body.bonus-sticky .machine-neon {
-            background: linear-gradient(45deg, #ff4433, #ff8800, #ffcc00);
-            animation: fireGlow 0.4s infinite alternate;
-            opacity: 0.7;
-        }
-        body.bonus-raining .machine-neon {
-            background: linear-gradient(45deg, #00f2ff, #9b30ff, #00ff88);
-            animation: waterGlow 0.4s infinite alternate;
-            opacity: 0.7;
-        }
-        @keyframes fireGlow { 0% { filter: blur(12px); opacity: 0.5; } 100% { filter: blur(32px); opacity: 0.9; } }
-        @keyframes waterGlow { 0% { filter: blur(12px); opacity: 0.5; } 100% { filter: blur(32px); opacity: 0.9; } }
-
         .slot-title { text-align: center; margin-bottom: 8px; }
         .slot-title .main { font-family: 'Rubik', sans-serif; font-size: 42px; background: linear-gradient(135deg, #fff, #ffd700); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: 6px; }
         .slot-title .accent { font-family: 'Rubik', sans-serif; font-size: 42px; background: linear-gradient(135deg, #00f2ff, #00ff88); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: 6px; }
         .slot-subtitle { text-align: center; font-size: 10px; letter-spacing: 4px; color: rgba(255, 255, 255, 0.4); margin-bottom: 10px; }
 
-        .reels-window {
-            background: #07090f;
-            padding: 12px;
-            border-radius: 28px;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            box-shadow: inset 0 15px 30px rgba(0, 0, 0, 0.7);
-            display: flex;
-            gap: 10px;
-            height: 440px;
-            overflow: hidden;
-            position: relative; /* ДЛЯ ЛІНІЙ ВИПЛАТ */
-        }
+        .reels-window { background: #07090f; padding: 12px; border-radius: 28px; border: 1px solid rgba(255, 215, 0, 0.2); box-shadow: inset 0 15px 30px rgba(0, 0, 0, 0.7); display: flex; gap: 10px; height: 440px; overflow: hidden; position: relative; }
+        .reel { width: 148px; height: 100%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 215, 0, 0.15); position: relative; transform: translateZ(0); }
+        .reel-strip { width: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; will-change: transform; }
+        .symbol-cell { width: 148px; height: 138px; display: flex; justify-content: center; align-items: center; position: relative; }
         
-        .reel {
-            width: 148px;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            position: relative;
-            transform: translateZ(0); 
-        }
-        .reel-strip {
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            will-change: transform; 
-        }
-        
-        .symbol-cell {
-            width: 148px;
-            height: 138px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-        
-        /* ВЕРТИКАЛЬНИЙ МБЛЮР */
-        .reel-blur {
-            filter: url(#verticalMotionBlur);
-            transform: scaleY(1.05); 
-        }
+        .reel-blur { filter: url(#verticalMotionBlur); transform: scaleY(1.03); }
 
-        /* ─── СВІТЛОВІ ЛІНІЇ ВИПЛАТ (ПОЛОСКИ) ─── */
-        .payline {
-            position: absolute;
-            left: 12px;
-            right: 12px;
-            height: 6px;
-            background: linear-gradient(90deg, transparent 0%, #ffd700 15%, #ffffff 50%, #ffd700 85%, transparent 100%);
-            box-shadow: 0 0 20px #ffd700, 0 0 40px #ffaa00, 0 0 10px #ffffff inset;
-            border-radius: 10px;
-            z-index: 50; /* Поверх символів */
-            opacity: 0;
-            pointer-events: none;
-            transform: scaleX(0);
-            transform-origin: center;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
-        }
-        .payline.active {
-            opacity: 1;
-            transform: scaleX(1);
-        }
-        /* Координати Y: padding 12px + висота комірки */
-        .payline-row-0 { top: 78px; }  /* 1-й ряд */
-        .payline-row-1 { top: 216px; } /* 2-й ряд */
-        .payline-row-2 { top: 354px; } /* 3-й ряд */
+        /* ЗОЛОТІ СВІТЛОВІ ЛІНІЇ ВИПЛАТ */
+        .payline-svg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none; }
+        .payline-path { stroke-dasharray: 3000; stroke-dashoffset: 3000; animation: drawLine 0.7s cubic-bezier(0.1, 0.8, 0.2, 1) forwards; filter: drop-shadow(0 0 12px #ffd700); }
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
 
-        .minecraft-block {
-            width: 85px;
-            height: 85px;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: rotateX(-20deg) rotateY(-35deg);
-            transition: all 0.2s ease;
-            z-index: 1;
-        }
-
-        .block-face {
-            position: absolute;
-            width: 85px;
-            height: 85px;
-            box-sizing: border-box;
-            border: 1.5px solid rgba(0, 0, 0, 0.5);
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
-            background-size: 14px 14px;
-            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.06) 75%);
-        }
-
+        .minecraft-block { width: 85px; height: 85px; position: relative; transform-style: preserve-3d; transform: rotateX(-20deg) rotateY(-35deg); transition: all 0.2s ease; z-index: 1; }
+        .block-face { position: absolute; width: 85px; height: 85px; box-sizing: border-box; border: 1.5px solid rgba(0, 0, 0, 0.5); box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4); background-size: 14px 14px; background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.06) 75%); }
         .face-top { transform: rotateX(90deg) translateZ(42.5px); background-color: var(--c-top); }
         .face-front { transform: translateZ(42.5px); background-color: var(--c-front); }
         .face-right { transform: rotateY(90deg) translateZ(42.5px); background-color: var(--c-right); }
 
+        /* КОЛЬОРИ БЛОКІВ */
         .block-dirt { --c-top: #6b4c3b; --c-front: #8b5e3c; --c-right: #5a3d2a; }
         .block-wood { --c-top: #8b6b4a; --c-front: #ab8b5a; --c-right: #6b4b3a; }
         .block-gold { --c-top: #fce029; --c-front: #d4b51c; --c-right: #a3890f; }
         .block-diamond { --c-top: #51eeea; --c-front: #35c4c4; --c-right: #229494; }
         .block-emerald { --c-top: #41f384; --c-front: #27c964; --c-right: #189647; }
-        .block-netherite { --c-top: #3b393b; --c-front: #4a474a; --c-right: #2d2b2d; }
-        .block-potion { --c-top: #ff3366; --c-front: #cc0033; --c-right: #990022; }
+        
         .block-debris { --c-top: #5c4a45; --c-front: #6e5a54; --c-right: #4a3a36; }
+        .block-potion { --c-top: #ff3366; --c-front: #cc0033; --c-right: #990022; }
         .block-gilded { --c-top: #362929; --c-front: #473838; --c-right: #241a1a; }
         .block-piglin_head { --c-top: #f0c3a3; --c-front: #f5d1b7; --c-right: #d9ab88; }
+        .block-netherite { --c-top: #3b393b; --c-front: #4a474a; --c-right: #2d2b2d; }
+
         .block-wild { --c-top: #2f1d40; --c-front: #1f122b; --c-right: #130a1c; }
         .block-scatter { --c-top: #4a1763; --c-front: #320d45; --c-right: #20062e; }
 
         .block-wild .block-face { border: 2px solid #ffd700; box-shadow: inset 0 0 15px #ffd700, 0 0 10px #ffd700; }
         .block-scatter .block-face { border: 2px solid #9b30ff; box-shadow: inset 0 0 15px #9b30ff, 0 0 10px #9b30ff; }
-        .block-gilded .block-face { border: 1px solid #ffd700; box-shadow: inset 0 0 8px rgba(255,215,0,0.5); }
+        .block-netherite .block-face { border: 1px solid #ff4433; box-shadow: inset 0 0 8px rgba(255,68,51,0.5); }
 
         .block-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; font-weight: 900; z-index: 10; text-shadow: 0 0 8px black; white-space: nowrap; pointer-events: none; }
         .text-wild { background: linear-gradient(135deg, #ffd700, #ffaa33); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 20px; }
         .text-scatter { background: linear-gradient(135deg, #9b30ff, #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 14px; }
-
         .sticky-mult { position: absolute; bottom: 6px; right: 6px; background: linear-gradient(135deg, #ffd700, #ff8800); color: #1a0a00; font-size: 16px; font-weight: 900; padding: 2px 7px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.5); z-index: 20; }
 
         @keyframes full3DRotate {
@@ -340,7 +118,6 @@
         .auto-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .auto-opt { background: #111622; border: 1px solid #2a2a3a; color: #ddd; padding: 10px 15px; font-size: 18px; font-weight: 800; border-radius: 14px; cursor: pointer; }
         .auto-opt:hover { border-color: #00ff88; color: #00ff88; }
-
         .bonus-menu { background: linear-gradient(135deg, #1a0f2a, #0a0515); border: 2px solid #9b30ff; padding: 35px; border-radius: 45px; text-align: center; max-width: 900px; }
         .bonus-title { font-size: 38px; background: linear-gradient(135deg, #9b30ff, #cc66ff); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 10px; }
         .bonus-subtitle { font-size: 14px; color: #888; margin-bottom: 25px; }
@@ -362,6 +139,13 @@
             <filter id="verticalMotionBlur" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur in="SourceGraphic" stdDeviation="0 15" />
             </filter>
+            <linearGradient id="gold-line" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,215,0,0)" />
+                <stop offset="20%" stop-color="#ffd700" />
+                <stop offset="50%" stop-color="#ffffff" />
+                <stop offset="80%" stop-color="#ffd700" />
+                <stop offset="100%" stop-color="rgba(255,215,0,0)" />
+            </linearGradient>
         </defs>
     </svg>
 
@@ -388,9 +172,7 @@
                     <div class="slot-subtitle">✦ НЕЗЕР СЛОТ | ДІАМАНТОВА ЛИХОМАНКА ✦</div>
                     
                     <div class="reels-window">
-                        <div class="payline payline-row-0" id="payline-0"></div>
-                        <div class="payline payline-row-1" id="payline-1"></div>
-                        <div class="payline payline-row-2" id="payline-2"></div>
+                        <svg class="payline-svg-container" id="payline-svg"></svg>
                         
                         <div class="reel"><div class="reel-strip" id="strip-0"></div></div>
                         <div class="reel"><div class="reel-strip" id="strip-1"></div></div>
@@ -404,12 +186,10 @@
                     <div class="ctrl-box" style="flex: 1;">
                         <div id="status-text" onclick="stopAutoGame()">✨ ГОТОВИЙ ДО ГРИ</div>
                     </div>
-                    
                     <div class="ctrl-box" style="flex: 0.7;">
                         <button class="toggle-btn" id="turbo-btn" onclick="toggleTurbo()">⚡ ТУРБО: ВИМК</button>
                         <button class="toggle-btn" id="auto-btn" onclick="openAutoModal()">🔄 АВТОГРА</button>
                     </div>
-
                     <div class="ctrl-box" style="flex: 0.8;">
                         <div style="color: #ffd700; font-size: 12px; letter-spacing: 2px;">✦ СТАВКА ✦</div>
                         <div class="bet-input-row">
@@ -418,7 +198,6 @@
                             <button class="bet-btn" id="bet-plus" onclick="updateBet(10)">+</button>
                         </div>
                     </div>
-                    
                     <div class="ctrl-box" style="background: transparent; border: none; padding: 0; flex: 1.1;">
                         <button class="spin-btn" id="spin-btn" onclick="spin()">🎲 КРУТИТИ</button>
                         <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">✨ КУПИТИ БОНУС <span id="bonus-price">1000</span></button>
@@ -477,7 +256,17 @@
                 const gainNode = audioContext.createGain();
                 gainNode.connect(audioContext.destination);
                 
-                if (type === 'win') {
+                if (type === 'spin') {
+                    // ТИХИЙ ШУМ ОБЕРТАННЯ
+                    gainNode.gain.value = 0.02; 
+                    const bufferSize = audioContext.sampleRate * 2;
+                    const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+                    const output = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+                    const whiteNoise = audioContext.createBufferSource();
+                    whiteNoise.buffer = buffer; whiteNoise.loop = true; whiteNoise.connect(gainNode);
+                    whiteNoise.start(); whiteNoise.stop(now + 0.1); 
+                } else if (type === 'win') {
                     gainNode.gain.value = 0.08;
                     const notes = [523.25, 659.25];
                     notes.forEach((freq, i) => {
@@ -510,19 +299,19 @@
                     osc2.connect(g2); g2.connect(audioContext.destination);
                     osc2.start(); osc2.stop(now + 0.25);
                 } else if (type === 'reel') {
-                    // ГЛИБОКИЙ, М'ЯКИЙ УДАР БАРАБАНА (Замість різкого звуку)
-                    gainNode.gain.value = 0.25; 
+                    // М'ЯКИЙ ГЛУХИЙ СТУК (БЕЗ РІЗКОСТІ)
+                    gainNode.gain.value = 0.4; 
                     const osc = audioContext.createOscillator();
-                    osc.type = 'sine'; // М'яка хвиля
-                    osc.frequency.setValueAtTime(150, now);
-                    osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+                    osc.type = 'sine'; 
+                    osc.frequency.setValueAtTime(100, now);
+                    osc.frequency.exponentialRampToValueAtTime(20, now + 0.1);
                     const g = audioContext.createGain();
-                    g.gain.setValueAtTime(0.25, now);
-                    g.gain.exponentialRampToValueAtTime(0.00001, now + 0.2);
+                    g.gain.setValueAtTime(0.4, now);
+                    g.gain.exponentialRampToValueAtTime(0.00001, now + 0.15);
                     osc.connect(g);
                     g.connect(audioContext.destination);
                     osc.start();
-                    osc.stop(now + 0.2);
+                    osc.stop(now + 0.15);
                 }
             } catch(e) { console.log('Audio error:', e); }
         }
@@ -556,16 +345,16 @@
 
         // НОВІ ІКОНКИ І ВАГА
         const symbolWeights = [
-            { block: 'block-dirt', weight: 20 },
-            { block: 'block-wood', weight: 18 },
-            { block: 'block-gold', weight: 12 },
-            { block: 'block-emerald', weight: 10 },
-            { block: 'block-diamond', weight: 8 },
-            { block: 'block-netherite', weight: 5 },  
-            { block: 'block-potion', weight: 10 },     
-            { block: 'block-debris', weight: 7 },      
-            { block: 'block-gilded', weight: 10 },     
-            { block: 'block-piglin_head', weight: 10 }, 
+            { block: 'block-dirt', weight: 45 },
+            { block: 'block-wood', weight: 35 },
+            { block: 'block-gold', weight: 25 },
+            { block: 'block-emerald', weight: 20 },
+            { block: 'block-diamond', weight: 15 },
+            { block: 'block-debris', weight: 10 },
+            { block: 'block-potion', weight: 8 },
+            { block: 'block-gilded', weight: 6 },
+            { block: 'block-piglin_head', weight: 4 },
+            { block: 'block-netherite', weight: 2 },
         ];
         
         let totalWeight = 0;
@@ -585,16 +374,16 @@
         const scatterBlock = 'block-scatter';
         
         const payTable = {
-            'block-dirt': { 3: 2, 4: 5, 5: 10 },
-            'block-wood': { 3: 3, 4: 8, 5: 15 },
-            'block-gold': { 3: 5, 4: 15, 5: 30 },
-            'block-gilded': { 3: 5, 4: 15, 5: 30 },
-            'block-emerald': { 3: 8, 4: 20, 5: 50 },
-            'block-piglin_head': { 3: 8, 4: 20, 5: 50 },
-            'block-debris': { 3: 10, 4: 30, 5: 80 },
-            'block-potion': { 3: 12, 4: 35, 5: 90 },
-            'block-diamond': { 3: 15, 4: 40, 5: 100 },
-            'block-netherite': { 3: 20, 4: 50, 5: 150 },
+            'block-dirt': { 3: 1.5, 4: 3, 5: 8 },
+            'block-wood': { 3: 2, 4: 5, 5: 12 },
+            'block-gold': { 3: 3, 4: 8, 5: 20 },
+            'block-emerald': { 3: 4, 4: 10, 5: 25 },
+            'block-diamond': { 3: 5, 4: 15, 5: 40 },
+            'block-debris': { 3: 8, 4: 25, 5: 60 },
+            'block-potion': { 3: 10, 4: 35, 5: 80 },
+            'block-gilded': { 3: 15, 4: 50, 5: 120 },
+            'block-piglin_head': { 3: 20, 4: 80, 5: 200 },
+            'block-netherite': { 3: 50, 4: 150, 5: 500 },
         };
         
         let isSpinning = false;
@@ -620,26 +409,16 @@
             let bonusPrice = currentBet * 100;
             bonusPriceSpan.innerText = bonusPrice;
         }
-        
         function updateBet(delta) {
             if (isSpinning || isBonusGame) return;
             let newVal = currentBet + delta;
-            if (newVal >= 10 && newVal <= 50000) {
-                currentBet = newVal;
-                betInput.value = currentBet;
-                updateBonusPrice();
-            }
+            if (newVal >= 10 && newVal <= 50000) { currentBet = newVal; betInput.value = currentBet; updateBonusPrice(); }
         }
-        
         function manualBetChange() {
             if (isSpinning || isBonusGame) return;
             let val = parseInt(betInput.value);
-            if (isNaN(val)) val = 10;
-            if (val < 10) val = 10;
-            if (val > 50000) val = 50000;
-            currentBet = val;
-            betInput.value = currentBet;
-            updateBonusPrice();
+            if (isNaN(val)) val = 10; if (val < 10) val = 10; if (val > 50000) val = 50000;
+            currentBet = val; betInput.value = currentBet; updateBonusPrice();
         }
         
         function setStatus(text) { document.getElementById('status-text').innerHTML = text; }
@@ -669,7 +448,6 @@
             closeAutoModal(); addToHistory(`🎰 АВТОГРА: ${count === 999 ? 'НЕСКІНЧЕННА' : count + ' СПІНІВ'}`, 'bonus');
             setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`); spin();
         }
-        
         function stopAutoGame() {
             if (autoSpinsLeft > 0 && !isBonusGame) {
                 if (isSpinning) { pendingStopAuto = true; addToHistory(`⏹ АВТОГРУ ЗУПИНЕНО ПІСЛЯ СПІНУ`, 'win'); } 
@@ -681,7 +459,7 @@
             let isWild = (block === wildBlock); let isScatter = (block === scatterBlock);
             let textHtml = '';
             
-            // ТІЛЬКИ WILD ТА СКАРБ МАЮТЬ ТЕКСТ
+            // ТЕКСТ ТІЛЬКИ НА WILD І СКАРБ
             if (isWild) textHtml = `<div class="block-text text-wild">⚡WILD⚡</div>`;
             else if (isScatter) textHtml = `<div class="block-text text-scatter">✦СКАРБ✦</div>`;
             
@@ -720,35 +498,90 @@
             return count;
         }
         
-        // ДОДАНО winningRows ДЛЯ ПОЛОСКИ
+        // 20 ЛІНІЙ ВИПЛАТ (ВСІ НАПРЯМКИ)
         function calculateWin(matrix, bet) {
             let totalWin = 0;
-            let winPositions = [];
-            let winningRows = []; // Тут будуть зберігатися номери виграшних ліній (0, 1, 2)
+            let winPositions = new Set();
+            let winningLinesData = []; 
             
             const lines = [
-                { id: 0, indices: [[0,0],[0,1],[0,2],[0,3],[0,4]] },
-                { id: 1, indices: [[1,0],[1,1],[1,2],[1,3],[1,4]] },
-                { id: 2, indices: [[2,0],[2,1],[2,2],[2,3],[2,4]] }
+                [{r:0,c:0}, {r:0,c:1}, {r:0,c:2}, {r:0,c:3}, {r:0,c:4}], // Гориз
+                [{r:1,c:0}, {r:1,c:1}, {r:1,c:2}, {r:1,c:3}, {r:1,c:4}],
+                [{r:2,c:0}, {r:2,c:1}, {r:2,c:2}, {r:2,c:3}, {r:2,c:4}],
+                [{r:0,c:0}, {r:1,c:0}, {r:2,c:0}], // Верт
+                [{r:0,c:1}, {r:1,c:1}, {r:2,c:1}],
+                [{r:0,c:2}, {r:1,c:2}, {r:2,c:2}],
+                [{r:0,c:3}, {r:1,c:3}, {r:2,c:3}],
+                [{r:0,c:4}, {r:1,c:4}, {r:2,c:4}],
+                [{r:0,c:0}, {r:1,c:1}, {r:2,c:2}, {r:1,c:3}, {r:0,c:4}], // V
+                [{r:2,c:0}, {r:1,c:1}, {r:0,c:2}, {r:1,c:3}, {r:2,c:4}],
+                [{r:0,c:0}, {r:1,c:1}, {r:2,c:2}], // Дрібні діагоналі
+                [{r:0,c:1}, {r:1,c:2}, {r:2,c:3}],
+                [{r:0,c:2}, {r:1,c:3}, {r:2,c:4}],
+                [{r:2,c:0}, {r:1,c:1}, {r:0,c:2}],
+                [{r:2,c:1}, {r:1,c:2}, {r:0,c:3}],
+                [{r:2,c:2}, {r:1,c:3}, {r:0,c:4}],
+                [{r:1,c:0}, {r:0,c:1}, {r:1,c:2}, {r:0,c:3}, {r:1,c:4}], // W-подібні
+                [{r:1,c:0}, {r:2,c:1}, {r:1,c:2}, {r:2,c:3}, {r:1,c:4}],
+                [{r:0,c:0}, {r:1,c:1}, {r:0,c:2}, {r:1,c:3}, {r:0,c:4}],
+                [{r:2,c:0}, {r:1,c:1}, {r:2,c:2}, {r:1,c:3}, {r:2,c:4}]
             ];
             
-            for (let line of lines) {
-                let firstBlock = matrix[line.indices[0][0]][line.indices[0][1]];
-                if (firstBlock === wildBlock || firstBlock === scatterBlock) continue;
-                let count = 1;
-                for (let i = 1; i < 5; i++) {
-                    let block = matrix[line.indices[i][0]][line.indices[i][1]];
-                    if (block === firstBlock || block === wildBlock) count++;
-                    else break;
+            lines.forEach((line) => {
+                for (let i = 0; i <= line.length - 3; i++) {
+                    let symbol = matrix[line[i].r][line[i].c];
+                    if (symbol === scatterBlock) continue;
+                    
+                    let currentMatch = [line[i]];
+                    let targetSymbol = symbol;
+                    
+                    for (let j = i + 1; j < line.length; j++) {
+                        let nextSymbol = matrix[line[j].r][line[j].c];
+                        if (nextSymbol === scatterBlock) break;
+                        
+                        if (targetSymbol === wildBlock && nextSymbol !== wildBlock) targetSymbol = nextSymbol;
+                        
+                        if (nextSymbol === targetSymbol || nextSymbol === wildBlock || targetSymbol === wildBlock) {
+                            currentMatch.push(line[j]);
+                        } else break;
+                    }
+                    
+                    if (currentMatch.length >= 3) {
+                        let evalSymbol = targetSymbol === wildBlock ? 'block-netherite' : targetSymbol;
+                        if (payTable[evalSymbol] && payTable[evalSymbol][currentMatch.length]) {
+                            let winAmount = payTable[evalSymbol][currentMatch.length] * bet;
+                            totalWin += winAmount;
+                            currentMatch.forEach(pos => winPositions.add(`${pos.r}-${pos.c}`));
+                            winningLinesData.push(currentMatch); 
+                        }
+                        i += currentMatch.length - 1; 
+                    }
                 }
-                if (count >= 3 && payTable[firstBlock] && payTable[firstBlock][count]) {
-                    let winAmount = payTable[firstBlock][count] * bet;
-                    totalWin += winAmount;
-                    winningRows.push(line.id); // Записуємо, який ряд виграв
-                    for (let i = 0; i < count; i++) winPositions.push(`${line.indices[i][0]}-${line.indices[i][1]}`);
-                }
-            }
-            return { totalWin, winPositions, winningRows };
+            });
+            return { totalWin, winPositions: Array.from(winPositions), winningLinesData };
+        }
+
+        // ВІДМАЛЬОВКА ЗОЛОТОЇ ЛІНІЇ
+        function drawPaylines(linesData) {
+            const svg = document.getElementById('payline-svg');
+            svg.innerHTML = ''; 
+            linesData.forEach(matchArr => {
+                let points = matchArr.map(pos => {
+                    let cx = 12 + pos.c * (148 + 10) + 148/2;
+                    let cy = 12 + pos.r * 138 + 138/2;
+                    return `${cx},${cy}`;
+                }).join(' L ');
+                
+                let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute('d', `M ${points}`);
+                path.setAttribute('stroke', 'url(#gold-line)');
+                path.setAttribute('stroke-width', '8');
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke-linecap', 'round');
+                path.setAttribute('stroke-linejoin', 'round');
+                path.classList.add('payline-path');
+                svg.appendChild(path);
+            });
         }
 
         async function spin() {
@@ -761,6 +594,7 @@
             isSpinning = true;
             document.getElementById('spin-btn').disabled = true; document.getElementById('buy-bonus-btn').disabled = true;
             document.getElementById('bet-minus').disabled = true; document.getElementById('bet-plus').disabled = true; betInput.disabled = true;
+            document.getElementById('payline-svg').innerHTML = ''; // Очищаємо лінії минулого спіну
             setStatus("🌀 КРУТИМО...");
             
             let actualBet = isBonusGame ? 0 : currentBet;
@@ -769,7 +603,7 @@
             
             const targetMatrix = generateMatrix();
             const baseDuration = isTurbo ? 250 : 600; 
-            const stopDelay = isTurbo ? 80 : 250; // Каскадна зупинка (1-й, потім 2-й і т.д.)
+            const stopDelay = isTurbo ? 100 : 350; // Каскадна зупинка
             const CELL_HEIGHT = 138;
             
             for (let x = 0; x < 5; x++) {
@@ -780,7 +614,7 @@
                     if (stickyWilds[`${x}-${y}`] && activeBonusType === 'sticky') { hasMult = true; multVal = stickyWilds[`${x}-${y}`] || 2; }
                     cellsHtml += getBlockDisplay(currentMatrix[y][x], hasMult, multVal);
                 }
-                const numRandoms = 20 + (x * 8); 
+                const numRandoms = 20 + (x * 12); 
                 for (let i = 0; i < numRandoms; i++) cellsHtml += getBlockDisplay(getRandomBlock());
                 for (let y = 0; y < 3; y++) {
                     let hasMult = false, multVal = 1;
@@ -798,7 +632,6 @@
                 
                 setTimeout(() => {
                     strip.classList.add('reel-blur');
-                    // Анімація відскоку (плавна зупинка)
                     strip.style.transition = `transform ${duration}ms cubic-bezier(0.15, 0.85, 0.2, 1.15)`;
                     strip.style.transform = `translateY(-${distance}px)`;
                     
@@ -831,22 +664,15 @@
                 const winResult = calculateWin(targetMatrix, currentBet);
                 const winAmount = winResult.totalWin;
                 const winPositions = winResult.winPositions;
-                const winningRows = winResult.winningRows; // Номери рядів (0,1,2)
+                const winningLinesData = winResult.winningLinesData; 
                 
                 if (winAmount > 0) {
                     if (winAmount >= currentBet * 30) playSound('bigwin');
                     else playSound('win');
                     
-                    // --- ВКЛЮЧАЄМО ЗОЛОТІ ПОЛОСИ ВИПЛАТ ---
-                    winningRows.forEach(rowId => {
-                        const lineEl = document.getElementById(`payline-${rowId}`);
-                        if (lineEl) {
-                            lineEl.classList.add('active');
-                            setTimeout(() => lineEl.classList.remove('active'), 1500);
-                        }
-                    });
+                    // МАЛЮЄМО ЛІНІЇ
+                    drawPaylines(winningLinesData);
 
-                    // Крутимо блоки 3D
                     for (let pos of winPositions) {
                         const [y, x] = pos.split('-');
                         const block = document.querySelector(`#strip-${x} .symbol-cell:nth-child(${parseInt(y)+1}) .minecraft-block`);
@@ -887,10 +713,10 @@
                         document.getElementById('bet-minus').disabled = isBonusGame; document.getElementById('bet-plus').disabled = isBonusGame; betInput.disabled = isBonusGame;
                         return;
                     }
-                    if (isBonusGame && freeSpinsLeft > 0) { setTimeout(() => spin(), isTurbo ? 150 : 400); } 
+                    if (isBonusGame && freeSpinsLeft > 0) { setTimeout(() => spin(), isTurbo ? 250 : 600); } 
                     else if (autoSpinsLeft > 0 && !isBonusGame) {
                         autoSpinsLeft--;
-                        if (autoSpinsLeft > 0) { setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`); setTimeout(() => spin(), isTurbo ? 150 : 400); } 
+                        if (autoSpinsLeft > 0) { setStatus(`⚡ АВТО: ${autoSpinsLeft} СПІНІВ`); setTimeout(() => spin(), isTurbo ? 250 : 600); } 
                         else {
                             addToHistory(`✅ АВТОГРА ЗАВЕРШЕНА!`, 'win'); setStatus("✨ ГОТОВИЙ ДО ГРИ");
                             document.getElementById('spin-btn').disabled = false; document.getElementById('buy-bonus-btn').disabled = false;
@@ -901,7 +727,7 @@
                         document.getElementById('bet-minus').disabled = isBonusGame; document.getElementById('bet-plus').disabled = isBonusGame; betInput.disabled = isBonusGame;
                         setStatus("✨ ГОТОВИЙ ДО ГРИ");
                     }
-                }, 300);
+                }, 500); // Час, щоб роздивитись лінію виграшу
             }, totalSpinTime);
         }
         

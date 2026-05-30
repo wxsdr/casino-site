@@ -680,12 +680,10 @@
         function getBlockDisplay(block, hasStickyMult = false, multValue = 1) {
             let isWild = (block === wildBlock); let isScatter = (block === scatterBlock);
             let textHtml = '';
+            
+            // ТІЛЬКИ WILD ТА СКАРБ МАЮТЬ ТЕКСТ
             if (isWild) textHtml = `<div class="block-text text-wild">⚡WILD⚡</div>`;
             else if (isScatter) textHtml = `<div class="block-text text-scatter">✦СКАРБ✦</div>`;
-            else if (block === 'block-netherite') textHtml = `<div class="block-text text-wild" style="font-size:16px;">✧ШАБЛОН✧</div>`;
-            else if (block === 'block-potion') textHtml = `<div class="block-text text-scatter" style="font-size:18px;">🔥СИЛА🔥</div>`;
-            else if (block === 'block-gilded') textHtml = `<div class="block-text text-wild" style="font-size:18px; -webkit-text-stroke:0.5px black;">🪙ЧОРНОКАМЕНЬ🪙</div>`;
-            else if (block === 'block-piglin_head') textHtml = `<div class="block-text text-wild" style="font-size:16px; -webkit-text-stroke:0.5px black;">🐗ПИГЛИН🐗</div>`;
             
             let multHtml = '';
             if (hasStickyMult && multValue > 1) multHtml = `<div class="sticky-mult">✧${multValue}✧</div>`;

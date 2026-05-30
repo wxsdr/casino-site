@@ -727,16 +727,14 @@
             document.getElementById('balance-amount').innerText = currentBalance;
         });
 
-        // Символи з вагою для реалістичних шансів
         const symbolWeights = [
-            { block: 'block-dirt', weight: 35 },    // 35%
-            { block: 'block-wood', weight: 30 },    // 30%
-            { block: 'block-gold', weight: 15 },    // 15%
-            { block: 'block-emerald', weight: 12 }, // 12%
-            { block: 'block-diamond', weight: 8 }   // 8%
+            { block: 'block-dirt', weight: 35 },
+            { block: 'block-wood', weight: 30 },
+            { block: 'block-gold', weight: 15 },
+            { block: 'block-emerald', weight: 12 },
+            { block: 'block-diamond', weight: 8 }
         ];
         
-        // Розрахунок загальної ваги
         let totalWeight = 0;
         symbolWeights.forEach(w => totalWeight += w.weight);
         
@@ -753,7 +751,6 @@
         const wildBlock = 'block-wild';
         const scatterBlock = 'block-scatter';
         
-        // Нова таблиця виплат з реалістичними коефіцієнтами
         const payTable = {
             'block-dirt': { 3: 2, 4: 5, 5: 10 },
             'block-wood': { 3: 3, 4: 8, 5: 15 },
@@ -917,31 +914,22 @@
             
             for (let y = 0; y < 3; y++) {
                 for (let x = 0; x < 5; x++) {
-                    // Sticky wilds from bonus
                     if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) {
                         matrix[y][x] = wildBlock;
                         continue;
                     }
-                    
-                    // Raining wilds bonus
                     if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.25) {
                         matrix[y][x] = wildBlock;
                         rainingWilds--;
                         continue;
                     }
-                    
-                    // Regular spin with realistic chances
                     let rand = Math.random();
-                    
-                    // Scatter - 2% chance
                     if (!isBonusGame && rand < 0.02) {
                         matrix[y][x] = scatterBlock;
                     }
-                    // Wild - 3% chance
                     else if (!isBonusGame && rand < 0.05) {
                         matrix[y][x] = wildBlock;
                     }
-                    // Regular symbols with weights
                     else {
                         matrix[y][x] = getRandomBlock();
                     }
@@ -984,7 +972,7 @@
             }
             return { totalWin, winPositions };
         }
-        
+
         async function spin() {
             if (isSpinning) return;
             if (!isBonusGame && currentBalance < currentBet) {
@@ -1005,6 +993,8 @@
             setStatus("🌀 КРУТИМО...");
             playSound('spin');
             
+            let actualBet = isBonusGame ? 0 : currentBet;
+
             if (!isBonusGame) await userRef.update({ chips: currentBalance - currentBet });
             else freeSpinsLeft--;
             
@@ -1049,6 +1039,7 @@
                 }
             }, totalSpinTime + 50);
             
+            // Внутрішня функція обробки результату, зроблена async, щоб дозволити await saveGameResult
             setTimeout(async () => {
                 const scatters = countScatters(targetMatrix);
                 const winResult = calculateWin(targetMatrix, currentBet);
@@ -1067,22 +1058,32 @@
                             setTimeout(() => block.classList.remove('winning-block'), 800);
                         }
                     }
-                }
-                
-                if (winAmount > 0) {
+
                     addToHistory(`🏆 +${winAmount} 🪙`, winAmount >= currentBet * 30 ? 'big-win' : 'win');
                     setStatus(`🏆 ВИГРАШ: ${winAmount}`);
                     if (!isBonusGame) await userRef.update({ chips: currentBalance + winAmount });
-                    await saveGameResult("Pixel Slots", currentBet, winAmount - currentBet);
+                    
+                    // Зберігаємо виграш
+                    await saveGameResult("Pixel Slots", actualBet, winAmount - actualBet);
+
                 } else if (scatters >= 3) {
                     playSound('bonus');
                     addToHistory(`✨ АКТИВАЦІЯ БОНУСУ! ✨`, 'bonus');
                     setStatus("✨ БОНУС!");
+                    
+                    // Зберігаємо пустий спін, що викликав бонус
+                    await saveGameResult("Pixel Slots", actualBet, -actualBet);
+                    
                     startBonusGame();
                     return;
-                } else if (isBonusGame && freeSpinsLeft === 0) {
-                    addToHistory(`🏁 БОНУС ЗАВЕРШЕНО`, 'win');
-                    endBonus();
+                } else {
+                    if (isBonusGame && freeSpinsLeft === 0) {
+                        addToHistory(`🏁 БОНУС ЗАВЕРШЕНО`, 'win');
+                        endBonus();
+                    }
+
+                    // Зберігаємо програш
+                    await saveGameResult("Pixel Slots", actualBet, -actualBet);
                 }
                 
                 userRef.once('value', snap => {
@@ -1123,7 +1124,6 @@
                             betInput.disabled = false;
                         }
                     } else {
-                        await saveGameResult("Pixel Slots", currentBet, -currentBet);
                         document.getElementById('spin-btn').disabled = false;
                         document.getElementById('buy-bonus-btn').disabled = false;
                         document.getElementById('bet-minus').disabled = isBonusGame;
@@ -1141,6 +1141,9 @@
             if (currentBalance >= bonusCost) {
                 await userRef.update({ chips: currentBalance - bonusCost });
                 addToHistory(`🎁 КУПЛЕНО БОНУС ЗА ${bonusCost} 🪙`, 'bonus');
+                
+                await saveGameResult("Pixel Slots (Bonus Buy)", bonusCost, -bonusCost);
+
                 document.getElementById('bonus-modal').style.display = 'flex';
             } else setStatus("❌ НЕ ВИСТАЧАЄ ФІШОК!");
         }
@@ -1198,19 +1201,19 @@
             if (audioContext && audioContext.state === 'suspended') audioContext.resume();
         }, { once: true });
 
+        // ФУНКЦІЯ ЗАПИСУ ІСТОРІЇ (Тепер не крашить гру)
         async function saveGameResult(gameName, bet, profit) {
-    const username = localStorage.getItem('casino_user');
-    if (!username) return;
-    const timestamp = firebase.database.ServerValue.TIMESTAMP;
-    await database.ref('users_by_name/' + username.toLowerCase() + '/game_history').push({
-        game: gameName,
-        bet: parseFloat(bet),
-        profit: parseFloat(profit),
-        ts: timestamp
-    });
-    await database.ref('users_by_name/' + username.toLowerCase() + '/total_games')
-        .set(firebase.database.ServerValue.increment(1));
-}
+            if (!username) return;
+            const timestamp = firebase.database.ServerValue.TIMESTAMP;
+            await database.ref('users_by_name/' + username.toLowerCase() + '/game_history').push({
+                game: gameName,
+                bet: parseFloat(bet),
+                profit: parseFloat(profit),
+                ts: timestamp
+            });
+            await database.ref('users_by_name/' + username.toLowerCase() + '/total_games')
+                .set(firebase.database.ServerValue.increment(1));
+        }
     </script>
 </body>
 </html>

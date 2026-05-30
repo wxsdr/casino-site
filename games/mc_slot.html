@@ -49,7 +49,6 @@
         
         .reel-blur { filter: url(#verticalMotionBlur); transform: scaleY(1.03); }
 
-        /* ЗОЛОТІ СВІТЛОВІ ЛІНІЇ ВИПЛАТ */
         .payline-svg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none; }
         .payline-path { stroke-dasharray: 3000; stroke-dashoffset: 3000; animation: drawLine 0.7s cubic-bezier(0.1, 0.8, 0.2, 1) forwards; filter: drop-shadow(0 0 12px #ffd700); }
         @keyframes drawLine { to { stroke-dashoffset: 0; } }
@@ -60,7 +59,6 @@
         .face-front { transform: translateZ(42.5px); background-color: var(--c-front); }
         .face-right { transform: rotateY(90deg) translateZ(42.5px); background-color: var(--c-right); }
 
-        /* КОЛЬОРИ БЛОКІВ */
         .block-dirt { --c-top: #6b4c3b; --c-front: #8b5e3c; --c-right: #5a3d2a; }
         .block-wood { --c-top: #8b6b4a; --c-front: #ab8b5a; --c-right: #6b4b3a; }
         .block-gold { --c-top: #fce029; --c-front: #d4b51c; --c-right: #a3890f; }
@@ -78,7 +76,7 @@
 
         .block-wild .block-face { border: 2px solid #ffd700; box-shadow: inset 0 0 15px #ffd700, 0 0 10px #ffd700; }
         .block-scatter .block-face { border: 2px solid #9b30ff; box-shadow: inset 0 0 15px #9b30ff, 0 0 10px #9b30ff; }
-        .block-netherite .block-face { border: 1px solid #ff4433; box-shadow: inset 0 0 8px rgba(255,68,51,0.5); }
+        .block-gilded .block-face { border: 1px solid #ffd700; box-shadow: inset 0 0 8px rgba(255,215,0,0.5); }
 
         .block-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; font-weight: 900; z-index: 10; text-shadow: 0 0 8px black; white-space: nowrap; pointer-events: none; }
         .text-wild { background: linear-gradient(135deg, #ffd700, #ffaa33); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 20px; }
@@ -186,10 +184,12 @@
                     <div class="ctrl-box" style="flex: 1;">
                         <div id="status-text" onclick="stopAutoGame()">✨ ГОТОВИЙ ДО ГРИ</div>
                     </div>
+                    
                     <div class="ctrl-box" style="flex: 0.7;">
                         <button class="toggle-btn" id="turbo-btn" onclick="toggleTurbo()">⚡ ТУРБО: ВИМК</button>
                         <button class="toggle-btn" id="auto-btn" onclick="openAutoModal()">🔄 АВТОГРА</button>
                     </div>
+
                     <div class="ctrl-box" style="flex: 0.8;">
                         <div style="color: #ffd700; font-size: 12px; letter-spacing: 2px;">✦ СТАВКА ✦</div>
                         <div class="bet-input-row">
@@ -198,6 +198,7 @@
                             <button class="bet-btn" id="bet-plus" onclick="updateBet(10)">+</button>
                         </div>
                     </div>
+                    
                     <div class="ctrl-box" style="background: transparent; border: none; padding: 0; flex: 1.1;">
                         <button class="spin-btn" id="spin-btn" onclick="spin()">🎲 КРУТИТИ</button>
                         <button class="buy-bonus-btn" id="buy-bonus-btn" onclick="buyBonus()">✨ КУПИТИ БОНУС <span id="bonus-price">1000</span></button>
@@ -257,7 +258,6 @@
                 gainNode.connect(audioContext.destination);
                 
                 if (type === 'spin') {
-                    // ТИХИЙ ШУМ ОБЕРТАННЯ
                     gainNode.gain.value = 0.02; 
                     const bufferSize = audioContext.sampleRate * 2;
                     const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
@@ -299,19 +299,18 @@
                     osc2.connect(g2); g2.connect(audioContext.destination);
                     osc2.start(); osc2.stop(now + 0.25);
                 } else if (type === 'reel') {
-                    // М'ЯКИЙ ГЛУХИЙ СТУК (БЕЗ РІЗКОСТІ)
-                    gainNode.gain.value = 0.4; 
+                    gainNode.gain.value = 0.25; 
                     const osc = audioContext.createOscillator();
                     osc.type = 'sine'; 
-                    osc.frequency.setValueAtTime(100, now);
-                    osc.frequency.exponentialRampToValueAtTime(20, now + 0.1);
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
                     const g = audioContext.createGain();
-                    g.gain.setValueAtTime(0.4, now);
-                    g.gain.exponentialRampToValueAtTime(0.00001, now + 0.15);
+                    g.gain.setValueAtTime(0.25, now);
+                    g.gain.exponentialRampToValueAtTime(0.00001, now + 0.2);
                     osc.connect(g);
                     g.connect(audioContext.destination);
                     osc.start();
-                    osc.stop(now + 0.15);
+                    osc.stop(now + 0.2);
                 }
             } catch(e) { console.log('Audio error:', e); }
         }
@@ -343,18 +342,17 @@
             document.getElementById('balance-amount').innerText = currentBalance;
         });
 
-        // НОВІ ІКОНКИ І ВАГА
         const symbolWeights = [
-            { block: 'block-dirt', weight: 45 },
-            { block: 'block-wood', weight: 35 },
-            { block: 'block-gold', weight: 25 },
-            { block: 'block-emerald', weight: 20 },
-            { block: 'block-diamond', weight: 15 },
-            { block: 'block-debris', weight: 10 },
-            { block: 'block-potion', weight: 8 },
-            { block: 'block-gilded', weight: 6 },
-            { block: 'block-piglin_head', weight: 4 },
-            { block: 'block-netherite', weight: 2 },
+            { block: 'block-dirt', weight: 120 },     // Урізаний шанс виграшу (багато мусору)
+            { block: 'block-wood', weight: 80 },
+            { block: 'block-gold', weight: 30 },
+            { block: 'block-emerald', weight: 15 },
+            { block: 'block-diamond', weight: 10 },
+            { block: 'block-debris', weight: 6 },
+            { block: 'block-potion', weight: 4 },
+            { block: 'block-gilded', weight: 3 },
+            { block: 'block-piglin_head', weight: 2 },
+            { block: 'block-netherite', weight: 1 },
         ];
         
         let totalWeight = 0;
@@ -373,17 +371,18 @@
         const wildBlock = 'block-wild';
         const scatterBlock = 'block-scatter';
         
+        // ЗБАЛАНСОВАНА ТАБЛИЦЯ (RTP FIX)
         const payTable = {
-            'block-dirt': { 3: 1.5, 4: 3, 5: 8 },
-            'block-wood': { 3: 2, 4: 5, 5: 12 },
-            'block-gold': { 3: 3, 4: 8, 5: 20 },
-            'block-emerald': { 3: 4, 4: 10, 5: 25 },
-            'block-diamond': { 3: 5, 4: 15, 5: 40 },
-            'block-debris': { 3: 8, 4: 25, 5: 60 },
-            'block-potion': { 3: 10, 4: 35, 5: 80 },
-            'block-gilded': { 3: 15, 4: 50, 5: 120 },
-            'block-piglin_head': { 3: 20, 4: 80, 5: 200 },
-            'block-netherite': { 3: 50, 4: 150, 5: 500 },
+            'block-dirt': { 3: 0.2, 4: 0.5, 5: 1.5 },
+            'block-wood': { 3: 0.3, 4: 0.8, 5: 2 },
+            'block-gold': { 3: 0.5, 4: 1.5, 5: 4 },
+            'block-emerald': { 3: 0.8, 4: 2.5, 5: 6 },
+            'block-diamond': { 3: 1.2, 4: 4, 5: 10 },
+            'block-debris': { 3: 2, 4: 6, 5: 15 },
+            'block-potion': { 3: 3, 4: 10, 5: 25 },
+            'block-gilded': { 3: 5, 4: 15, 5: 40 },
+            'block-piglin_head': { 3: 10, 4: 30, 5: 80 },
+            'block-netherite': { 3: 20, 4: 60, 5: 200 },
         };
         
         let isSpinning = false;
@@ -459,7 +458,6 @@
             let isWild = (block === wildBlock); let isScatter = (block === scatterBlock);
             let textHtml = '';
             
-            // ТЕКСТ ТІЛЬКИ НА WILD І СКАРБ
             if (isWild) textHtml = `<div class="block-text text-wild">⚡WILD⚡</div>`;
             else if (isScatter) textHtml = `<div class="block-text text-scatter">✦СКАРБ✦</div>`;
             
@@ -478,14 +476,14 @@
         
         function generateMatrix() {
             let matrix = [[], [], []];
-            let rainingWilds = (isBonusGame && activeBonusType === 'raining') ? Math.floor(Math.random() * 3) + 1 : 0;
+            let rainingWilds = (isBonusGame && activeBonusType === 'raining') ? Math.floor(Math.random() * 2) + 1 : 0;
             for (let y = 0; y < 3; y++) {
                 for (let x = 0; x < 5; x++) {
                     if (isBonusGame && activeBonusType === 'sticky' && stickyWilds[`${x}-${y}`]) { matrix[y][x] = wildBlock; continue; }
-                    if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.25) { matrix[y][x] = wildBlock; rainingWilds--; continue; }
+                    if (isBonusGame && activeBonusType === 'raining' && rainingWilds > 0 && Math.random() < 0.15) { matrix[y][x] = wildBlock; rainingWilds--; continue; }
                     let rand = Math.random();
-                    if (!isBonusGame && rand < 0.02) matrix[y][x] = scatterBlock;
-                    else if (!isBonusGame && rand < 0.05) matrix[y][x] = wildBlock;
+                    if (!isBonusGame && rand < 0.008) matrix[y][x] = scatterBlock; // Рідкісний скаттер
+                    else if (!isBonusGame && rand < 0.02) matrix[y][x] = wildBlock; // Рідкісний вайлд
                     else matrix[y][x] = getRandomBlock();
                 }
             }
@@ -498,24 +496,24 @@
             return count;
         }
         
-        // 20 ЛІНІЙ ВИПЛАТ (ВСІ НАПРЯМКИ)
+        // 20 ЛІНІЙ ВИПЛАТ
         function calculateWin(matrix, bet) {
             let totalWin = 0;
             let winPositions = new Set();
             let winningLinesData = []; 
             
             const lines = [
-                [{r:0,c:0}, {r:0,c:1}, {r:0,c:2}, {r:0,c:3}, {r:0,c:4}], // Гориз
+                [{r:0,c:0}, {r:0,c:1}, {r:0,c:2}, {r:0,c:3}, {r:0,c:4}], // Горизонтальні
                 [{r:1,c:0}, {r:1,c:1}, {r:1,c:2}, {r:1,c:3}, {r:1,c:4}],
                 [{r:2,c:0}, {r:2,c:1}, {r:2,c:2}, {r:2,c:3}, {r:2,c:4}],
-                [{r:0,c:0}, {r:1,c:0}, {r:2,c:0}], // Верт
+                [{r:0,c:0}, {r:1,c:1}, {r:2,c:2}, {r:1,c:3}, {r:0,c:4}], // V
+                [{r:2,c:0}, {r:1,c:1}, {r:0,c:2}, {r:1,c:3}, {r:2,c:4}],
+                [{r:0,c:0}, {r:1,c:0}, {r:2,c:0}], // Вертикальні (перші 3)
                 [{r:0,c:1}, {r:1,c:1}, {r:2,c:1}],
                 [{r:0,c:2}, {r:1,c:2}, {r:2,c:2}],
                 [{r:0,c:3}, {r:1,c:3}, {r:2,c:3}],
                 [{r:0,c:4}, {r:1,c:4}, {r:2,c:4}],
-                [{r:0,c:0}, {r:1,c:1}, {r:2,c:2}, {r:1,c:3}, {r:0,c:4}], // V
-                [{r:2,c:0}, {r:1,c:1}, {r:0,c:2}, {r:1,c:3}, {r:2,c:4}],
-                [{r:0,c:0}, {r:1,c:1}, {r:2,c:2}], // Дрібні діагоналі
+                [{r:0,c:0}, {r:1,c:1}, {r:2,c:2}], // Діагоналі
                 [{r:0,c:1}, {r:1,c:2}, {r:2,c:3}],
                 [{r:0,c:2}, {r:1,c:3}, {r:2,c:4}],
                 [{r:2,c:0}, {r:1,c:1}, {r:0,c:2}],
@@ -558,6 +556,8 @@
                     }
                 }
             });
+            // Округлюємо для уникнення десяткових дробів
+            totalWin = Math.floor(totalWin);
             return { totalWin, winPositions: Array.from(winPositions), winningLinesData };
         }
 
@@ -727,7 +727,7 @@
                         document.getElementById('bet-minus').disabled = isBonusGame; document.getElementById('bet-plus').disabled = isBonusGame; betInput.disabled = isBonusGame;
                         setStatus("✨ ГОТОВИЙ ДО ГРИ");
                     }
-                }, 500); // Час, щоб роздивитись лінію виграшу
+                }, 500);
             }, totalSpinTime);
         }
         
